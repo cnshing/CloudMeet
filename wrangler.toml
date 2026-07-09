@@ -5,8 +5,8 @@ pages_build_output_dir = ".svelte-kit/cloudflare"
 [[d1_databases]]
 binding = "DB"
 database_name = "cloudmeet"
-database_id = "YOUR_DATABASE_ID"
+database_id = "02426104-3018-40d9-ab8a-494bc8b9f448"
 
 [[kv_namespaces]]
 binding = "KV"
-id = "YOUR_KV_NAMESPACE_ID"
+id = "9fce872eeb1e4dc88215de7207fa301c"
