@@ -152,25 +152,25 @@
 		class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
 		onclick={handleBackdropClick}
 	>
-		<div class="bg-white rounded-xl shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+		<div class="bg-surface rounded-xl shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
 			<!-- Header -->
-			<div class="p-6 border-b border-gray-200">
+			<div class="p-6 border-b border-border">
 				<div class="flex justify-between items-start">
 					<div>
-						<h2 class="text-xl font-semibold text-gray-900">Propose New Time</h2>
-						<p class="text-sm text-gray-600 mt-1">
+						<h2 class="text-xl font-semibold text-foreground">Propose New Time</h2>
+						<p class="text-sm text-muted-foreground mt-1">
 							Current: {formatCompactDateTime(new Date(booking.start_time))}
 						</p>
 					</div>
-					<button onclick={onClose} class="text-gray-400 hover:text-gray-600">
+					<button onclick={onClose} class="text-subtle-foreground hover:text-muted-foreground">
 						<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
 						</svg>
 					</button>
 				</div>
-				<div class="mt-3 bg-gray-50 rounded-lg p-3">
-					<p class="text-sm"><span class="text-gray-600">Meeting:</span> <span class="font-medium">{booking.event_type_name}</span></p>
-					<p class="text-sm"><span class="text-gray-600">With:</span> <span class="font-medium">{booking.attendee_name}</span></p>
+				<div class="mt-3 bg-background rounded-lg p-3">
+					<p class="text-sm"><span class="text-muted-foreground">Meeting:</span> <span class="font-medium text-foreground">{booking.event_type_name}</span></p>
+					<p class="text-sm"><span class="text-muted-foreground">With:</span> <span class="font-medium text-foreground">{booking.attendee_name}</span></p>
 				</div>
 			</div>
 
@@ -187,19 +187,19 @@
 					<div class="flex-1">
 						<div class="flex items-center justify-between mb-4">
 							<button onclick={prevMonth} class="p-1 hover:bg-gray-100 rounded">
-								<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+								<svg class="w-5 h-5 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
 								</svg>
 							</button>
-							<span class="font-medium">{monthName}</span>
+							<span class="font-medium text-foreground">{monthName}</span>
 							<button onclick={nextMonth} class="p-1 hover:bg-gray-100 rounded">
-								<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+								<svg class="w-5 h-5 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
 								</svg>
 							</button>
 						</div>
 
-						<div class="grid grid-cols-7 gap-1 text-center text-xs text-gray-500 mb-2">
+						<div class="grid grid-cols-7 gap-1 text-center text-xs text-subtle-foreground mb-2">
 							<div>Su</div><div>Mo</div><div>Tu</div><div>We</div><div>Th</div><div>Fr</div><div>Sa</div>
 						</div>
 
@@ -210,10 +210,10 @@
 									disabled={day.isPast || !day.isCurrentMonth}
 									onclick={() => selectDate(day.date)}
 									class="aspect-square flex items-center justify-center text-sm rounded-lg transition
-										{day.isCurrentMonth ? '' : 'text-gray-300'}
-										{day.isPast ? 'text-gray-300 cursor-not-allowed' : 'hover:bg-blue-50'}
+										{day.isCurrentMonth ? 'text-foreground' : 'text-gray-300'}
+										{day.isPast ? 'text-gray-300 cursor-not-allowed' : 'hover:bg-accent-subtle'}
 										{day.isToday ? 'font-bold' : ''}
-										{selectedDate === formatDateKey(day.date) ? 'bg-blue-600 text-white hover:bg-blue-700' : ''}"
+										{selectedDate === formatDateKey(day.date) ? 'bg-primary text-primary-foreground hover:opacity-90' : ''}"
 								>
 									{day.date.getDate()}
 								</button>
@@ -223,18 +223,14 @@
 
 					<!-- Time slots -->
 					<div class="flex-1">
-						<h3 class="font-medium text-gray-900 mb-3">
-							{#if selectedDate}
-								Available times
-							{:else}
-								Select a date
-							{/if}
+						<h3 class="font-medium text-foreground mb-3">
+							{#if selectedDate}Available times{:else}Select a date{/if}
 						</h3>
 
 						{#if loadingSlots}
-							<div class="text-center py-8 text-gray-500">Loading...</div>
+							<div class="text-center py-8 text-subtle-foreground">Loading...</div>
 						{:else if selectedDate && availableSlots.length === 0}
-							<div class="text-center py-8 text-gray-500">No available times</div>
+							<div class="text-center py-8 text-subtle-foreground">No available times</div>
 						{:else if selectedDate}
 							<div class="grid grid-cols-2 gap-2 max-h-64 overflow-y-auto">
 								{#each availableSlots as slot}
@@ -243,15 +239,15 @@
 										onclick={() => selectSlot(slot)}
 										class="px-3 py-2 text-sm border rounded-lg transition
 											{selectedTime === slot.start
-												? 'bg-blue-600 text-white border-blue-600'
-												: 'border-gray-300 hover:border-blue-500 hover:bg-blue-50'}"
+												? 'bg-primary text-primary-foreground border-primary'
+												: 'border-border-medium text-muted-foreground hover:border-border-strong hover:bg-accent-subtle'}"
 									>
 										{formatSlotTime(slot.start)}
 									</button>
 								{/each}
 							</div>
 						{:else}
-							<div class="text-center py-8 text-gray-400">
+							<div class="text-center py-8 text-subtle-foreground">
 								<svg class="w-12 h-12 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
 								</svg>
@@ -263,25 +259,25 @@
 
 				<!-- Message -->
 				<div class="mt-6">
-					<label for="message" class="block text-sm font-medium text-gray-700 mb-2">
+					<label for="message" class="block text-sm font-medium text-muted-foreground mb-2">
 						Message to attendee (optional)
 					</label>
 					<textarea
 						id="message"
 						bind:value={message}
 						rows="3"
-						class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+						class="w-full px-3 py-2 border border-border-medium rounded-lg focus:ring-2 focus:ring-primary focus:border-primary text-sm"
 						placeholder="Let them know why you need to reschedule..."
 					></textarea>
 				</div>
 			</div>
 
 			<!-- Footer -->
-			<div class="p-6 border-t border-gray-200 flex gap-3 justify-end">
+			<div class="p-6 border-t border-border flex gap-3 justify-end">
 				<button
 					type="button"
 					onclick={onClose}
-					class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition"
+					class="px-4 py-2 text-sm font-medium text-muted-foreground bg-gray-100 rounded-lg hover:bg-gray-200 transition"
 				>
 					Cancel
 				</button>
@@ -289,7 +285,7 @@
 					type="button"
 					onclick={handleSubmit}
 					disabled={!selectedDate || !selectedTime || submitting}
-					class="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
+					class="px-4 py-2 text-sm font-medium text-primary-foreground bg-primary rounded-lg hover:opacity-90 transition disabled:opacity-50 disabled:cursor-not-allowed"
 				>
 					{submitting ? 'Sending...' : 'Send Proposal'}
 				</button>

@@ -7,7 +7,7 @@
 		href="https://github.com/dennisklappe/CloudMeet"
 		target="_blank"
 		rel="noopener noreferrer"
-		class="text-xs text-gray-400 hover:text-gray-500 transition"
+		class="text-xs text-subtle-foreground hover:text-muted-foreground transition"
 	>
 		Powered by CloudMeet
 	</a>

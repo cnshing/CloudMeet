@@ -2,43 +2,119 @@
 @tailwind components;
 @tailwind utilities;
 
+/*
+ * All values are sourced from the "mode1" color style set.
+ * :root   → light-mode defaults  (light* tokens)
+ * .dark   → dark-mode overrides  (dark* tokens)
+ *
+ * Toggle the `dark` class on <html> to switch themes.
+ */
+
 @layer base {
-	:root {
-		--color-primary: theme('colors.blue.600');
-		--color-primary-hover: theme('colors.blue.700');
-	}
+  :root {
+    /* Backgrounds */
+    --color-background:          #f3f4f1;
+    --color-background-gradient: #f3f4f1;
+    --color-surface:             #fafafa;
+    --color-surface-2:           #e5e6e3;
+
+    /* Foregrounds */
+    --color-foreground:          #3b3b3b;
+    --color-muted-foreground:    #444444;
+    --color-subtle-foreground:   #676866;
+
+    /* Accents */
+    --color-accent:              #77ac22;
+    --color-accent-subtle:       #dbecbb;
+
+    /* Primary */
+    --color-primary:             #86c322;
+    --color-primary-foreground:  #191919;
+
+    /* Borders */
+    --color-border:              rgba(211, 211, 209, 0.27);
+    --color-border-strong:       #628c20;
+    --color-border-subtle:       rgba(211, 211, 209, 0.27);
+    --color-border-medium:       #b3b4b1;
+    --color-border-primary:      #628c20;
+    --color-border-icon:         #b3b4b1;
+
+  }
+
+  .dark {
+
+    --color-background:          #0c0c0c;   
+    --color-background-gradient: #212121;
+    --color-surface:             #191919;
+    --color-surface-2:           #3b3b3b;
+    --color-foreground:          #fafafa;
+    --color-muted-foreground:    #e5e6e3;
+    --color-subtle-foreground:   #cdcecb;
+    --color-accent:              #b9ff49;
+    --color-accent-subtle:       #33401c;
+    --color-primary:             #b9ff49;
+    --color-primary-foreground:  #212121;
+    --color-border:              #676866;
+    --color-border-strong:       #b9ff49;
+    --color-border-subtle:       #444444;
+    --color-border-medium:       #676866;
+    --color-border-primary:      #b9ff49;
+    --color-border-icon:         #fafafa;
+  }
+
+  /*
+   * Apply design-system colours to every text-like input, textarea, and
+   * select.  [type="checkbox"], [type="radio"], [type="hidden"],
+   * [type="file"], and [type="color"] are intentionally excluded because
+   * they are either purely decorative or have custom styling elsewhere.
+   *
+   * surface-2 is used as the input background:
+   *   light → #e5e6e3  (warm light-gray, clearly stands out on surface/background)
+   *   dark  → #3b3b3b  (medium-dark, readable against the dark surface #191919)
+   */
+  input:not([type="checkbox"]):not([type="radio"]):not([type="hidden"]):not([type="file"]):not([type="range"]):not([type="color"]),
+  textarea,
+  select {
+    background-color: var(--color-surface-2);
+    color: var(--color-foreground);
+  }
+
+  ::placeholder {
+    color: var(--color-subtle-foreground);
+    opacity: 1; /* Firefox reduces opacity by default */
+  }
 }
 
 @layer utilities {
-	.animate-fade-in {
-		animation: fadeIn 0.3s ease-in-out;
-	}
+  .animate-fade-in {
+    animation: fadeIn 0.3s ease-in-out;
+  }
 
-	@keyframes fadeIn {
-		from { opacity: 0; }
-		to { opacity: 1; }
-	}
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+  }
 
-	/* Custom scrollbar styling */
-	.scrollbar-thin {
-		scrollbar-width: thin;
-		scrollbar-color: #d1d5db transparent;
-	}
+  /* Custom scrollbar styling */
+  .scrollbar-thin {
+    scrollbar-width: thin;
+    scrollbar-color: #d1d5db transparent;
+  }
 
-	.scrollbar-thin::-webkit-scrollbar {
-		width: 6px;
-	}
+  .scrollbar-thin::-webkit-scrollbar {
+    width: 6px;
+  }
 
-	.scrollbar-thin::-webkit-scrollbar-track {
-		background: transparent;
-	}
+  .scrollbar-thin::-webkit-scrollbar-track {
+    background: transparent;
+  }
 
-	.scrollbar-thin::-webkit-scrollbar-thumb {
-		background-color: #d1d5db;
-		border-radius: 3px;
-	}
+  .scrollbar-thin::-webkit-scrollbar-thumb {
+    background-color: #d1d5db;
+    border-radius: 3px;
+  }
 
-	.scrollbar-thin::-webkit-scrollbar-thumb:hover {
-		background-color: #9ca3af;
-	}
+  .scrollbar-thin::-webkit-scrollbar-thumb:hover {
+    background-color: #9ca3af;
+  }
 }

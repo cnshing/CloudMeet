@@ -56,10 +56,10 @@
 
 <div>
 	<div class="flex justify-between items-center mb-4">
-		<h2 class="text-xl font-bold text-gray-900">Upcoming Bookings</h2>
+		<h2 class="text-xl font-bold text-foreground">Upcoming Bookings</h2>
 		<select
 			bind:value={sortOrder}
-			class="text-sm border border-gray-300 rounded-md px-2 py-1 bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+			class="text-sm border border-border-medium rounded-md px-2 py-1 bg-surface-2 text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
 		>
 			<option value="last_booked">Last booked</option>
 			<option value="upcoming">Upcoming first</option>
@@ -69,12 +69,12 @@
 	<div class="space-y-4">
 		{#if sortedBookings().length > 0}
 			{#each sortedBookings() as booking}
-				<div class="bg-white rounded-lg shadow-sm p-4 border border-gray-200">
+				<div class="bg-surface rounded-lg shadow-sm p-4 border border-border">
 					<div class="flex justify-between items-start mb-2">
 						<div>
-							<h3 class="font-semibold text-gray-900">{booking.event_type_name}</h3>
-							<p class="text-sm text-gray-600">{booking.attendee_name}</p>
-							<p class="text-xs text-gray-500">{booking.attendee_email}</p>
+							<h3 class="font-semibold text-foreground">{booking.event_type_name}</h3>
+							<p class="text-sm text-muted-foreground">{booking.attendee_name}</p>
+							<p class="text-xs text-subtle-foreground">{booking.attendee_email}</p>
 						</div>
 						<div class="flex items-center gap-2">
 							<span class="px-2 py-1 text-xs rounded-full {getStatusColor(booking.status)}">
@@ -83,7 +83,7 @@
 							{#if booking.status === 'confirmed'}
 								<button
 									onclick={() => onRescheduleClick(booking.id)}
-									class="text-xs text-blue-600 hover:text-blue-700 font-medium"
+									class="text-xs text-accent hover:text-accent font-medium"
 								>
 									Reschedule
 								</button>
@@ -96,11 +96,11 @@
 							{/if}
 						</div>
 					</div>
-					<div class="text-sm text-gray-700 mt-2">
+					<div class="text-sm text-muted-foreground mt-2">
 						<p>{formatCompactDateTime(new Date(booking.start_time))}</p>
 					</div>
 					{#if booking.attendee_notes}
-						<div class="mt-2 text-sm text-gray-600 bg-gray-50 rounded p-2">
+						<div class="mt-2 text-sm text-muted-foreground bg-gray-50 rounded p-2">
 							<span class="font-medium">Message:</span> {booking.attendee_notes}
 						</div>
 					{/if}
@@ -115,8 +115,8 @@
 				</div>
 			{/each}
 		{:else}
-			<div class="bg-white rounded-lg shadow-sm p-8 text-center border border-gray-200">
-				<p class="text-gray-600">No bookings yet</p>
+			<div class="bg-surface rounded-lg shadow-sm p-8 text-center border border-border">
+				<p class="text-muted-foreground">No bookings yet</p>
 			</div>
 		{/if}
 	</div>

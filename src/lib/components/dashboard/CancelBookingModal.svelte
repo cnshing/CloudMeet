@@ -51,10 +51,10 @@
 
 {#if show && booking}
 	<div class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-		<div class="bg-white rounded-lg shadow-xl max-w-md w-full">
+		<div class="bg-surface rounded-lg shadow-xl max-w-md w-full">
 			<div class="p-6">
-				<h3 class="text-lg font-semibold text-gray-900 mb-2">Cancel Booking</h3>
-				<p class="text-sm text-gray-600 mb-4">
+				<h3 class="text-lg font-semibold text-foreground mb-2">Cancel Booking</h3>
+				<p class="text-sm text-muted-foreground mb-4">
 					Cancel <strong>{booking.event_type_name}</strong> with <strong>{booking.attendee_name}</strong> on {formatCompactDateTime(new Date(booking.start_time))}?
 				</p>
 
@@ -65,7 +65,7 @@
 				{/if}
 
 				<div class="mb-4">
-					<label for="cancel-message" class="block text-sm font-medium text-gray-700 mb-1">
+					<label for="cancel-message" class="block text-sm font-medium text-muted-foreground mb-1">
 						Message to attendee (optional)
 					</label>
 					<textarea
@@ -73,15 +73,15 @@
 						bind:value={cancelMessage}
 						placeholder="Let them know why you're cancelling..."
 						rows="3"
-						class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-red-500 focus:border-transparent text-sm"
+						class="w-full px-3 py-2 border border-border-medium rounded-md focus:ring-2 focus:ring-red-500 focus:border-transparent text-sm"
 					></textarea>
-					<p class="text-xs text-gray-500 mt-1">This message will be included in the cancellation email</p>
+					<p class="text-xs text-subtle-foreground mt-1">This message will be included in the cancellation email</p>
 				</div>
 
 				<div class="flex justify-end gap-3">
 					<button
 						onclick={handleClose}
-						class="px-4 py-2 text-sm text-gray-600 hover:text-gray-800"
+						class="px-4 py-2 text-sm text-muted-foreground hover:text-foreground"
 					>
 						Keep Booking
 					</button>

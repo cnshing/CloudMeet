@@ -5,9 +5,6 @@
 		currentMonth: Date;
 		selectedDate: string | null;
 		availableDates: Set<string>;
-		brandColor: string;
-		brandLighter: string;
-		brandDark: string;
 		onDateSelect: (dateStr: string) => void;
 		onPrevMonth: () => void;
 		onNextMonth: () => void;
@@ -17,9 +14,6 @@
 		currentMonth,
 		selectedDate,
 		availableDates,
-		brandColor,
-		brandLighter,
-		brandDark,
 		onDateSelect,
 		onPrevMonth,
 		onNextMonth
@@ -80,15 +74,15 @@
 
 <div>
 	<div class="flex items-center justify-between mb-4">
-		<h3 class="text-lg font-medium text-gray-900">{formatMonthYear(currentMonth)}</h3>
+		<h3 class="text-lg font-medium text-foreground">{formatMonthYear(currentMonth)}</h3>
 		<div class="flex gap-2">
 			<button onclick={onPrevMonth} class="p-2 hover:bg-gray-100 rounded-full transition" aria-label="Previous month">
-				<svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+				<svg class="w-5 h-5 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
 				</svg>
 			</button>
 			<button onclick={onNextMonth} class="p-2 hover:bg-gray-100 rounded-full transition" aria-label="Next month">
-				<svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+				<svg class="w-5 h-5 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
 				</svg>
 			</button>
@@ -97,7 +91,7 @@
 
 	<div class="grid grid-cols-7 gap-1 mb-2">
 		{#each weekDays as day}
-			<div class="text-center text-xs font-medium text-gray-500 py-2">{day}</div>
+			<div class="text-center text-xs font-medium text-subtle-foreground py-2">{day}</div>
 		{/each}
 	</div>
 
@@ -112,11 +106,10 @@
 				disabled={!isClickable}
 				class="aspect-square flex items-center justify-center text-sm rounded-full transition relative
 					{!day.isCurrentMonth ? 'text-gray-300' : ''}
-					{isClickable && !isSelected ? 'font-semibold cursor-pointer' : ''}
-					{day.isAvailable && !hasSlots && day.isCurrentMonth ? 'text-gray-400' : ''}
+					{isClickable && !isSelected ? 'font-semibold cursor-pointer bg-accent-subtle text-border-strong' : ''}
+					{day.isAvailable && !hasSlots && day.isCurrentMonth ? 'text-subtle-foreground' : ''}
 					{!day.isAvailable && day.isCurrentMonth ? 'text-gray-300 cursor-not-allowed' : ''}
-					{isSelected ? 'text-white' : ''}"
-				style="{isClickable && !isSelected ? `background-color: ${brandLighter}; color: ${brandDark}` : ''}{isSelected ? `background-color: ${brandColor}` : ''}"
+					{isSelected ? 'bg-primary text-primary-foreground' : ''}"
 			>
 				{day.date.getDate()}
 			</button>
