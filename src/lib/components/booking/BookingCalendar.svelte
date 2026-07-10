@@ -5,9 +5,6 @@
 		currentMonth: Date;
 		selectedDate: string | null;
 		availableDates: Set<string>;
-		brandColor: string;
-		brandLighter: string;
-		brandDark: string;
 		onDateSelect: (dateStr: string) => void;
 		onPrevMonth: () => void;
 		onNextMonth: () => void;
@@ -17,9 +14,6 @@
 		currentMonth,
 		selectedDate,
 		availableDates,
-		brandColor,
-		brandLighter,
-		brandDark,
 		onDateSelect,
 		onPrevMonth,
 		onNextMonth
@@ -112,11 +106,10 @@
 				disabled={!isClickable}
 				class="aspect-square flex items-center justify-center text-sm rounded-full transition relative
 					{!day.isCurrentMonth ? 'text-gray-300' : ''}
-					{isClickable && !isSelected ? 'font-semibold cursor-pointer' : ''}
+					{isClickable && !isSelected ? 'font-semibold cursor-pointer bg-accent-subtle text-border-strong' : ''}
 					{day.isAvailable && !hasSlots && day.isCurrentMonth ? 'text-subtle-foreground' : ''}
 					{!day.isAvailable && day.isCurrentMonth ? 'text-gray-300 cursor-not-allowed' : ''}
-					{isSelected ? 'text-white' : ''}"
-				style="{isClickable && !isSelected ? `background-color: ${brandLighter}; color: ${brandDark}` : ''}{isSelected ? `background-color: ${brandColor}` : ''}"
+					{isSelected ? 'bg-primary text-primary-foreground' : ''}"
 			>
 				{day.date.getDate()}
 			</button>

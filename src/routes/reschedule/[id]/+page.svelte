@@ -2,16 +2,11 @@
 	import type { PageData } from './$types';
 	import TimezoneSelector from '$lib/components/TimezoneSelector.svelte';
 	import Footer from '$lib/components/Footer.svelte';
-	import { createBrandColors } from '$lib/utils/colorUtils';
 	import { detectTimezone, getCurrentTime } from '$lib/constants/timezones';
 	import { formatDateLocal, formatSelectedDate } from '$lib/utils/dateFormatters';
 	import { BookingCalendar } from '$lib/components/booking';
 
 	let { data }: { data: PageData } = $props();
-
-	// Brand colors
-	const brandColor = data.booking.brandColor;
-	const colors = createBrandColors(brandColor);
 
 	let selectedDate = $state<string | null>(null);
 	let selectedSlot = $state<{ start: string; end: string } | null>(null);
@@ -154,10 +149,7 @@
 	<title>Reschedule Meeting</title>
 </svelte:head>
 
-<div
-	class="min-h-screen bg-background flex flex-col items-center justify-center p-4"
-	style="--brand-color: {brandColor}; --brand-light: {colors.light}; --brand-lighter: {colors.lighter}; --brand-dark: {colors.dark};"
->
+<div class="min-h-screen bg-background flex flex-col items-center justify-center p-4">
 	{#if rescheduleStatus === 'success'}
 		<!-- Success Screen -->
 		<div class="bg-surface rounded-2xl shadow-lg p-8 max-w-md w-full">
@@ -187,7 +179,7 @@
 								<svg class="w-5 h-5 text-subtle-foreground mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
 								</svg>
-								<a href={newMeetingUrl} target="_blank" class="hover:underline break-all" style="color: var(--brand-color)">{data.booking.inviteCalendar === 'outlook' ? 'Join Microsoft Teams Meeting' : 'Join Google Meet'}</a>
+								<a href={newMeetingUrl} target="_blank" class="text-primary hover:underline break-all">{data.booking.inviteCalendar === 'outlook' ? 'Join Microsoft Teams Meeting' : 'Join Google Meet'}</a>
 							</div>
 						{/if}
 					</div>
@@ -211,7 +203,7 @@
 						{#if data.booking.profileImage}
 							<img src={data.booking.profileImage} alt={data.booking.hostName} class="w-12 h-12 rounded-full object-cover mb-3" />
 						{:else}
-							<div class="w-12 h-12 rounded-full flex items-center justify-center text-white font-semibold text-lg mb-3" style="background-color: var(--brand-color)">
+							<div class="w-12 h-12 rounded-full flex items-center justify-center text-primary-foreground font-semibold text-lg mb-3 bg-primary">
 								{data.booking.hostName?.charAt(0) || 'H'}
 							</div>
 						{/if}
@@ -232,7 +224,7 @@
 							<span>{data.booking.inviteCalendar === 'outlook' ? 'Microsoft Teams' : 'Google Meet'}</span>
 						</div>
 					</div>
-					
+
 					<!-- Current booking info -->
 					<div class="mt-6 pt-6 border-t border-border">
 						<p class="text-xs font-semibold text-subtle-foreground uppercase mb-2">Current booking</p>
@@ -262,9 +254,8 @@
 				{/if}
 				<div class="flex items-stretch">
 					<div class="w-80">
-						<!-- Timezone selector -->
 						<h2 class="text-xl font-semibold text-foreground mb-6">Select a New Date & Time</h2>
-						<BookingCalendar {currentMonth} {selectedDate} {availableDates} {brandColor} brandLighter={colors.lighter} brandDark={colors.dark} onDateSelect={handleDateSelect} onPrevMonth={prevMonth} onNextMonth={nextMonth} />
+						<BookingCalendar {currentMonth} {selectedDate} {availableDates} onDateSelect={handleDateSelect} onPrevMonth={prevMonth} onNextMonth={nextMonth} />
 						<div class="mt-6 relative">
 							<p class="text-sm font-semibold text-foreground mb-2">Time zone</p>
 							<button type="button" onclick={() => showTimezoneDropdown = !showTimezoneDropdown}
@@ -282,7 +273,6 @@
 									{selectedTimezone}
 									onSelect={(tz) => selectedTimezone = tz}
 									onClose={() => showTimezoneDropdown = false}
-									{brandColor}
 								/>
 							{/if}
 						</div>
@@ -295,7 +285,7 @@
 							</h3>
 							{#if loading}
 								<div class="flex items-center justify-center py-8">
-									<div class="animate-spin rounded-full h-8 w-8 border-2 border-t-transparent" style="border-color: var(--brand-color); border-top-color: transparent"></div>
+									<div class="animate-spin rounded-full h-8 w-8 border-2 border-t-transparent" style="border-color: var(--color-primary); border-top-color: transparent"></div>
 								</div>
 							{:else if availableSlots.length === 0}
 								<p class="text-sm text-subtle-foreground py-4">No available times</p>
@@ -307,7 +297,7 @@
 												{formatTime(slot.start)}
 											</button>
 										{:else}
-											<button type="button" onclick={() => selectSlot(slot)} class="w-full py-2.5 px-3 border-2 rounded-lg text-sm font-semibold transition" style="border-color: var(--brand-color); color: var(--brand-color)">
+											<button type="button" onclick={() => selectSlot(slot)} class="w-full py-2.5 px-3 border-2 border-primary text-primary rounded-lg text-sm font-semibold transition hover:bg-accent-subtle">
 												{formatTime(slot.start)}
 											</button>
 										{/if}
@@ -322,8 +312,7 @@
 				{#if selectedSlot}
 					<div class="mt-6 pt-6 border-t border-border">
 						<button onclick={handleReschedule} disabled={rescheduleStatus === 'submitting'}
-							class="w-full py-3 px-6 text-white rounded-full font-semibold transition disabled:opacity-50"
-							style="background-color: var(--brand-color)">
+							class="w-full py-3 px-6 bg-primary text-primary-foreground rounded-full font-semibold transition disabled:opacity-50 hover:bg-border-strong">
 							{rescheduleStatus === 'submitting' ? 'Rescheduling...' : 'Confirm Reschedule'}
 						</button>
 					</div>

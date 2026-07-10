@@ -4,7 +4,6 @@
 			name?: string;
 			email?: string;
 			profile_image?: string | null;
-			brand_color?: string;
 			contact_email?: string | null;
 			settings?: string | null;
 		} | null;
@@ -26,29 +25,12 @@
 	let showProfileEdit = $state(false);
 	let profileName = $state(user?.name || '');
 	let profileImage = $state(user?.profile_image || '');
-	let brandColor = $state(user?.brand_color || '#3b82f6');
 	let contactEmail = $state(user?.contact_email || '');
 	let timeFormat = $state<'12h' | '24h'>(getUserSettings().timeFormat || '12h');
 	let savingProfile = $state(false);
 	let uploadingImage = $state(false);
 	let profileError = $state('');
 	let profileSuccess = $state('');
-
-	// Preset brand colors
-	const presetColors = [
-		'#3b82f6', // Blue
-		'#8b5cf6', // Purple
-		'#ec4899', // Pink
-		'#ef4444', // Red
-		'#f97316', // Orange
-		'#eab308', // Yellow
-		'#22c55e', // Green
-		'#14b8a6', // Teal
-		'#06b6d4', // Cyan
-		'#6366f1', // Indigo
-		'#000000', // Black
-		'#6b7280'  // Gray
-	];
 
 	async function handleImageUpload(e: Event) {
 		const input = e.target as HTMLInputElement;
@@ -95,7 +77,6 @@
 				body: JSON.stringify({
 					name: profileName,
 					profileImage,
-					brandColor,
 					contactEmail,
 					timeFormat
 				})
@@ -210,45 +191,6 @@
 						</p>
 					</div>
 				</div>
-			</div>
-
-			<!-- Brand Color -->
-			<div class="mt-6">
-				<label class="block text-sm font-medium text-muted-foreground mb-3">
-					Brand Color
-				</label>
-				<div class="flex items-center gap-4">
-					<div class="flex flex-wrap gap-2">
-						{#each presetColors as color}
-							<button
-								type="button"
-								onclick={() => brandColor = color}
-								class="w-8 h-8 rounded-full border-2 transition-transform hover:scale-110 {brandColor === color ? 'ring-2 ring-offset-2 ring-gray-400' : 'border-border'}"
-								style="background-color: {color}"
-								title={color}
-							></button>
-						{/each}
-					</div>
-					<div class="flex items-center gap-2">
-						<label class="relative cursor-pointer">
-							<input
-								type="color"
-								bind:value={brandColor}
-								class="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-							/>
-							<div
-								class="w-8 h-8 rounded-full border-2 border-dashed border-border-medium flex items-center justify-center hover:border-border-strong transition"
-								style="background-color: {brandColor}"
-							>
-								<svg class="w-4 h-4 text-white drop-shadow" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path>
-								</svg>
-							</div>
-						</label>
-						<span class="text-sm text-subtle-foreground font-mono">{brandColor}</span>
-					</div>
-				</div>
-				<p class="text-xs text-subtle-foreground mt-2">This color will be used on your booking page for buttons and accents</p>
 			</div>
 
 			<!-- Time Format -->

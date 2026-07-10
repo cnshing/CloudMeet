@@ -7,8 +7,6 @@
 		};
 		bookingStatus: 'idle' | 'submitting' | 'success' | 'error';
 		bookingError: string;
-		brandColor: string;
-		brandDark: string;
 		onSubmit: (e: Event) => void;
 	}
 
@@ -16,8 +14,6 @@
 		bookingForm = $bindable(),
 		bookingStatus,
 		bookingError,
-		brandColor,
-		brandDark,
 		onSubmit
 	}: Props = $props();
 </script>
@@ -40,7 +36,7 @@
 				bind:value={bookingForm.name}
 				required
 				class="w-full px-4 py-3 border border-border-medium rounded-lg focus:ring-2 focus:border-transparent outline-none"
-				style="--tw-ring-color: {brandColor}"
+				style="--tw-ring-color: var(--color-primary)"
 			/>
 		</div>
 		<div>
@@ -51,7 +47,7 @@
 				bind:value={bookingForm.email}
 				required
 				class="w-full px-4 py-3 border border-border-medium rounded-lg focus:ring-2 focus:border-transparent outline-none"
-				style="--tw-ring-color: {brandColor}"
+				style="--tw-ring-color: var(--color-primary)"
 			/>
 		</div>
 		<div>
@@ -63,16 +59,13 @@
 				bind:value={bookingForm.notes}
 				rows="4"
 				class="w-full px-4 py-3 border border-border-medium rounded-lg focus:ring-2 focus:border-transparent outline-none resize-none"
-				style="--tw-ring-color: {brandColor}"
+				style="--tw-ring-color: var(--color-primary)"
 			></textarea>
 		</div>
 		<button
 			type="submit"
 			disabled={bookingStatus === 'submitting'}
-			class="w-full text-white py-3 px-6 rounded-full font-semibold transition disabled:opacity-50"
-			style="background-color: {brandColor}"
-			onmouseenter={(e) => e.currentTarget.style.backgroundColor = brandDark}
-			onmouseleave={(e) => e.currentTarget.style.backgroundColor = brandColor}
+			class="w-full bg-primary text-primary-foreground py-3 px-6 rounded-full font-semibold transition disabled:opacity-50 hover:bg-border-strong"
 		>
 			{bookingStatus === 'submitting' ? 'Scheduling...' : 'Schedule Event'}
 		</button>

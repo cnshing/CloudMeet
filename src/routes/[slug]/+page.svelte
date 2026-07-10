@@ -3,8 +3,7 @@
 	import type { PageData } from './$types';
 	import TimezoneSelector from '$lib/components/TimezoneSelector.svelte';
 	import Footer from '$lib/components/Footer.svelte';
-	import { createBrandColors } from '$lib/utils/colorUtils';
-	import { detectTimezone, getTimezoneLabel, getTimezoneWithTime, TIMEZONE_LABELS } from '$lib/constants/timezones';
+	import { detectTimezone, getTimezoneWithTime } from '$lib/constants/timezones';
 	import { formatDateLocal, formatSelectedDate, createFormatters } from '$lib/utils/dateFormatters';
 	import { BookingCalendar, TimeSlotList, BookingForm, BookingSuccess, EventSidebar } from '$lib/components/booking';
 
@@ -29,10 +28,6 @@
 			sanitizedDescription = '';
 		}
 	});
-
-	// Brand colors
-	const brandColor = data.user?.brandColor || '#3b82f6';
-	const colors = createBrandColors(brandColor);
 
 	let selectedDate = $state<string | null>(null);
 	let selectedSlot = $state<{ start: string; end: string } | null>(null);
@@ -254,16 +249,13 @@
 
 <svelte:head>
 	<title>{data.eventType?.name || 'Book a Meeting'}</title>
-	<!-- Dynamic favicon based on brand color -->
-	<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,{encodeURIComponent(`<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><defs><linearGradient id='grad' x1='0%' y1='0%' x2='100%' y2='100%'><stop offset='0%' style='stop-color:${brandColor};stop-opacity:1'/><stop offset='100%' style='stop-color:${colors.darkHex};stop-opacity:1'/></linearGradient></defs><circle cx='16' cy='16' r='15' fill='url(%23grad)'/><rect x='7' y='9' width='18' height='15' rx='2' fill='white' opacity='0.95'/><rect x='7' y='9' width='18' height='5' rx='2' fill='white'/><rect x='7' y='12' width='18' height='2' fill='${brandColor}'/><rect x='10' y='6' width='2.5' height='5' rx='1' fill='white'/><rect x='19.5' y='6' width='2.5' height='5' rx='1' fill='white'/><circle cx='16' cy='18' r='4' fill='none' stroke='${colors.darkHex}' stroke-width='1.5'/><line x1='16' y1='18' x2='16' y2='16' stroke='${colors.darkHex}' stroke-width='1.5' stroke-linecap='round'/><line x1='16' y1='18' x2='18' y2='18' stroke='${colors.darkHex}' stroke-width='1.5' stroke-linecap='round'/></svg>`)}" />
+	<!-- Static favicon using design system primary color -->
+	<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,{encodeURIComponent(`<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><defs><linearGradient id='grad' x1='0%' y1='0%' x2='100%' y2='100%'><stop offset='0%' style='stop-color:#86c322;stop-opacity:1'/><stop offset='100%' style='stop-color:#628c20;stop-opacity:1'/></linearGradient></defs><circle cx='16' cy='16' r='15' fill='url(%23grad)'/><rect x='7' y='9' width='18' height='15' rx='2' fill='white' opacity='0.95'/><rect x='7' y='9' width='18' height='5' rx='2' fill='white'/><rect x='7' y='12' width='18' height='2' fill='#86c322'/><rect x='10' y='6' width='2.5' height='5' rx='1' fill='white'/><rect x='19.5' y='6' width='2.5' height='5' rx='1' fill='white'/><circle cx='16' cy='18' r='4' fill='none' stroke='#628c20' stroke-width='1.5'/><line x1='16' y1='18' x2='16' y2='16' stroke='#628c20' stroke-width='1.5' stroke-linecap='round'/><line x1='16' y1='18' x2='18' y2='18' stroke='#628c20' stroke-width='1.5' stroke-linecap='round'/></svg>`)}" />
 </svelte:head>
 
-<div
-	class="min-h-screen bg-surface md:bg-background flex flex-col items-center md:justify-center md:p-4"
-	style="--brand-color: {brandColor}; --brand-light: {colors.light}; --brand-lighter: {colors.lighter}; --brand-dark: {colors.dark};"
->
+<div class="min-h-screen bg-surface md:bg-background flex flex-col items-center md:justify-center md:p-4">
 	{#if bookingStatus === 'success'}
-		<BookingSuccess eventName={data.eventType?.name || 'Meeting'} selectedDate={selectedDate!} selectedSlot={selectedSlot!} {meetingUrl} {meetingType} {brandColor} {formatTimeRange} {formatSelectedDate} />
+		<BookingSuccess eventName={data.eventType?.name || 'Meeting'} selectedDate={selectedDate!} selectedSlot={selectedSlot!} {meetingUrl} {meetingType} {formatTimeRange} {formatSelectedDate} />
 		<Footer class="mt-6" />
 	{:else}
 		<!-- MOBILE LAYOUT -->
@@ -293,7 +285,7 @@
 					{#if data.user?.profileImage}
 						<img src={data.user.profileImage} alt={data.user.name} class="w-24 h-24 rounded-full object-cover border-4 border-surface shadow-lg" />
 					{:else}
-						<div class="w-24 h-24 rounded-full flex items-center justify-center text-white font-semibold text-3xl border-4 border-surface shadow-lg" style="background-color: var(--brand-color)">
+						<div class="w-24 h-24 rounded-full flex items-center justify-center text-primary-foreground font-semibold text-3xl border-4 border-surface shadow-lg bg-primary">
 							{data.user?.name?.charAt(0) || 'M'}
 						</div>
 					{/if}
@@ -338,7 +330,6 @@
 								{selectedTimezone}
 								onSelect={(tz) => selectedTimezone = tz}
 								onClose={() => showTimezoneDropdown = false}
-								{brandColor}
 							/>
 						</div>
 					{/if}
@@ -392,11 +383,10 @@
 								disabled={!isClickable}
 								class="aspect-square flex items-center justify-center text-sm rounded-full transition
 									{!day.isCurrentMonth ? 'text-gray-300' : ''}
-									{isClickable && !isSelected ? 'font-semibold' : ''}
+									{isClickable && !isSelected ? 'font-semibold bg-accent-subtle text-border-strong' : ''}
 									{day.isAvailable && !hasSlots && day.isCurrentMonth ? 'text-subtle-foreground' : ''}
 									{!day.isAvailable && day.isCurrentMonth ? 'text-gray-300' : ''}
-									{isSelected ? 'text-white' : ''}"
-								style="{isClickable && !isSelected ? `background-color: var(--brand-lighter); color: var(--brand-dark)` : ''}{isSelected ? `background-color: var(--brand-color)` : ''}"
+									{isSelected ? 'bg-primary text-primary-foreground' : ''}"
 							>
 								{day.date.getDate()}
 							</button>
@@ -412,7 +402,7 @@
 					<p class="text-sm text-subtle-foreground text-center mb-6">{selectedDate ? formatSelectedDate(selectedDate) : ''}</p>
 					{#if loading}
 						<div class="flex items-center justify-center py-8">
-							<div class="animate-spin rounded-full h-8 w-8 border-2 border-t-transparent" style="border-color: var(--brand-color); border-top-color: transparent;"></div>
+							<div class="animate-spin rounded-full h-8 w-8 border-2 border-t-transparent" style="border-color: var(--color-primary); border-top-color: transparent;"></div>
 						</div>
 					{:else if availableSlots.length === 0}
 						<p class="text-sm text-subtle-foreground py-4 text-center">No available times for this date</p>
@@ -421,8 +411,7 @@
 							{#each availableSlots as slot}
 								{@const isSelected = selectedSlot === slot}
 								<button type="button" onclick={() => selectSlot(slot)}
-									class="py-3 px-4 border-2 rounded-lg text-sm font-semibold transition {isSelected ? 'border-foreground bg-foreground text-background' : ''}"
-									style="{!isSelected ? `border-color: var(--brand-color); color: var(--brand-color)` : ''}"
+									class="py-3 px-4 border-2 rounded-lg text-sm font-semibold transition {isSelected ? 'border-foreground bg-foreground text-background' : 'border-primary text-primary hover:bg-accent-subtle'}"
 								>
 									{formatTime(slot.start)}
 								</button>
@@ -432,8 +421,7 @@
 							<button
 								type="button"
 								onclick={confirmSlot}
-								class="w-full mt-6 py-3 px-6 text-white rounded-full font-semibold transition"
-								style="background-color: var(--brand-color)"
+								class="w-full mt-6 py-3 px-6 bg-primary text-primary-foreground rounded-full font-semibold transition hover:bg-border-strong"
 							>
 								Next
 							</button>
@@ -457,23 +445,22 @@
 							<label for="mobile-name" class="block text-sm font-medium text-muted-foreground mb-1.5">Name *</label>
 							<input type="text" id="mobile-name" bind:value={bookingForm.name} required
 								class="w-full px-4 py-3 border border-border-medium rounded-lg focus:ring-2 focus:border-transparent outline-none text-sm"
-								style="--tw-ring-color: var(--brand-color)" />
+								style="--tw-ring-color: var(--color-primary)" />
 						</div>
 						<div>
 							<label for="mobile-email" class="block text-sm font-medium text-muted-foreground mb-1.5">Email *</label>
 							<input type="email" id="mobile-email" bind:value={bookingForm.email} required
 								class="w-full px-4 py-3 border border-border-medium rounded-lg focus:ring-2 focus:border-transparent outline-none text-sm"
-								style="--tw-ring-color: var(--brand-color)" />
+								style="--tw-ring-color: var(--color-primary)" />
 						</div>
 						<div>
 							<label for="mobile-notes" class="block text-sm font-medium text-muted-foreground mb-1.5">Additional notes</label>
 							<textarea id="mobile-notes" bind:value={bookingForm.notes} rows="4"
 								class="w-full px-4 py-3 border border-border-medium rounded-lg focus:ring-2 focus:border-transparent outline-none resize-none text-sm"
-								style="--tw-ring-color: var(--brand-color)"></textarea>
+								style="--tw-ring-color: var(--color-primary)"></textarea>
 						</div>
 						<button type="submit" disabled={bookingStatus === 'submitting'}
-							class="w-full text-white py-3 px-6 rounded-full font-semibold transition disabled:opacity-50"
-							style="background-color: var(--brand-color)">
+							class="w-full bg-primary text-primary-foreground py-3 px-6 rounded-full font-semibold transition disabled:opacity-50 hover:bg-border-strong">
 							{bookingStatus === 'submitting' ? 'Scheduling...' : 'Schedule Event'}
 						</button>
 					</form>
@@ -486,7 +473,7 @@
 
 		<!-- DESKTOP LAYOUT -->
 		<div class="hidden md:flex bg-surface rounded-2xl shadow-lg overflow-hidden transition-all duration-300 ease-in-out" style="width: {showForm ? '700px' : selectedDate ? '920px' : '650px'}">
-			<EventSidebar user={data.user} eventType={data.eventType} {selectedDate} {selectedSlot} {brandColor} {formatTime} />
+			<EventSidebar user={data.user} eventType={data.eventType} {selectedDate} {selectedSlot} {formatTime} />
 
 			<!-- Main Content -->
 			<div class="flex-1 p-6">
@@ -497,7 +484,7 @@
 				{/if}
 
 				{#if showForm}
-					<BookingForm bind:bookingForm {bookingStatus} {bookingError} {brandColor} brandDark={colors.dark} onSubmit={handleSubmit} />
+					<BookingForm bind:bookingForm {bookingStatus} {bookingError} onSubmit={handleSubmit} />
 				{:else}
 					<div class="flex items-stretch">
 						<div class="w-80">
@@ -507,9 +494,6 @@
 								{currentMonth}
 								{selectedDate}
 								{availableDates}
-								{brandColor}
-								brandLighter={colors.lighter}
-								brandDark={colors.dark}
 								onDateSelect={handleDateSelect}
 								onPrevMonth={prevMonth}
 								onNextMonth={nextMonth}
@@ -532,7 +516,6 @@
 										{selectedTimezone}
 										onSelect={(tz) => selectedTimezone = tz}
 										onClose={() => showTimezoneDropdown = false}
-										{brandColor}
 									/>
 								{/if}
 							</div>
@@ -544,7 +527,6 @@
 								{availableSlots}
 								{selectedSlot}
 								{loading}
-								{brandColor}
 								{formatTime}
 								onSelectSlot={selectSlot}
 								onConfirm={confirmSlot}

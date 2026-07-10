@@ -27,9 +27,9 @@
 						class="w-24 h-24 rounded-full mx-auto mb-4 object-cover shadow-md"
 					/>
 				{:else}
-					<div class="w-24 h-24 rounded-full mx-auto mb-4 flex items-center justify-center text-white font-bold text-3xl shadow-md" style="background-color: {data.user.brandColor || '#3b82f6'}">
-						{data.user.name?.charAt(0) || 'U'}
-					</div>
+				<div class="w-24 h-24 rounded-full mx-auto mb-4 flex items-center justify-center text-primary-foreground font-bold text-3xl shadow-md bg-primary">
+					{data.user.name?.charAt(0) || 'U'}
+				</div>
 				{/if}
 				<h1 class="text-3xl font-bold text-foreground mb-2">{data.user.name}</h1>
 				<p class="text-muted-foreground">Select a meeting type to book a time</p>
@@ -41,8 +41,7 @@
 					{#each data.eventTypes as eventType}
 						<a
 							href="/{eventType.slug}"
-							class="block bg-surface rounded-lg shadow-sm hover:shadow-md transition-all p-5 border-l-4 hover:translate-x-1"
-							style="border-left-color: {data.user.brandColor || '#3b82f6'}"
+						class="block bg-surface rounded-lg shadow-sm hover:shadow-md transition-all p-5 border-l-4 border-l-primary hover:translate-x-1"
 						>
 							<div class="flex justify-between items-start">
 								<div class="flex-1 min-w-0">
@@ -51,7 +50,7 @@
 										<p class="text-muted-foreground text-sm line-clamp-2">{stripHtml(eventType.description)}</p>
 									{/if}
 								</div>
-								<div class="flex items-center text-sm font-medium ml-4 px-3 py-1 rounded-full" style="background-color: {data.user.brandColor || '#3b82f6'}20; color: {data.user.brandColor || '#3b82f6'}">
+								<div class="flex items-center text-sm font-medium ml-4 px-3 py-1 rounded-full bg-accent-subtle text-accent">
 									<svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 										<path
 											stroke-linecap="round"

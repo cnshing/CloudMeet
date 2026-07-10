@@ -11,7 +11,6 @@
 		availableSlots: TimeSlot[];
 		selectedSlot: TimeSlot | null;
 		loading: boolean;
-		brandColor: string;
 		formatTime: (isoStr: string) => string;
 		onSelectSlot: (slot: TimeSlot) => void;
 		onConfirm: () => void;
@@ -22,7 +21,6 @@
 		availableSlots,
 		selectedSlot,
 		loading,
-		brandColor,
 		formatTime,
 		onSelectSlot,
 		onConfirm
@@ -36,7 +34,7 @@
 
 	{#if loading}
 		<div class="flex items-center justify-center py-8">
-			<div class="animate-spin rounded-full h-8 w-8 border-2 border-t-transparent" style="border-color: {brandColor}; border-top-color: transparent"></div>
+			<div class="animate-spin rounded-full h-8 w-8 border-2 border-t-transparent" style="border-color: var(--color-primary); border-top-color: transparent"></div>
 		</div>
 	{:else if availableSlots.length === 0}
 		<p class="text-sm text-subtle-foreground py-4">No available times</p>
@@ -51,8 +49,7 @@
 						<button
 							type="button"
 							onclick={onConfirm}
-							class="flex-1 py-2.5 px-3 text-white rounded-lg text-sm font-semibold transition"
-							style="background-color: {brandColor}"
+							class="flex-1 py-2.5 px-3 bg-primary text-primary-foreground rounded-lg text-sm font-semibold transition hover:bg-border-strong"
 						>
 							Next
 						</button>
@@ -61,8 +58,7 @@
 					<button
 						type="button"
 						onclick={() => onSelectSlot(slot)}
-						class="w-full py-2.5 px-3 border-2 rounded-lg text-sm font-semibold transition"
-						style="border-color: {brandColor}; color: {brandColor}"
+						class="w-full py-2.5 px-3 border-2 border-primary text-primary rounded-lg text-sm font-semibold transition hover:bg-accent-subtle"
 					>
 						{formatTime(slot.start)}
 					</button>

@@ -9,8 +9,6 @@
 	const success = $derived($page.url.searchParams.get('success'));
 	const action = $derived(data.action);
 
-	const brandColor = data.proposal?.brand_color || '#3b82f6';
-
 	function formatDateTime(dateStr: string) {
 		const date = new Date(dateStr);
 		return new Intl.DateTimeFormat('en-US', {
@@ -73,9 +71,9 @@
 			</div>
 			<h1 class="text-2xl font-semibold text-foreground mb-2">Meeting Cancelled</h1>
 			<p class="text-muted-foreground mb-6">The meeting has been cancelled. The host has been notified.</p>
-			<a href="/{data.proposal?.event_slug}" class="inline-block px-6 py-3 text-white rounded-lg transition" style="background-color: {brandColor}">
-				Book a New Time
-			</a>
+		<a href="/{data.proposal?.event_slug}" class="inline-block px-6 py-3 bg-primary text-primary-foreground rounded-lg transition hover:bg-border-strong">
+			Book a New Time
+		</a>
 		</div>
 	{:else if data.alreadyResponded}
 		<!-- Already Responded -->
@@ -93,9 +91,9 @@
 		<div class="bg-surface rounded-2xl shadow-lg p-8 max-w-md w-full text-center">
 			<h1 class="text-2xl font-semibold text-foreground mb-4">Propose Different Time</h1>
 			<p class="text-muted-foreground mb-6">You'll be redirected to choose a different time for your meeting.</p>
-			<a href="/reschedule/{data.proposal?.booking_id}" class="inline-block px-6 py-3 text-white rounded-lg transition" style="background-color: {brandColor}">
-				Choose Different Time
-			</a>
+		<a href="/reschedule/{data.proposal?.booking_id}" class="inline-block px-6 py-3 bg-primary text-primary-foreground rounded-lg transition hover:bg-border-strong">
+			Choose Different Time
+		</a>
 		</div>
 	{:else}
 		<!-- Response Form -->
@@ -163,8 +161,7 @@
 
 				<a
 					href="/reschedule/{data.proposal?.booking_id}"
-					class="block w-full px-6 py-3 text-center rounded-lg font-medium transition border-2 hover:bg-gray-50"
-					style="border-color: {brandColor}; color: {brandColor}"
+					class="block w-full px-6 py-3 text-center rounded-lg font-medium transition border-2 border-primary text-primary hover:bg-accent-subtle"
 				>
 					Propose Different Time
 				</a>

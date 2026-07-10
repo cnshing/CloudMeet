@@ -1,6 +1,5 @@
 <script lang="ts">
 	import { browser } from '$app/environment';
-	import type { BrandColors } from '$lib/utils/colorUtils';
 	import { formatSelectedDate } from '$lib/utils/dateFormatters';
 
 	interface Props {
@@ -17,7 +16,6 @@
 		} | null;
 		selectedDate: string | null;
 		selectedSlot: { start: string; end: string } | null;
-		brandColor: string;
 		formatTime: (isoStr: string) => string;
 	}
 
@@ -26,7 +24,6 @@
 		eventType,
 		selectedDate,
 		selectedSlot,
-		brandColor,
 		formatTime
 	}: Props = $props();
 
@@ -66,7 +63,7 @@
 			{#if user?.profileImage}
 				<img src={user.profileImage} alt={user.name} class="w-12 h-12 rounded-full object-cover mb-3" />
 			{:else}
-				<div class="w-12 h-12 rounded-full flex items-center justify-center text-white font-semibold text-lg mb-3" style="background-color: {brandColor}">
+				<div class="w-12 h-12 rounded-full flex items-center justify-center text-primary-foreground font-semibold text-lg mb-3 bg-primary">
 					{user?.name?.charAt(0) || 'M'}
 				</div>
 			{/if}
