@@ -41,8 +41,8 @@
 		{#if success || data.alreadyCanceled}
 			<!-- Success Message -->
 			<div class="bg-surface rounded-lg shadow-lg p-8 text-center">
-				<div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-					<svg class="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+			<div class="w-16 h-16 bg-accent-subtle rounded-full flex items-center justify-center mx-auto mb-4">
+				<svg class="w-8 h-8 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 						<path
 							stroke-linecap="round"
 							stroke-linejoin="round"
@@ -97,7 +97,7 @@
 						>
 							{cancelling ? 'Cancelling...' : 'Yes, Cancel Booking'}
 						</button>
-						<a href="/{data.booking.event_slug}" class="flex-1 px-6 py-3 bg-gray-200 text-muted-foreground rounded-lg hover:bg-gray-300 transition text-center font-medium">
+						<a href="/{data.booking.event_slug}" class="flex-1 px-6 py-3 bg-surface-2 text-muted-foreground rounded-lg hover:bg-border-medium transition text-center font-medium">
 							Keep Booking
 						</a>
 					</div>

@@ -111,13 +111,13 @@
 				<div class="flex gap-4">
 					<a
 						href="/dashboard/calendars"
-						class="px-4 py-2 bg-gray-100 text-muted-foreground rounded-lg hover:bg-gray-200 transition"
-					>
-						Calendars
-					</a>
-					<a
-						href="/dashboard/emails"
-						class="px-4 py-2 bg-gray-100 text-muted-foreground rounded-lg hover:bg-gray-200 transition"
+					class="px-4 py-2 bg-surface-2 text-muted-foreground rounded-lg hover:bg-border-medium transition"
+				>
+					Calendars
+				</a>
+				<a
+					href="/dashboard/emails"
+					class="px-4 py-2 bg-surface-2 text-muted-foreground rounded-lg hover:bg-border-medium transition"
 					>
 						Emails
 					</a>
@@ -130,7 +130,7 @@
 					<form method="POST" action="/auth/logout">
 						<button
 							type="submit"
-							class="px-4 py-2 bg-gray-200 text-muted-foreground rounded-lg hover:bg-gray-300 transition"
+							class="px-4 py-2 bg-surface-2 text-muted-foreground rounded-lg hover:bg-border-medium transition"
 						>
 							Logout
 						</button>
@@ -166,7 +166,7 @@
 		</div>
 
 		{#if cancelSuccess || rescheduleSuccess}
-			<div class="bg-green-50 border border-green-200 text-green-800 rounded-lg p-3 text-sm mb-4">
+			<div class="bg-accent-subtle border border-border-strong text-foreground rounded-lg p-3 text-sm mb-4">
 				{cancelSuccess || rescheduleSuccess}
 			</div>
 		{/if}

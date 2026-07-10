@@ -76,12 +76,12 @@
 	<div class="flex items-center justify-between mb-4">
 		<h3 class="text-lg font-medium text-foreground">{formatMonthYear(currentMonth)}</h3>
 		<div class="flex gap-2">
-			<button onclick={onPrevMonth} class="p-2 hover:bg-gray-100 rounded-full transition" aria-label="Previous month">
+			<button onclick={onPrevMonth} class="p-2 hover:bg-surface-2 rounded-full transition" aria-label="Previous month">
 				<svg class="w-5 h-5 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
 				</svg>
 			</button>
-			<button onclick={onNextMonth} class="p-2 hover:bg-gray-100 rounded-full transition" aria-label="Next month">
+			<button onclick={onNextMonth} class="p-2 hover:bg-surface-2 rounded-full transition" aria-label="Next month">
 				<svg class="w-5 h-5 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
 				</svg>

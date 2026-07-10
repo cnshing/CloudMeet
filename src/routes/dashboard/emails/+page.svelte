@@ -175,16 +175,16 @@
 
 		{#if loading}
 			<div class="flex justify-center py-12">
-				<div class="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+				<div class="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
 			</div>
 		{:else}
 			<!-- Google Calendar Notice -->
-			<div class="bg-green-50 border border-green-200 rounded-lg p-4 mb-6">
+			<div class="bg-accent-subtle border border-border-strong rounded-lg p-4 mb-6">
 				<div class="flex gap-3">
-					<svg class="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+					<svg class="w-5 h-5 text-accent flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
 					</svg>
-					<div class="text-sm text-green-800">
+					<div class="text-sm text-foreground">
 						<p class="font-medium mb-1">Calendar Notifications</p>
 						<p>Your attendees will always receive calendar invitations with meeting details and video call links (Google Meet or Microsoft Teams). The emails below are <strong>additional</strong> custom notifications you can send.</p>
 					</div>
@@ -192,19 +192,19 @@
 			</div>
 
 			<!-- Info Box -->
-			<div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+			<div class="bg-surface border border-border rounded-lg p-4 mb-6">
 				<div class="flex gap-3">
-					<svg class="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+					<svg class="w-5 h-5 text-accent flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
 					</svg>
-					<div class="text-sm text-blue-800">
+					<div class="text-sm text-muted-foreground">
 						<p class="font-medium mb-1">Email Variables</p>
 						<p>You can use these variables in your subject lines:</p>
-						<code class="text-xs bg-blue-100 px-1 py-0.5 rounded">{'{event_name}'}</code>,
-						<code class="text-xs bg-blue-100 px-1 py-0.5 rounded">{'{host_name}'}</code>,
-						<code class="text-xs bg-blue-100 px-1 py-0.5 rounded">{'{attendee_name}'}</code>,
-						<code class="text-xs bg-blue-100 px-1 py-0.5 rounded">{'{date}'}</code>,
-						<code class="text-xs bg-blue-100 px-1 py-0.5 rounded">{'{time}'}</code>
+						<code class="text-xs bg-surface-2 px-1 py-0.5 rounded">{'{event_name}'}</code>,
+						<code class="text-xs bg-surface-2 px-1 py-0.5 rounded">{'{host_name}'}</code>,
+						<code class="text-xs bg-surface-2 px-1 py-0.5 rounded">{'{attendee_name}'}</code>,
+						<code class="text-xs bg-surface-2 px-1 py-0.5 rounded">{'{date}'}</code>,
+						<code class="text-xs bg-surface-2 px-1 py-0.5 rounded">{'{time}'}</code>
 					</div>
 				</div>
 			</div>
@@ -231,7 +231,7 @@
 									<div class="flex items-center gap-3">
 										<button
 											onclick={() => expandedTemplate = expandedTemplate === template.template_type ? null : template.template_type}
-											class="text-sm text-blue-600 hover:text-blue-700"
+											class="text-sm text-accent hover:opacity-80"
 										>
 											{expandedTemplate === template.template_type ? 'Close' : 'Edit'}
 										</button>
@@ -243,7 +243,7 @@
 												disabled={saving === template.template_type}
 												class="sr-only peer"
 											/>
-											<div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+											<div class="w-11 h-6 bg-surface-2 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary/30 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
 										</label>
 									</div>
 								</div>
@@ -260,7 +260,7 @@
 												type="text"
 												bind:value={editSubjects[template.template_type]}
 												placeholder={template.default_subject}
-												class="w-full px-3 py-2 border border-border-medium rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+												class="w-full px-3 py-2 border border-border-medium rounded-md focus:ring-2 focus:ring-primary focus:border-transparent text-sm"
 											/>
 										</div>
 
@@ -272,7 +272,7 @@
 												bind:value={editMessages[template.template_type]}
 												placeholder="Add a personal message that will appear in the email..."
 												rows="3"
-												class="w-full px-3 py-2 border border-border-medium rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+												class="w-full px-3 py-2 border border-border-medium rounded-md focus:ring-2 focus:ring-primary focus:border-transparent text-sm"
 											></textarea>
 											<p class="text-xs text-subtle-foreground mt-1">This message will be added to the email template</p>
 										</div>
@@ -287,7 +287,7 @@
 											<button
 												onclick={() => saveTemplate(template)}
 												disabled={saving === template.template_type}
-												class="px-4 py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 transition disabled:opacity-50"
+												class="px-4 py-2 bg-primary text-primary-foreground text-sm rounded-lg hover:opacity-90 transition disabled:opacity-50"
 											>
 												{saving === template.template_type ? 'Saving...' : 'Save Changes'}
 											</button>
@@ -323,7 +323,7 @@
 									<div class="flex items-center gap-3">
 										<button
 											onclick={() => expandedTemplate = expandedTemplate === template.template_type ? null : template.template_type}
-											class="text-sm text-blue-600 hover:text-blue-700"
+											class="text-sm text-accent hover:opacity-80"
 										>
 											{expandedTemplate === template.template_type ? 'Close' : 'Edit'}
 										</button>
@@ -335,7 +335,7 @@
 												disabled={saving === template.template_type}
 												class="sr-only peer"
 											/>
-											<div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+											<div class="w-11 h-6 bg-surface-2 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary/30 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
 										</label>
 									</div>
 								</div>
@@ -352,7 +352,7 @@
 												type="text"
 												bind:value={editSubjects[template.template_type]}
 												placeholder={template.default_subject}
-												class="w-full px-3 py-2 border border-border-medium rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+												class="w-full px-3 py-2 border border-border-medium rounded-md focus:ring-2 focus:ring-primary focus:border-transparent text-sm"
 											/>
 										</div>
 
@@ -364,7 +364,7 @@
 												bind:value={editMessages[template.template_type]}
 												placeholder="Add a personal message that will appear in the reminder..."
 												rows="3"
-												class="w-full px-3 py-2 border border-border-medium rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+												class="w-full px-3 py-2 border border-border-medium rounded-md focus:ring-2 focus:ring-primary focus:border-transparent text-sm"
 											></textarea>
 										</div>
 
@@ -378,7 +378,7 @@
 											<button
 												onclick={() => saveTemplate(template)}
 												disabled={saving === template.template_type}
-												class="px-4 py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 transition disabled:opacity-50"
+												class="px-4 py-2 bg-primary text-primary-foreground text-sm rounded-lg hover:opacity-90 transition disabled:opacity-50"
 											>
 												{saving === template.template_type ? 'Saving...' : 'Save Changes'}
 											</button>
