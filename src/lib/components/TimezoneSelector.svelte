@@ -77,7 +77,7 @@
 				type="text"
 				placeholder="Search..."
 				class="w-full pl-10 pr-4 py-2 text-sm border border-border rounded-lg focus:ring-2 focus:border-transparent outline-none"
-				style="--tw-ring-color: var(--color-primary)"
+				style="--tw-ring-color: var(--color-primary-)"
 			/>
 		</div>
 	</div>
@@ -101,7 +101,7 @@
 						role="option"
 						aria-selected={isSelected}
 						onclick={() => handleSelect(tz.value)}
-						class="w-full px-4 py-2.5 flex items-center justify-between text-left text-sm hover:bg-gray-50 transition-colors {isSelected ? 'font-medium bg-accent-subtle text-accent' : 'text-muted-foreground'}"
+						class="w-full px-4 py-2.5 flex items-center justify-between text-left text-sm hover:bg-surface-2 transition-colors {isSelected ? 'font-medium bg-accent-subtle text-accent' : 'text-muted-foreground'}"
 					>
 						<span class="flex items-center gap-2">
 							{#if isSelected}
