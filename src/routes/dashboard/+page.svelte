@@ -99,38 +99,38 @@
 	}
 </script>
 
-<div class="min-h-screen bg-gray-50">
+<div class="min-h-screen bg-background">
 	<!-- Header -->
-	<header class="bg-white shadow-sm">
+	<header class="bg-surface shadow-sm">
 		<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
 			<div class="flex justify-between items-center">
 				<div>
-					<h1 class="text-2xl font-bold text-gray-900">Dashboard</h1>
-					<p class="text-sm text-gray-600">Welcome back, {data.user?.name || 'User'}!</p>
+					<h1 class="text-2xl font-bold text-foreground">Dashboard</h1>
+					<p class="text-sm text-muted-foreground">Welcome back, {data.user?.name || 'User'}!</p>
 				</div>
 				<div class="flex gap-4">
 					<a
 						href="/dashboard/calendars"
-						class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition"
+						class="px-4 py-2 bg-gray-100 text-muted-foreground rounded-lg hover:bg-gray-200 transition"
 					>
 						Calendars
 					</a>
 					<a
 						href="/dashboard/emails"
-						class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition"
+						class="px-4 py-2 bg-gray-100 text-muted-foreground rounded-lg hover:bg-gray-200 transition"
 					>
 						Emails
 					</a>
 					<a
 						href="/dashboard/availability"
-						class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+						class="px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:opacity-90 transition"
 					>
 						Set Availability
 					</a>
 					<form method="POST" action="/auth/logout">
 						<button
 							type="submit"
-							class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition"
+							class="px-4 py-2 bg-gray-200 text-muted-foreground rounded-lg hover:bg-gray-300 transition"
 						>
 							Logout
 						</button>
@@ -145,20 +145,20 @@
 		<ProfileSection user={data.user} />
 
 		<!-- Booking Link -->
-		<div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-8">
-			<h2 class="text-lg font-semibold text-blue-900 mb-2">Your Booking Page</h2>
+		<div class="bg-accent-subtle border border-border-primary rounded-lg p-4 mb-8">
+			<h2 class="text-lg font-semibold text-foreground mb-2">Your Booking Page</h2>
 			<div class="flex items-center gap-2">
 				<input
 					type="text"
 					readonly
 					value="{data.appUrl}/"
-					class="flex-1 px-3 py-2 bg-white border border-blue-300 rounded-md text-sm"
+					class="flex-1 px-3 py-2 bg-surface border border-border-medium rounded-md text-sm"
 				/>
 				<button
 					onclick={() => {
 						navigator.clipboard.writeText(data.appUrl + '/');
 					}}
-					class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition text-sm"
+					class="px-4 py-2 bg-primary text-primary-foreground rounded-md hover:opacity-90 transition text-sm"
 				>
 					Copy Link
 				</button>

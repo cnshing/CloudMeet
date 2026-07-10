@@ -142,19 +142,19 @@
 	}
 </script>
 
-<div class="min-h-screen bg-gray-50">
+<div class="min-h-screen bg-background">
 	<!-- Header -->
-	<header class="bg-white shadow-sm">
+	<header class="bg-surface shadow-sm">
 		<div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
 			<div class="flex items-center gap-4">
-				<a href="/dashboard" class="text-gray-500 hover:text-gray-700">
+				<a href="/dashboard" class="text-subtle-foreground hover:text-muted-foreground">
 					<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
 					</svg>
 				</a>
 				<div>
-					<h1 class="text-2xl font-bold text-gray-900">Email Settings</h1>
-					<p class="text-sm text-gray-600">Manage your automated email notifications</p>
+					<h1 class="text-2xl font-bold text-foreground">Email Settings</h1>
+					<p class="text-sm text-muted-foreground">Manage your automated email notifications</p>
 				</div>
 			</div>
 		</div>
@@ -211,21 +211,21 @@
 
 			<!-- Notification Emails -->
 			<div class="mb-8">
-				<h2 class="text-lg font-semibold text-gray-900 mb-4">Booking Notifications</h2>
+				<h2 class="text-lg font-semibold text-foreground mb-4">Booking Notifications</h2>
 				<div class="space-y-3">
 					{#each templates.filter(t => !t.template_type.startsWith('reminder_')) as template}
-						<div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+						<div class="bg-surface rounded-lg shadow-sm border border-border overflow-hidden">
 							<div class="p-4">
 								<div class="flex items-center justify-between">
 									<div class="flex items-center gap-3">
-										<div class="p-2 bg-gray-100 rounded-lg">
-											<svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+										<div class="p-2 bg-background rounded-lg">
+											<svg class="w-5 h-5 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 												<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d={getTemplateIcon(template.template_type)}></path>
 											</svg>
 										</div>
 										<div>
-											<h3 class="font-medium text-gray-900">{template.name}</h3>
-											<p class="text-sm text-gray-500">{template.description}</p>
+											<h3 class="font-medium text-foreground">{template.name}</h3>
+											<p class="text-sm text-subtle-foreground">{template.description}</p>
 										</div>
 									</div>
 									<div class="flex items-center gap-3">
@@ -250,37 +250,37 @@
 							</div>
 
 							{#if expandedTemplate === template.template_type}
-								<div class="border-t border-gray-200 p-4 bg-gray-50">
+								<div class="border-t border-border p-4 bg-background">
 									<div class="space-y-4">
 										<div>
-											<label class="block text-sm font-medium text-gray-700 mb-1">
+											<label class="block text-sm font-medium text-muted-foreground mb-1">
 												Subject Line
 											</label>
 											<input
 												type="text"
 												bind:value={editSubjects[template.template_type]}
 												placeholder={template.default_subject}
-												class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+												class="w-full px-3 py-2 border border-border-medium rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
 											/>
 										</div>
 
 										<div>
-											<label class="block text-sm font-medium text-gray-700 mb-1">
+											<label class="block text-sm font-medium text-muted-foreground mb-1">
 												Custom Message (Optional)
 											</label>
 											<textarea
 												bind:value={editMessages[template.template_type]}
 												placeholder="Add a personal message that will appear in the email..."
 												rows="3"
-												class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+												class="w-full px-3 py-2 border border-border-medium rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
 											></textarea>
-											<p class="text-xs text-gray-500 mt-1">This message will be added to the email template</p>
+											<p class="text-xs text-subtle-foreground mt-1">This message will be added to the email template</p>
 										</div>
 
 										<div class="flex justify-end gap-2">
 											<button
 												onclick={() => expandedTemplate = null}
-												class="px-4 py-2 text-sm text-gray-600 hover:text-gray-800"
+												class="px-4 py-2 text-sm text-muted-foreground hover:text-foreground"
 											>
 												Cancel
 											</button>
@@ -302,11 +302,11 @@
 
 			<!-- Reminder Emails -->
 			<div>
-				<h2 class="text-lg font-semibold text-gray-900 mb-4">Meeting Reminders</h2>
-				<p class="text-sm text-gray-600 mb-4">Automatically remind attendees before their scheduled meetings.</p>
+				<h2 class="text-lg font-semibold text-foreground mb-4">Meeting Reminders</h2>
+				<p class="text-sm text-muted-foreground mb-4">Automatically remind attendees before their scheduled meetings.</p>
 				<div class="space-y-3">
 					{#each templates.filter(t => t.template_type.startsWith('reminder_')) as template}
-						<div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+						<div class="bg-surface rounded-lg shadow-sm border border-border overflow-hidden">
 							<div class="p-4">
 								<div class="flex items-center justify-between">
 									<div class="flex items-center gap-3">
@@ -316,8 +316,8 @@
 											</svg>
 										</div>
 										<div>
-											<h3 class="font-medium text-gray-900">{template.name}</h3>
-											<p class="text-sm text-gray-500">{template.description}</p>
+											<h3 class="font-medium text-foreground">{template.name}</h3>
+											<p class="text-sm text-subtle-foreground">{template.description}</p>
 										</div>
 									</div>
 									<div class="flex items-center gap-3">
@@ -342,36 +342,36 @@
 							</div>
 
 							{#if expandedTemplate === template.template_type}
-								<div class="border-t border-gray-200 p-4 bg-gray-50">
+								<div class="border-t border-border p-4 bg-background">
 									<div class="space-y-4">
 										<div>
-											<label class="block text-sm font-medium text-gray-700 mb-1">
+											<label class="block text-sm font-medium text-muted-foreground mb-1">
 												Subject Line
 											</label>
 											<input
 												type="text"
 												bind:value={editSubjects[template.template_type]}
 												placeholder={template.default_subject}
-												class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+												class="w-full px-3 py-2 border border-border-medium rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
 											/>
 										</div>
 
 										<div>
-											<label class="block text-sm font-medium text-gray-700 mb-1">
+											<label class="block text-sm font-medium text-muted-foreground mb-1">
 												Custom Message (Optional)
 											</label>
 											<textarea
 												bind:value={editMessages[template.template_type]}
 												placeholder="Add a personal message that will appear in the reminder..."
 												rows="3"
-												class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+												class="w-full px-3 py-2 border border-border-medium rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
 											></textarea>
 										</div>
 
 										<div class="flex justify-end gap-2">
 											<button
 												onclick={() => expandedTemplate = null}
-												class="px-4 py-2 text-sm text-gray-600 hover:text-gray-800"
+												class="px-4 py-2 text-sm text-muted-foreground hover:text-foreground"
 											>
 												Cancel
 											</button>

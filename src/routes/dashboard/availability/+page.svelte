@@ -87,15 +87,13 @@
 	}
 </script>
 
-<div class="min-h-screen bg-gray-50">
+<div class="min-h-screen bg-background">
 	<!-- Header -->
-	<header class="bg-white shadow-sm">
+	<header class="bg-surface shadow-sm">
 		<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
 			<div class="flex items-center gap-4">
-				<a href="/dashboard" class="text-gray-600 hover:text-gray-900">
-					← Back to Dashboard
-				</a>
-				<h1 class="text-2xl font-bold text-gray-900">Set Availability</h1>
+				<a href="/dashboard" class="text-muted-foreground hover:text-foreground">← Back to Dashboard</a>
+				<h1 class="text-2xl font-bold text-foreground">Set Availability</h1>
 			</div>
 		</div>
 	</header>
@@ -114,25 +112,25 @@
 		{/if}
 
 		<!-- Timezone Selection -->
-		<div class="bg-white rounded-lg shadow-sm p-6 mb-6">
-			<h2 class="text-lg font-semibold text-gray-900 mb-4">Your Timezone</h2>
-			<p class="text-sm text-gray-600 mb-4">
+		<div class="bg-surface rounded-lg shadow-sm p-6 mb-6">
+			<h2 class="text-lg font-semibold text-foreground mb-4">Your Timezone</h2>
+			<p class="text-sm text-muted-foreground mb-4">
 				Set your timezone so that your availability is shown correctly to people booking meetings.
 			</p>
 			<div class="relative">
 				<button
 					type="button"
 					onclick={() => showTimezoneDropdown = !showTimezoneDropdown}
-					class="flex items-center gap-3 px-4 py-3 border border-gray-300 rounded-lg hover:border-gray-400 transition w-full sm:w-auto"
+					class="flex items-center gap-3 px-4 py-3 border border-border-medium rounded-lg hover:border-border-strong transition w-full sm:w-auto"
 				>
-					<svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+					<svg class="w-5 h-5 text-subtle-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
 					</svg>
 					<div class="text-left">
-						<div class="font-medium text-gray-900">{getTimezoneLabel(selectedTimezone)}</div>
-						<div class="text-sm text-gray-500">{selectedTimezone} ({getCurrentTime(selectedTimezone)})</div>
+						<div class="font-medium text-foreground">{getTimezoneLabel(selectedTimezone)}</div>
+						<div class="text-sm text-subtle-foreground">{selectedTimezone} ({getCurrentTime(selectedTimezone)})</div>
 					</div>
-					<svg class="w-5 h-5 text-gray-400 ml-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+					<svg class="w-5 h-5 text-subtle-foreground ml-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
 					</svg>
 				</button>
@@ -146,9 +144,9 @@
 			</div>
 		</div>
 
-		<div class="bg-white rounded-lg shadow-sm p-6 mb-6">
-			<h2 class="text-lg font-semibold text-gray-900 mb-4">Weekly Schedule</h2>
-			<p class="text-sm text-gray-600 mb-6">
+		<div class="bg-surface rounded-lg shadow-sm p-6 mb-6">
+			<h2 class="text-lg font-semibold text-foreground mb-4">Weekly Schedule</h2>
+			<p class="text-sm text-muted-foreground mb-6">
 				Set your available hours for each day of the week. People can only book meetings during these times.
 			</p>
 
@@ -158,35 +156,26 @@
 
 				<div class="space-y-4">
 					{#each availability as day}
-						<div class="flex items-center gap-4 p-4 border border-gray-200 rounded-lg">
+						<div class="flex items-center gap-4 p-4 border border-border rounded-lg">
 							<div class="flex items-center min-w-[120px]">
 								<input
 									type="checkbox"
 									bind:checked={day.enabled}
-									class="h-4 w-4 text-blue-600 rounded border-gray-300"
+									class="h-4 w-4 text-primary rounded border-border-medium"
 									id="day-{day.day}"
 								/>
-								<label for="day-{day.day}" class="ml-2 font-medium text-gray-900">
+								<label for="day-{day.day}" class="ml-2 font-medium text-foreground">
 									{day.name}
 								</label>
 							</div>
-
 							{#if day.enabled}
 								<div class="flex items-center gap-2 flex-1">
-									<input
-										type="time"
-										bind:value={day.startTime}
-										class="px-3 py-2 border border-gray-300 rounded-md text-sm"
-									/>
-									<span class="text-gray-600">to</span>
-									<input
-										type="time"
-										bind:value={day.endTime}
-										class="px-3 py-2 border border-gray-300 rounded-md text-sm"
-									/>
+									<input type="time" bind:value={day.startTime} class="px-3 py-2 border border-border-medium rounded-md text-sm" />
+									<span class="text-muted-foreground">to</span>
+									<input type="time" bind:value={day.endTime} class="px-3 py-2 border border-border-medium rounded-md text-sm" />
 								</div>
 							{:else}
-								<span class="text-gray-400 text-sm">Unavailable</span>
+								<span class="text-subtle-foreground text-sm">Unavailable</span>
 							{/if}
 						</div>
 					{/each}
@@ -196,23 +185,18 @@
 					<button
 						type="submit"
 						disabled={saving}
-						class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition disabled:opacity-50"
+						class="px-6 py-2 bg-primary text-primary-foreground rounded-lg hover:opacity-90 transition disabled:opacity-50"
 					>
 						{saving ? 'Saving...' : 'Save Availability'}
 					</button>
-
 					<button
 						type="button"
 						onclick={() => {
-							// Set typical work hours (Mon-Fri 9-5)
 							availability = availability.map((day) => ({
-								...day,
-								enabled: day.day >= 1 && day.day <= 5,
-								startTime: '09:00',
-								endTime: '17:00'
+								...day, enabled: day.day >= 1 && day.day <= 5, startTime: '09:00', endTime: '17:00'
 							}));
 						}}
-						class="px-6 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition"
+						class="px-6 py-2 bg-gray-200 text-muted-foreground rounded-lg hover:bg-gray-300 transition"
 					>
 						Set Default Hours (Mon-Fri, 9-5)
 					</button>
@@ -220,9 +204,9 @@
 			</form>
 		</div>
 
-		<div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
-			<h3 class="font-semibold text-blue-900 mb-2">Note</h3>
-			<p class="text-sm text-blue-800">
+		<div class="bg-accent-subtle border border-border-primary rounded-lg p-4">
+			<h3 class="font-semibold text-foreground mb-2">Note</h3>
+			<p class="text-sm text-muted-foreground">
 				Your connected calendars will also be checked for conflicts. Even if you're available according to these hours,
 				if you have an event on your calendar during a time slot, it won't be shown as available to book.
 			</p>

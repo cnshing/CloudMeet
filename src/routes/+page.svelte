@@ -16,7 +16,7 @@
 
 {#if data.user && data.eventTypes}
 	<!-- Event Types View -->
-	<div class="min-h-screen bg-gray-50 py-12">
+	<div class="min-h-screen bg-background py-12">
 		<div class="max-w-2xl mx-auto px-4">
 			<!-- User Header -->
 			<div class="text-center mb-10">
@@ -31,8 +31,8 @@
 						{data.user.name?.charAt(0) || 'U'}
 					</div>
 				{/if}
-				<h1 class="text-3xl font-bold text-gray-900 mb-2">{data.user.name}</h1>
-				<p class="text-gray-600">Select a meeting type to book a time</p>
+				<h1 class="text-3xl font-bold text-foreground mb-2">{data.user.name}</h1>
+				<p class="text-muted-foreground">Select a meeting type to book a time</p>
 			</div>
 
 			<!-- Event Types List -->
@@ -41,14 +41,14 @@
 					{#each data.eventTypes as eventType}
 						<a
 							href="/{eventType.slug}"
-							class="block bg-white rounded-lg shadow-sm hover:shadow-md transition-all p-5 border-l-4 hover:translate-x-1"
+							class="block bg-surface rounded-lg shadow-sm hover:shadow-md transition-all p-5 border-l-4 hover:translate-x-1"
 							style="border-left-color: {data.user.brandColor || '#3b82f6'}"
 						>
 							<div class="flex justify-between items-start">
 								<div class="flex-1 min-w-0">
-									<h2 class="text-lg font-semibold text-gray-900 mb-1">{eventType.name}</h2>
+									<h2 class="text-lg font-semibold text-foreground mb-1">{eventType.name}</h2>
 									{#if eventType.description}
-										<p class="text-gray-600 text-sm line-clamp-2">{stripHtml(eventType.description)}</p>
+										<p class="text-muted-foreground text-sm line-clamp-2">{stripHtml(eventType.description)}</p>
 									{/if}
 								</div>
 								<div class="flex items-center text-sm font-medium ml-4 px-3 py-1 rounded-full" style="background-color: {data.user.brandColor || '#3b82f6'}20; color: {data.user.brandColor || '#3b82f6'}">
@@ -67,9 +67,9 @@
 					{/each}
 				</div>
 			{:else}
-				<div class="bg-white rounded-lg shadow-md p-12 text-center">
+				<div class="bg-surface rounded-lg shadow-md p-12 text-center">
 					<svg
-						class="w-16 h-16 mx-auto mb-4 text-gray-400"
+						class="w-16 h-16 mx-auto mb-4 text-subtle-foreground"
 						fill="none"
 						stroke="currentColor"
 						viewBox="0 0 24 24"
@@ -81,34 +81,34 @@
 							d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
 						></path>
 					</svg>
-					<h2 class="text-xl font-semibold text-gray-900 mb-2">No Available Meeting Types</h2>
-					<p class="text-gray-600">Check back later.</p>
+					<h2 class="text-xl font-semibold text-foreground mb-2">No Available Meeting Types</h2>
+					<p class="text-muted-foreground">Check back later.</p>
 				</div>
 			{/if}
 		</div>
 	</div>
 {:else}
 	<!-- Landing Page -->
-	<div class="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
+	<div class="min-h-screen bg-gradient-to-br from-background-gradient to-surface-2">
 		<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
 		<!-- Header -->
 		<div class="text-center mb-16">
-			<h1 class="text-5xl font-bold text-gray-900 mb-4">
+			<h1 class="text-5xl font-bold text-foreground mb-4">
 				Meeting Scheduler
 			</h1>
-			<p class="text-xl text-gray-600 mb-8">
+			<p class="text-xl text-muted-foreground mb-8">
 				Free, open-source meeting scheduling on Cloudflare
 			</p>
 			<div class="flex justify-center gap-4">
 				<a
 					href="/auth/login"
-					class="inline-flex items-center px-8 py-3 border border-transparent text-base font-medium rounded-lg shadow-sm text-white bg-blue-600 hover:bg-blue-700 transition"
+					class="inline-flex items-center px-8 py-3 border border-transparent text-base font-medium rounded-lg shadow-sm text-primary-foreground bg-primary hover:opacity-90 transition"
 				>
 					Login with Google
 				</a>
 				<a
 					href="/dashboard"
-					class="inline-flex items-center px-8 py-3 border border-gray-300 text-base font-medium rounded-lg text-gray-700 bg-white hover:bg-gray-50 transition"
+					class="inline-flex items-center px-8 py-3 border border-border-medium text-base font-medium rounded-lg text-muted-foreground bg-surface hover:bg-surface-2 transition"
 				>
 					Go to Dashboard
 				</a>
@@ -117,10 +117,10 @@
 
 		<!-- Features -->
 		<div class="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
-			<div class="bg-white p-8 rounded-xl shadow-sm">
-				<div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mb-4">
+			<div class="bg-surface p-8 rounded-xl shadow-sm">
+				<div class="w-12 h-12 bg-accent-subtle rounded-lg flex items-center justify-center mb-4">
 					<svg
-						class="w-6 h-6 text-blue-600"
+						class="w-6 h-6 text-accent"
 						fill="none"
 						stroke="currentColor"
 						viewBox="0 0 24 24"
@@ -133,13 +133,13 @@
 						></path>
 					</svg>
 				</div>
-				<h3 class="text-lg font-semibold mb-2 text-gray-900">Google Calendar Sync</h3>
-				<p class="text-gray-600 text-sm">
+				<h3 class="text-lg font-semibold mb-2 text-foreground">Google Calendar Sync</h3>
+				<p class="text-muted-foreground text-sm">
 					Automatically sync with your Google Calendar to prevent double bookings
 				</p>
 			</div>
 
-			<div class="bg-white p-8 rounded-xl shadow-sm">
+			<div class="bg-surface p-8 rounded-xl shadow-sm">
 				<div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mb-4">
 					<svg
 						class="w-6 h-6 text-green-600"
@@ -155,13 +155,13 @@
 						></path>
 					</svg>
 				</div>
-				<h3 class="text-lg font-semibold mb-2 text-gray-900">Set Your Hours</h3>
-				<p class="text-gray-600 text-sm">
+				<h3 class="text-lg font-semibold mb-2 text-foreground">Set Your Hours</h3>
+				<p class="text-muted-foreground text-sm">
 					Define your availability and let people book meetings during those times
 				</p>
 			</div>
 
-			<div class="bg-white p-8 rounded-xl shadow-sm">
+			<div class="bg-surface p-8 rounded-xl shadow-sm">
 				<div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mb-4">
 					<svg
 						class="w-6 h-6 text-purple-600"
@@ -177,8 +177,8 @@
 						></path>
 					</svg>
 				</div>
-				<h3 class="text-lg font-semibold mb-2 text-gray-900">Lightning Fast</h3>
-				<p class="text-gray-600 text-sm">
+				<h3 class="text-lg font-semibold mb-2 text-foreground">Lightning Fast</h3>
+				<p class="text-muted-foreground text-sm">
 					Built on Cloudflare's edge network for instant page loads worldwide
 				</p>
 			</div>
@@ -186,17 +186,17 @@
 
 		<!-- How It Works -->
 		<div class="mt-20 max-w-3xl mx-auto">
-			<h2 class="text-3xl font-bold text-center text-gray-900 mb-12">How It Works</h2>
+			<h2 class="text-3xl font-bold text-center text-foreground mb-12">How It Works</h2>
 			<div class="space-y-6">
 				<div class="flex gap-4">
 					<div
-						class="flex-shrink-0 w-10 h-10 bg-blue-600 text-white rounded-full flex items-center justify-center font-bold"
+						class="flex-shrink-0 w-10 h-10 bg-primary text-primary-foreground rounded-full flex items-center justify-center font-bold"
 					>
 						1
 					</div>
 					<div>
-						<h4 class="font-semibold text-gray-900 mb-1">Connect Your Google Calendar</h4>
-						<p class="text-gray-600 text-sm">
+						<h4 class="font-semibold text-foreground mb-1">Connect Your Google Calendar</h4>
+						<p class="text-muted-foreground text-sm">
 							Log in with Google and grant access to your calendar
 						</p>
 					</div>
@@ -204,13 +204,13 @@
 
 				<div class="flex gap-4">
 					<div
-						class="flex-shrink-0 w-10 h-10 bg-blue-600 text-white rounded-full flex items-center justify-center font-bold"
+						class="flex-shrink-0 w-10 h-10 bg-primary text-primary-foreground rounded-full flex items-center justify-center font-bold"
 					>
 						2
 					</div>
 					<div>
-						<h4 class="font-semibold text-gray-900 mb-1">Set Your Availability</h4>
-						<p class="text-gray-600 text-sm">
+						<h4 class="font-semibold text-foreground mb-1">Set Your Availability</h4>
+						<p class="text-muted-foreground text-sm">
 							Define your working hours and create event types (30 min meetings, consultations, etc.)
 						</p>
 					</div>
@@ -218,13 +218,13 @@
 
 				<div class="flex gap-4">
 					<div
-						class="flex-shrink-0 w-10 h-10 bg-blue-600 text-white rounded-full flex items-center justify-center font-bold"
+						class="flex-shrink-0 w-10 h-10 bg-primary text-primary-foreground rounded-full flex items-center justify-center font-bold"
 					>
 						3
 					</div>
 					<div>
-						<h4 class="font-semibold text-gray-900 mb-1">Share Your Link</h4>
-						<p class="text-gray-600 text-sm">
+						<h4 class="font-semibold text-foreground mb-1">Share Your Link</h4>
+						<p class="text-muted-foreground text-sm">
 							Get a personalized booking link to share with others
 						</p>
 					</div>
@@ -232,13 +232,13 @@
 
 				<div class="flex gap-4">
 					<div
-						class="flex-shrink-0 w-10 h-10 bg-blue-600 text-white rounded-full flex items-center justify-center font-bold"
+						class="flex-shrink-0 w-10 h-10 bg-primary text-primary-foreground rounded-full flex items-center justify-center font-bold"
 					>
 						4
 					</div>
 					<div>
-						<h4 class="font-semibold text-gray-900 mb-1">Get Booked</h4>
-						<p class="text-gray-600 text-sm">
+						<h4 class="font-semibold text-foreground mb-1">Get Booked</h4>
+						<p class="text-muted-foreground text-sm">
 							When someone books a meeting, it's automatically added to your Google Calendar
 						</p>
 					</div>
@@ -250,7 +250,7 @@
 		<div class="mt-20 text-center">
 			<a
 				href="/auth/login"
-				class="inline-flex items-center px-12 py-4 border border-transparent text-lg font-medium rounded-lg shadow-sm text-white bg-blue-600 hover:bg-blue-700 transition"
+				class="inline-flex items-center px-12 py-4 border border-transparent text-lg font-medium rounded-lg shadow-sm text-primary-foreground bg-primary hover:opacity-90 transition"
 			>
 				Get Started - It's Free
 			</a>
