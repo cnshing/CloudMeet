@@ -152,7 +152,7 @@
 					type="text"
 					readonly
 					value="{data.appUrl}/"
-					class="flex-1 px-3 py-2 bg-surface border border-border-medium rounded-md text-sm"
+					class="flex-1 px-3 py-2 bg-surface-2 border border-border-medium rounded-md text-sm text-foreground"
 				/>
 				<button
 					onclick={() => {

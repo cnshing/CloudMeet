@@ -59,7 +59,7 @@
 		<h2 class="text-xl font-bold text-foreground">Upcoming Bookings</h2>
 		<select
 			bind:value={sortOrder}
-			class="text-sm border border-border-medium rounded-md px-2 py-1 bg-surface text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+			class="text-sm border border-border-medium rounded-md px-2 py-1 bg-surface-2 text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
 		>
 			<option value="last_booked">Last booked</option>
 			<option value="upcoming">Upcoming first</option>

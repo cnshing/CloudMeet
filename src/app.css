@@ -38,6 +38,7 @@
     --color-border-medium:       #b3b4b1;
     --color-border-primary:      #628c20;
     --color-border-icon:         #b3b4b1;
+
   }
 
   .dark {
@@ -59,6 +60,28 @@
     --color-border-medium:       #676866;
     --color-border-primary:      #b9ff49;
     --color-border-icon:         #fafafa;
+  }
+
+  /*
+   * Apply design-system colours to every text-like input, textarea, and
+   * select.  [type="checkbox"], [type="radio"], [type="hidden"],
+   * [type="file"], and [type="color"] are intentionally excluded because
+   * they are either purely decorative or have custom styling elsewhere.
+   *
+   * surface-2 is used as the input background:
+   *   light → #e5e6e3  (warm light-gray, clearly stands out on surface/background)
+   *   dark  → #3b3b3b  (medium-dark, readable against the dark surface #191919)
+   */
+  input:not([type="checkbox"]):not([type="radio"]):not([type="hidden"]):not([type="file"]):not([type="range"]):not([type="color"]),
+  textarea,
+  select {
+    background-color: var(--color-surface-2);
+    color: var(--color-foreground);
+  }
+
+  ::placeholder {
+    color: var(--color-subtle-foreground);
+    opacity: 1; /* Firefox reduces opacity by default */
   }
 }
 
