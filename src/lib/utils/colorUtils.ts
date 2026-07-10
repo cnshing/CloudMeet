@@ -42,20 +42,54 @@ export function adjustBrightnessHex(hex: string, percent: number): string {
  */
 export interface BrandColors {
 	base: string;
-	rgb: RGB;
 	light: string;
 	lighter: string;
 	dark: string;
 	darkHex: string;
 }
 
-export function createBrandColors(brandColor: string): BrandColors {
+/**
+ * Set to true to use design system CSS tokens (app.css primary colors)
+ * instead of computing variants from the user's stored hex brand color.
+ *
+ */
+export const USE_DESIGN_SYSTEM_COLORS = true;
+
+/**
+ * Original implementation - derives all variants via hex math on the user's brand color.
+ */
+function createHexBrandColors(brandColor: string): BrandColors {
 	return {
 		base: brandColor,
-		rgb: hexToRgb(brandColor),
 		light: adjustBrightness(brandColor, 40),
 		lighter: adjustBrightness(brandColor, 60),
 		dark: adjustBrightness(brandColor, -15),
 		darkHex: adjustBrightnessHex(brandColor, -20)
 	};
+}
+
+/**
+ * Design-system implementation: all variants are CSS custom property references
+ * sourced from the tokens defined in app.css
+ */
+function createDesignSystemColors(): BrandColors {
+	return {
+		base:    'var(--color-primary)',
+		light:   'var(--color-accent)',
+		lighter: 'var(--color-accent-subtle)',
+		dark:    'var(--color-border-strong)',
+		darkHex: 'var(--color-border-strong)'
+	};
+}
+
+/**
+ * Public entrypoint — returns a BrandColors set.
+ *
+ * Routes through createDesignSystemColors() or createHexBrandColors() depending on
+ * the USE_DESIGN_SYSTEM_COLORS feature flag.
+ */
+export function createBrandColors(brandColor: string): BrandColors {
+	return USE_DESIGN_SYSTEM_COLORS
+		? createDesignSystemColors()
+		: createHexBrandColors(brandColor);
 }

@@ -260,7 +260,7 @@
 
 <div
 	class="min-h-screen bg-surface md:bg-background flex flex-col items-center md:justify-center md:p-4"
-	style="--brand-color: {brandColor}; --brand-light: {colors.light}; --brand-lighter: {colors.lighter}; --brand-dark: {colors.dark}; --brand-rgb: {colors.rgb.r}, {colors.rgb.g}, {colors.rgb.b};"
+	style="--brand-color: {brandColor}; --brand-light: {colors.light}; --brand-lighter: {colors.lighter}; --brand-dark: {colors.dark};"
 >
 	{#if bookingStatus === 'success'}
 		<BookingSuccess eventName={data.eventType?.name || 'Meeting'} selectedDate={selectedDate!} selectedSlot={selectedSlot!} {meetingUrl} {meetingType} {brandColor} {formatTimeRange} {formatSelectedDate} />
