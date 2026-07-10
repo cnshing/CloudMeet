@@ -66,7 +66,7 @@
 					{/each}
 				</div>
 			{:else}
-				<div class="bg-surface rounded-lg shadow-md p-12 text-center">
+				<div class="bg-surface rounded-lg border border-border shadow-md p-12 text-center">
 					<svg
 						class="w-16 h-16 mx-auto mb-4 text-subtle-foreground"
 						fill="none"
