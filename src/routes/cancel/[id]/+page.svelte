@@ -40,7 +40,7 @@
 	<div class="max-w-2xl mx-auto px-4">
 		{#if success || data.alreadyCanceled}
 			<!-- Success Message -->
-			<div class="bg-surface rounded-lg shadow-lg p-8 text-center">
+			<div class="bg-surface border border-border rounded-lg shadow-lg p-8 text-center">
 			<div class="w-16 h-16 bg-accent-subtle rounded-full flex items-center justify-center mx-auto mb-4">
 				<svg class="w-8 h-8 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 						<path
@@ -66,7 +66,7 @@
 					<div class="bg-red-50 border border-red-200 text-red-800 rounded-lg p-4 mb-6">Error: {form.error}</div>
 				{/if}
 
-				<div class="bg-background border border-border rounded-lg p-6 mb-6">
+				<div class="bg-surface-2 border border-border rounded-lg p-6 mb-6">
 					<h2 class="font-semibold text-foreground mb-4">Booking Details</h2>
 					<div class="space-y-2 text-sm">
 						<div><span class="text-muted-foreground">Event:</span><span class="ml-2 text-foreground font-medium">{data.booking.event_name}</span></div>
