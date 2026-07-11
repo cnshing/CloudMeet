@@ -25,6 +25,6 @@
 		href="https://linkedin.com/in/shing-chan"
 		class="px-3 text-xs text-subtle-foreground hover:text-muted-foreground transition"
 	>
-		Linkedin
+		LinkedIn
 	</a>
 </div>
