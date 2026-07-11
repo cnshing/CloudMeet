@@ -196,7 +196,7 @@
 								...day, enabled: day.day >= 1 && day.day <= 5, startTime: '09:00', endTime: '17:00'
 							}));
 						}}
-						class="px-6 py-2 bg-gray-200 text-muted-foreground rounded-lg hover:bg-gray-300 transition"
+						class="px-6 py-2 bg-surface text-muted-foreground rounded-lg hover:bg-surface-2 transition"
 					>
 						Set Default Hours (Mon-Fri, 9-5)
 					</button>

@@ -49,7 +49,7 @@
 			case 'pending':
 				return 'bg-yellow-100 text-yellow-800';
 			default:
-				return 'bg-gray-100 text-gray-800';
+				return 'bg-surface-2 text-muted-foreground';
 		}
 	}
 </script>
@@ -100,7 +100,7 @@
 						<p>{formatCompactDateTime(new Date(booking.start_time))}</p>
 					</div>
 					{#if booking.attendee_notes}
-						<div class="mt-2 text-sm text-muted-foreground bg-gray-50 rounded p-2">
+						<div class="mt-2 text-sm text-muted-foreground bg-background rounded p-2">
 							<span class="font-medium">Message:</span> {booking.attendee_notes}
 						</div>
 					{/if}

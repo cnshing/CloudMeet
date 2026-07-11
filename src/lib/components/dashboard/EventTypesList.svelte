@@ -38,7 +38,7 @@
 						<span
 							class="px-2 py-1 text-xs rounded-full {eventType.is_active
 								? 'bg-green-100 text-green-800'
-								: 'bg-gray-100 text-gray-800'}"
+								: 'bg-surface-2 text-muted-foreground'}"
 						>
 							{eventType.is_active ? 'Active' : 'Inactive'}
 						</span>

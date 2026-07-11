@@ -138,7 +138,7 @@
 								{profileName?.charAt(0) || 'U'}
 							</div>
 						{/if}
-						<label class="absolute bottom-0 right-0 bg-surface rounded-full p-2 shadow-lg border border-border cursor-pointer hover:bg-gray-50 transition">
+						<label class="absolute bottom-0 right-0 bg-surface rounded-full p-2 shadow-lg border border-border cursor-pointer hover:bg-background transition">
 							<input
 								type="file"
 								accept="image/*"

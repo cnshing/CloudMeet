@@ -351,13 +351,13 @@
 
 					<!-- Month navigation with arrows on sides -->
 					<div class="flex items-center justify-between mb-4">
-						<button onclick={prevMonth} class="p-2 hover:bg-gray-100 rounded-full transition" aria-label="Previous month">
+						<button onclick={prevMonth} class="p-2 hover:bg-surface-2 rounded-full transition" aria-label="Previous month">
 							<svg class="w-5 h-5 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
 							</svg>
 						</button>
 						<h3 class="text-base font-semibold text-foreground">{formatMonthYear(currentMonth)}</h3>
-						<button onclick={nextMonth} class="p-2 hover:bg-gray-100 rounded-full transition" aria-label="Next month">
+						<button onclick={nextMonth} class="p-2 hover:bg-surface-2 rounded-full transition" aria-label="Next month">
 							<svg class="w-5 h-5 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
 							</svg>

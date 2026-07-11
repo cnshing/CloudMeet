@@ -186,13 +186,13 @@
 					<!-- Calendar -->
 					<div class="flex-1">
 						<div class="flex items-center justify-between mb-4">
-							<button onclick={prevMonth} class="p-1 hover:bg-gray-100 rounded">
+							<button onclick={prevMonth} class="p-1 hover:bg-surface-2 rounded">
 								<svg class="w-5 h-5 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
 								</svg>
 							</button>
 							<span class="font-medium text-foreground">{monthName}</span>
-							<button onclick={nextMonth} class="p-1 hover:bg-gray-100 rounded">
+							<button onclick={nextMonth} class="p-1 hover:bg-surface-2 rounded">
 								<svg class="w-5 h-5 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
 								</svg>
@@ -277,7 +277,7 @@
 				<button
 					type="button"
 					onclick={onClose}
-					class="px-4 py-2 text-sm font-medium text-muted-foreground bg-gray-100 rounded-lg hover:bg-gray-200 transition"
+					class="px-4 py-2 text-sm font-medium text-muted-foreground bg-surface rounded-lg hover:bg-surface-2 transition"
 				>
 					Cancel
 				</button>

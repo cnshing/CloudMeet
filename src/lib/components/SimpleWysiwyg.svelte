@@ -40,11 +40,11 @@
 
 <div class="border border-gray-300 rounded-md overflow-hidden focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-transparent">
 	<!-- Toolbar -->
-	<div class="flex items-center gap-1 p-2 bg-gray-50 border-b border-gray-300">
+	<div class="flex items-center gap-1 p-2 bg-surface border-b border-gray-300">
 		<button
 			type="button"
 			onclick={() => execCommand('bold')}
-			class="p-1.5 rounded hover:bg-gray-200 transition"
+			class="p-1.5 rounded hover:bg-surface-2 transition"
 			title="Bold"
 		>
 			<svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
@@ -55,7 +55,7 @@
 		<button
 			type="button"
 			onclick={() => execCommand('italic')}
-			class="p-1.5 rounded hover:bg-gray-200 transition"
+			class="p-1.5 rounded hover:bg-surface-2 transition"
 			title="Italic"
 		>
 			<svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
@@ -67,7 +67,7 @@
 		<button
 			type="button"
 			onclick={() => execCommand('underline')}
-			class="p-1.5 rounded hover:bg-gray-200 transition"
+			class="p-1.5 rounded hover:bg-surface-2 transition"
 			title="Underline"
 		>
 			<svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
@@ -75,11 +75,11 @@
 				<line x1="4" y1="21" x2="20" y2="21"></line>
 			</svg>
 		</button>
-		<div class="w-px h-5 bg-gray-300 mx-1"></div>
+		<div class="w-px h-5 bg-border-medium mx-1"></div>
 		<button
 			type="button"
 			onclick={() => execCommand('insertUnorderedList')}
-			class="p-1.5 rounded hover:bg-gray-200 transition"
+			class="p-1.5 rounded hover:bg-surface-2 transition"
 			title="Bullet List"
 		>
 			<svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
@@ -94,7 +94,7 @@
 		<button
 			type="button"
 			onclick={() => execCommand('insertOrderedList')}
-			class="p-1.5 rounded hover:bg-gray-200 transition"
+			class="p-1.5 rounded hover:bg-surface-2 transition"
 			title="Numbered List"
 		>
 			<svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">

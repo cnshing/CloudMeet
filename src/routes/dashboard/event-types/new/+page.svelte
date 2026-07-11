@@ -166,7 +166,7 @@
 						<label class="block text-sm font-medium text-muted-foreground mb-2">Cover Image</label>
 						<p class="text-xs text-subtle-foreground mb-3">Displayed at the top of your booking page</p>
 						{#if coverImage}
-							<div class="relative mb-3 p-4 bg-gray-100 rounded-lg">
+							<div class="relative mb-3 p-4 bg-surface-2 rounded-lg">
 								<img src={coverImage} alt="Cover preview" class="max-h-20 w-auto object-contain mx-auto" />
 								<button type="button" onclick={removeCoverImage} class="absolute top-2 right-2 bg-red-600 text-white p-1.5 rounded-full hover:bg-red-700 transition">
 									<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
@@ -252,7 +252,7 @@
 						<button type="submit" disabled={saving} class="px-6 py-2 bg-primary text-primary-foreground rounded-lg hover:opacity-90 transition disabled:opacity-50">
 							{saving ? 'Creating...' : 'Create Event Type'}
 						</button>
-						<a href="/dashboard" class="px-6 py-2 bg-gray-200 text-muted-foreground rounded-lg hover:bg-gray-300 transition">Cancel</a>
+						<a href="/dashboard" class="px-6 py-2 bg-surface text-muted-foreground rounded-lg hover:bg-surface-2 transition">Cancel</a>
 					</div>
 				</div>
 			</form>
