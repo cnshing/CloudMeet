@@ -537,6 +537,6 @@
 			</div>
 		</div>
 
-		<Footer class="mt-6" />
+		<Footer class="mt-6 hidden md:block" />
 	{/if}
 </div>
