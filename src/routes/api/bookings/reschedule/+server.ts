@@ -6,7 +6,7 @@
 import { json, error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { createCalendarEvent, cancelCalendarEvent, getValidAccessToken } from '$lib/server/google-calendar';
-import { sendRescheduleEmail, sendAdminRescheduleNotification, getEmailTemplates, isEmailEnabled } from '$lib/server/email';
+import { sendRescheduleEmail, sendAdminRescheduleNotification, getEmailTemplates, getEmailConfig, isEmailEnabled } from '$lib/server/email';
 
 export const POST: RequestHandler = async ({ request, platform }) => {
 	const env = platform?.env;
@@ -190,8 +190,12 @@ export const POST: RequestHandler = async ({ request, platform }) => {
 		await env.KV.delete(`availability:${originalBooking.event_slug}:${oldDateStr}`);
 		await env.KV.delete(`availability:${originalBooking.event_slug}:${newDateStr}`);
 
-		// Send reschedule email (not cancellation email!)
-		if (env.EMAILIT_API_KEY) {
+		// Send reschedule email (not cancellation email!) via configured provider
+		const emailConfig = getEmailConfig(env, {
+			from: env.EMAIL_FROM || originalBooking.host_email,
+			replyTo: originalBooking.contact_email || originalBooking.host_email
+		});
+		if (emailConfig) {
 			try {
 				// Parse user settings for time format
 				let timeFormat: '12h' | '24h' = '12h';
@@ -202,7 +206,6 @@ export const POST: RequestHandler = async ({ request, platform }) => {
 					// Keep default
 				}
 
-				const replyToEmail = originalBooking.contact_email || originalBooking.host_email;
 				const templates = await getEmailTemplates(db, originalBooking.user_id);
 
 				// Check if reschedule email template is enabled (default to true)
@@ -229,11 +232,7 @@ export const POST: RequestHandler = async ({ request, platform }) => {
 							brandColor: originalBooking.brand_color || undefined,
 							attendeeNotes: originalBooking.attendee_notes
 						},
-						{
-							apiKey: env.EMAILIT_API_KEY,
-							from: env.EMAIL_FROM || originalBooking.host_email,
-							replyTo: replyToEmail
-						},
+						emailConfig,
 						template?.subject || undefined
 					);
 				}
@@ -261,10 +260,7 @@ export const POST: RequestHandler = async ({ request, platform }) => {
 							attendeeNotes: originalBooking.attendee_notes
 						},
 						originalBooking.host_email,
-						{
-							apiKey: env.EMAILIT_API_KEY,
-							from: env.EMAIL_FROM || originalBooking.host_email
-						}
+						emailConfig
 					);
 				} catch (adminEmailErr) {
 					console.error('Failed to send admin reschedule notification:', adminEmailErr);

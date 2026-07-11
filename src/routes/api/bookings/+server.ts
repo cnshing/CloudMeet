@@ -7,7 +7,7 @@ import { json, error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { createCalendarEvent, getValidAccessToken } from '$lib/server/google-calendar';
 import { createOutlookCalendarEvent, getValidOutlookAccessToken } from '$lib/server/outlook-calendar';
-import { sendBookingEmail, sendAdminNotificationEmail, getEmailTemplates, isEmailEnabled, type EmailTemplateType } from '$lib/server/email';
+import { sendBookingEmail, sendAdminNotificationEmail, getEmailTemplates, getEmailConfig, isEmailEnabled, type EmailTemplateType } from '$lib/server/email';
 import { isValidEmail, validateLength, validateFields, MAX_LENGTHS } from '$lib/server/validation';
 
 export const POST: RequestHandler = async ({ request, platform }) => {
@@ -231,8 +231,12 @@ export const POST: RequestHandler = async ({ request, platform }) => {
 		const cacheKey = `availability:${eventSlug}:${dateStr}`;
 		await env.KV.delete(cacheKey);
 
-		// Send booking confirmation email via Emailit (if enabled)
-		if (env.EMAILIT_API_KEY) {
+		// Send booking confirmation email via configured provider (if enabled)
+		const emailConfig = getEmailConfig(env, {
+			from: env.EMAIL_FROM || user.email,
+			replyTo: user.contact_email || user.email
+		});
+		if (emailConfig) {
 			try {
 				// Parse user settings for time format
 				let timeFormat: '12h' | '24h' = '12h';
@@ -242,9 +246,6 @@ export const POST: RequestHandler = async ({ request, platform }) => {
 				} catch {
 					// Keep default
 				}
-
-				// Use contact email for reply-to if available
-				const replyToEmail = user.contact_email || user.email;
 
 				// Get the booking ID (it's a UUID string, not integer)
 				const bookingResult = await db
@@ -284,11 +285,7 @@ export const POST: RequestHandler = async ({ request, platform }) => {
 							...emailData,
 							customMessage: template?.custom_message
 						},
-						{
-							apiKey: env.EMAILIT_API_KEY,
-							from: env.EMAIL_FROM || user.email,
-							replyTo: replyToEmail
-						},
+						emailConfig,
 						template?.subject || undefined
 					);
 				}
@@ -297,10 +294,7 @@ export const POST: RequestHandler = async ({ request, platform }) => {
 				await sendAdminNotificationEmail(
 					emailData,
 					user.contact_email || user.email,
-					{
-						apiKey: env.EMAILIT_API_KEY,
-						from: env.EMAIL_FROM || user.email
-					}
+					emailConfig
 				);
 
 				// Schedule reminder emails

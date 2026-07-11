@@ -7,7 +7,7 @@
  */
 
 import { json, error, type RequestEvent } from '@sveltejs/kit';
-import { sendReminderEmail, getEmailTemplates, type EmailTemplateType } from '$lib/server/email';
+import { sendReminderEmail, getEmailTemplates, getEmailConfig, type EmailTemplateType } from '$lib/server/email';
 
 export const GET = async ({ url, platform }: RequestEvent) => {
 	const env = platform?.env;
@@ -101,8 +101,13 @@ export const GET = async ({ url, platform }: RequestEvent) => {
 					continue;
 				}
 
-				// Send the reminder email
-				if (env.EMAILIT_API_KEY) {
+				// Send the reminder email via configured provider
+				const replyToEmail = email.contact_email || email.host_email;
+				const emailConfig = getEmailConfig(env, {
+					from: env.EMAIL_FROM || email.host_email,
+					replyTo: replyToEmail
+				});
+				if (emailConfig) {
 					// Parse user settings for time format
 					let timeFormat: '12h' | '24h' = '12h';
 					try {
@@ -111,8 +116,6 @@ export const GET = async ({ url, platform }: RequestEvent) => {
 					} catch {
 						// Keep default
 					}
-
-					const replyToEmail = email.contact_email || email.host_email;
 
 					await sendReminderEmail(
 						{
@@ -133,11 +136,7 @@ export const GET = async ({ url, platform }: RequestEvent) => {
 							brandColor: email.brand_color || undefined
 						},
 						email.template_type as 'reminder_24h' | 'reminder_1h' | 'reminder_30m',
-						{
-							apiKey: env.EMAILIT_API_KEY,
-							from: env.EMAIL_FROM || email.host_email,
-							replyTo: replyToEmail
-						},
+						emailConfig,
 						template?.subject || undefined
 					);
 

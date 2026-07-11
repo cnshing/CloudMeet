@@ -2,6 +2,8 @@
  * Email service types
  */
 
+import type { EmailProvider } from './providers';
+
 export interface BookingEmailData {
 	attendeeName: string;
 	attendeeEmail: string;
@@ -29,6 +31,24 @@ export interface RescheduleEmailData extends BookingEmailData {
 	oldEndTime: Date;
 }
 
+export interface RescheduleProposalEmailData {
+	attendeeName: string;
+	attendeeEmail: string;
+	eventName: string;
+	eventSlug: string;
+	hostName: string;
+	hostEmail: string;
+	oldStartTime: Date;
+	oldEndTime: Date;
+	newStartTime: Date;
+	newEndTime: Date;
+	message: string | null;
+	responseUrl: string;
+	appUrl: string;
+	timeFormat: '12h' | '24h';
+	brandColor: string;
+}
+
 export type EmailTemplateType = 'confirmation' | 'cancellation' | 'reschedule' | 'reminder_24h' | 'reminder_1h' | 'reminder_30m';
 
 export interface EmailTemplate {
@@ -39,7 +59,7 @@ export interface EmailTemplate {
 }
 
 export interface EmailConfig {
-	apiKey: string;
+	provider: EmailProvider;
 	from: string;
 	replyTo?: string;
 }

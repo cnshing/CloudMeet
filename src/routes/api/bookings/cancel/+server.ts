@@ -7,7 +7,7 @@ import { json, error, type RequestEvent } from '@sveltejs/kit';
 import { getCurrentUser } from '$lib/server/auth';
 import { cancelCalendarEvent, getValidAccessToken } from '$lib/server/google-calendar';
 import { cancelOutlookCalendarEvent, getValidOutlookAccessToken } from '$lib/server/outlook-calendar';
-import { sendCancellationEmail, getEmailTemplates, isEmailEnabled } from '$lib/server/email';
+import { sendCancellationEmail, getEmailTemplates, getEmailConfig, isEmailEnabled } from '$lib/server/email';
 
 export const POST = async (event: RequestEvent) => {
 	const env = event.platform?.env;
@@ -123,8 +123,13 @@ export const POST = async (event: RequestEvent) => {
 			.bind(bookingId)
 			.run();
 
-		// Send cancellation email if enabled
-		if (env.EMAILIT_API_KEY) {
+		// Send cancellation email if enabled and a provider is configured
+		const replyToEmail = booking.contact_email || booking.host_email;
+		const emailConfig = getEmailConfig(env, {
+			from: env.EMAIL_FROM || booking.host_email,
+			replyTo: replyToEmail
+		});
+		if (emailConfig) {
 			try {
 				// Parse user settings for time format
 				let timeFormat: '12h' | '24h' = '12h';
@@ -135,7 +140,6 @@ export const POST = async (event: RequestEvent) => {
 					// Keep default
 				}
 
-				const replyToEmail = booking.contact_email || booking.host_email;
 				const templates = await getEmailTemplates(db, booking.user_id);
 
 				if (isEmailEnabled(templates, 'cancellation')) {
@@ -159,11 +163,7 @@ export const POST = async (event: RequestEvent) => {
 							timeFormat,
 							brandColor: booking.brand_color || undefined
 						},
-						{
-							apiKey: env.EMAILIT_API_KEY,
-							from: env.EMAIL_FROM || booking.host_email,
-							replyTo: replyToEmail
-						},
+						emailConfig,
 						template?.subject || undefined
 					);
 				}
