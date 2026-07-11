@@ -114,7 +114,7 @@
 		contenteditable="true"
 		oninput={updateValue}
 		onpaste={handlePaste}
-		class="min-h-[120px] p-3 outline-none prose prose-sm max-w-none input"
+		class="min-h-[120px] p-3 outline-none prose prose-sm max-w-none input text-foreground"
 		data-placeholder={placeholder}
 	></div>
 </div>
