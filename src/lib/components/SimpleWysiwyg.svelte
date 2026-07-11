@@ -114,7 +114,7 @@
 		contenteditable="true"
 		oninput={updateValue}
 		onpaste={handlePaste}
-		class="min-h-[120px] p-3 outline-none prose prose-sm max-w-none"
+		class="min-h-[120px] p-3 outline-none prose prose-sm max-w-none input"
 		data-placeholder={placeholder}
 	></div>
 </div>
@@ -122,7 +122,7 @@
 <style>
 	[contenteditable]:empty:before {
 		content: attr(data-placeholder);
-		color: #9ca3af;
+		color: var(--color-subtle-foreground);
 		pointer-events: none;
 	}
 

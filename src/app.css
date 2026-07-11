@@ -74,7 +74,8 @@
    */
   input:not([type="checkbox"]):not([type="radio"]):not([type="hidden"]):not([type="file"]):not([type="range"]):not([type="color"]),
   textarea,
-  select {
+  select,
+  .input {
     background-color: var(--color-surface-2);
     color: var(--color-foreground);
   }
