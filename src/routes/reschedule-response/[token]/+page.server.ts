@@ -6,7 +6,7 @@
 import { error, redirect, fail } from '@sveltejs/kit';
 import type { PageServerLoad, Actions } from './$types';
 import { createCalendarEvent, cancelCalendarEvent, getValidAccessToken } from '$lib/server/google-calendar';
-import { sendAdminRescheduleNotification, sendAdminCancellationNotification } from '$lib/server/email';
+import { getEmailConfig, sendAdminRescheduleNotification, sendAdminCancellationNotification } from '$lib/server/email';
 
 export const load: PageServerLoad = async ({ params, url, platform }) => {
 	const db = platform?.env?.DB;
@@ -159,10 +159,23 @@ export const actions: Actions = {
 				const calendarEvent = await createCalendarEvent(accessToken, {
 					summary: `${proposal.event_name} with ${proposal.attendee_name}`,
 					description: proposal.attendee_notes || '',
-					startTime: proposal.proposed_start_time,
-					endTime: proposal.proposed_end_time,
-					attendeeEmail: proposal.attendee_email,
-					hostEmail: proposal.host_email
+					start: {
+						dateTime: new Date(proposal.proposed_start_time).toISOString(),
+						timeZone: 'UTC'
+					},
+					end: {
+						dateTime: new Date(proposal.proposed_end_time).toISOString(),
+						timeZone: 'UTC'
+					},
+					attendees: [
+						{ email: proposal.attendee_email }
+					],
+					conferenceData: {
+						createRequest: {
+							requestId: crypto.randomUUID(),
+							conferenceSolutionKey: { type: 'hangoutsMeet' }
+						}
+					}
 				});
 
 				newGoogleEventId = calendarEvent.id;
@@ -194,7 +207,10 @@ export const actions: Actions = {
 				.run();
 
 			// Send admin notification about accepted reschedule
-			if (env.EMAILIT_API_KEY) {
+			const emailConfig = getEmailConfig(env, {
+				from: env.EMAIL_FROM || proposal.host_email
+			});
+			if (emailConfig) {
 				try {
 					// Parse user settings for time format
 					let timeFormat: '12h' | '24h' = '12h';
@@ -225,10 +241,7 @@ export const actions: Actions = {
 							attendeeNotes: proposal.attendee_notes
 						},
 						proposal.host_email,
-						{
-							apiKey: env.EMAILIT_API_KEY,
-							from: env.EMAIL_FROM || proposal.host_email
-						}
+						emailConfig
 					);
 				} catch (emailErr) {
 					console.error('Failed to send admin reschedule notification:', emailErr);
@@ -321,7 +334,10 @@ export const actions: Actions = {
 				.run();
 
 			// Send admin notification about declined reschedule (meeting cancelled)
-			if (env.EMAILIT_API_KEY) {
+			const emailConfig = getEmailConfig(env, {
+				from: env.EMAIL_FROM || proposal.host_email
+			});
+			if (emailConfig) {
 				try {
 					// Parse user settings for time format
 					let timeFormat: '12h' | '24h' = '12h';
@@ -351,10 +367,7 @@ export const actions: Actions = {
 							customMessage: 'Attendee declined the reschedule proposal and cancelled the meeting.'
 						},
 						proposal.host_email,
-						{
-							apiKey: env.EMAILIT_API_KEY,
-							from: env.EMAIL_FROM || proposal.host_email
-						}
+						emailConfig
 					);
 				} catch (emailErr) {
 					console.error('Failed to send admin cancellation notification:', emailErr);

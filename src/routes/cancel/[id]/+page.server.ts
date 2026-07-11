@@ -5,7 +5,7 @@
 import { error, redirect, fail } from '@sveltejs/kit';
 import type { PageServerLoad, Actions } from './$types';
 import { cancelCalendarEvent, getValidAccessToken } from '$lib/server/google-calendar';
-import { sendCancellationEmail, sendAdminCancellationNotification, getEmailTemplates, isEmailEnabled } from '$lib/server/email';
+import { sendCancellationEmail, sendAdminCancellationNotification, getEmailTemplates, getEmailConfig, isEmailEnabled } from '$lib/server/email';
 
 export const load: PageServerLoad = async ({ params, platform }) => {
 	const db = platform?.env?.DB;
@@ -122,8 +122,11 @@ export const actions: Actions = {
 				.bind(bookingId)
 				.run();
 
-			// Send cancellation email if enabled
-			if (env.EMAILIT_API_KEY) {
+			// Send cancellation email if enabled and a provider is configured
+			const emailConfig = getEmailConfig(env, {
+				from: env.EMAIL_FROM || '',
+			});
+			if (emailConfig) {
 				try {
 					// Get full booking details for email
 					const fullBooking = await db
@@ -165,6 +168,11 @@ export const actions: Actions = {
 						}
 
 						const replyToEmail = fullBooking.contact_email || fullBooking.host_email;
+						const bookingEmailConfig = {
+							...emailConfig,
+							from: env.EMAIL_FROM || fullBooking.host_email,
+							replyTo: replyToEmail
+						};
 						const templates = await getEmailTemplates(db, fullBooking.user_id);
 						if (isEmailEnabled(templates, 'cancellation')) {
 							const template = templates.get('cancellation');
@@ -187,11 +195,7 @@ export const actions: Actions = {
 									timeFormat,
 									brandColor: fullBooking.brand_color || undefined
 								},
-								{
-									apiKey: env.EMAILIT_API_KEY,
-									from: env.EMAIL_FROM || fullBooking.host_email,
-									replyTo: replyToEmail
-								},
+								bookingEmailConfig,
 								template?.subject || undefined
 							);
 						}
@@ -217,10 +221,7 @@ export const actions: Actions = {
 									brandColor: fullBooking.brand_color || undefined
 								},
 								fullBooking.host_email,
-								{
-									apiKey: env.EMAILIT_API_KEY,
-									from: env.EMAIL_FROM || fullBooking.host_email
-								}
+								bookingEmailConfig
 							);
 						} catch (adminErr) {
 							console.error('Failed to send admin cancellation notification:', adminErr);

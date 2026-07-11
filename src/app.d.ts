@@ -13,8 +13,11 @@ declare global {
 				BASE_URL: string;
 				APP_URL?: string;
 				ADMIN_EMAIL?: string;
+				EMAIL_PROVIDER?: 'emailit' | 'noop';
 				EMAILIT_API_KEY?: string;
 				EMAIL_FROM?: string;
+				MICROSOFT_CLIENT_ID?: string;
+				MICROSOFT_CLIENT_SECRET?: string;
 				TURNSTILE_SECRET_KEY?: string;
 				CRON_SECRET?: string;
 			};
