@@ -41,47 +41,47 @@
 <div class="border border-border-medium rounded-md overflow-hidden focus-within:ring-2 focus-within:ring-primary focus-within:border-transparent">
 	<!-- Toolbar -->
 	<div class="flex items-center gap-1 p-2 bg-surface border-b border-border-medium">
-		<button
-			type="button"
-			onclick={() => execCommand('bold')}
-			class="p-1.5 rounded hover:bg-surface-2 transition"
-			title="Bold"
-		>
+	<button
+		type="button"
+		onclick={() => execCommand('bold')}
+		class="p-1.5 rounded hover:bg-surface-2 transition text-muted-foreground focus:outline-none"
+		title="Bold"
+	>
 			<svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
 				<path d="M6 4h8a4 4 0 014 4 4 4 0 01-4 4H6z"></path>
 				<path d="M6 12h9a4 4 0 014 4 4 4 0 01-4 4H6z"></path>
 			</svg>
 		</button>
-		<button
-			type="button"
-			onclick={() => execCommand('italic')}
-			class="p-1.5 rounded hover:bg-surface-2 transition"
-			title="Italic"
-		>
+	<button
+		type="button"
+		onclick={() => execCommand('italic')}
+		class="p-1.5 rounded hover:bg-surface-2 transition text-muted-foreground focus:outline-none"
+		title="Italic"
+	>
 			<svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
 				<line x1="19" y1="4" x2="10" y2="4"></line>
 				<line x1="14" y1="20" x2="5" y2="20"></line>
 				<line x1="15" y1="4" x2="9" y2="20"></line>
 			</svg>
 		</button>
-		<button
-			type="button"
-			onclick={() => execCommand('underline')}
-			class="p-1.5 rounded hover:bg-surface-2 transition"
-			title="Underline"
-		>
+	<button
+		type="button"
+		onclick={() => execCommand('underline')}
+		class="p-1.5 rounded hover:bg-surface-2 transition text-muted-foreground focus:outline-none"
+		title="Underline"
+	>
 			<svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
 				<path d="M6 3v7a6 6 0 0012 0V3"></path>
 				<line x1="4" y1="21" x2="20" y2="21"></line>
 			</svg>
 		</button>
 		<div class="w-px h-5 bg-border-medium mx-1"></div>
-		<button
-			type="button"
-			onclick={() => execCommand('insertUnorderedList')}
-			class="p-1.5 rounded hover:bg-surface-2 transition"
-			title="Bullet List"
-		>
+	<button
+		type="button"
+		onclick={() => execCommand('insertUnorderedList')}
+		class="p-1.5 rounded hover:bg-surface-2 transition text-muted-foreground focus:outline-none"
+		title="Bullet List"
+	>
 			<svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
 				<line x1="8" y1="6" x2="21" y2="6"></line>
 				<line x1="8" y1="12" x2="21" y2="12"></line>
@@ -91,12 +91,12 @@
 				<circle cx="4" cy="18" r="1" fill="currentColor"></circle>
 			</svg>
 		</button>
-		<button
-			type="button"
-			onclick={() => execCommand('insertOrderedList')}
-			class="p-1.5 rounded hover:bg-surface-2 transition"
-			title="Numbered List"
-		>
+	<button
+		type="button"
+		onclick={() => execCommand('insertOrderedList')}
+		class="p-1.5 rounded hover:bg-surface-2 transition text-muted-foreground focus:outline-none"
+		title="Numbered List"
+	>
 			<svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
 				<line x1="10" y1="6" x2="21" y2="6"></line>
 				<line x1="10" y1="12" x2="21" y2="12"></line>
