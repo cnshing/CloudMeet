@@ -1,5 +1,5 @@
 import type { EmailConfig } from './types';
-import { createEmailitProvider, createNoopProvider } from './providers';
+import { createEmailitProvider, createNoopProvider, createResendProvider } from './providers';
 import type { EmailProvider, EmailProviderName } from './providers';
 
 export interface EmailConfigOptions {
@@ -19,6 +19,11 @@ export function getEmailProviderFromEnv(env: App.Platform['env']): EmailProvider
 		case 'emailit':
 			return env.EMAILIT_API_KEY
 				? createEmailitProvider({ apiKey: env.EMAILIT_API_KEY })
+				: null;
+
+		case 'resend':
+			return env.RESEND_API_KEY
+				? createResendProvider({ apiKey: env.RESEND_API_KEY })
 				: null;
 
 		case 'noop':

@@ -5,7 +5,7 @@
  * translate it into the provider-specific API payload internally.
  */
 
-export type EmailProviderName = 'emailit' | 'noop';
+export type EmailProviderName = 'emailit' | 'resend' | 'noop';
 
 export interface EmailAddress {
 	email: string;
