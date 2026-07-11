@@ -105,10 +105,10 @@
 				onclick={() => isClickable && onDateSelect(day.dateStr)}
 				disabled={!isClickable}
 				class="aspect-square flex items-center justify-center text-sm rounded-full transition relative
-					{!day.isCurrentMonth ? 'text-gray-300' : ''}
-					{isClickable && !isSelected ? 'font-semibold cursor-pointer bg-accent-subtle text-border-strong' : ''}
-					{day.isAvailable && !hasSlots && day.isCurrentMonth ? 'text-subtle-foreground' : ''}
-					{!day.isAvailable && day.isCurrentMonth ? 'text-gray-300 cursor-not-allowed' : ''}
+				{!day.isCurrentMonth ? 'text-subtle-foreground' : ''}
+				{isClickable && !isSelected ? 'font-semibold cursor-pointer bg-accent-subtle text-border-strong' : ''}
+				{day.isAvailable && !hasSlots && day.isCurrentMonth ? 'text-subtle-foreground' : ''}
+				{!day.isAvailable && day.isCurrentMonth ? 'text-subtle-foreground cursor-not-allowed' : ''}
 					{isSelected ? 'bg-primary text-primary-foreground' : ''}"
 			>
 				{day.date.getDate()}

@@ -137,7 +137,7 @@ export function generateAdminRescheduleEmail(data: RescheduleEmailData): string 
 					</div>
 				</td>
 				<td style="width: 4%; text-align: center; vertical-align: middle;">
-					<span style="color: #9ca3af; font-size: 20px;">→</span>
+					<span style="color: #9c9d9b; font-size: 20px;">→</span>
 				</td>
 				<td style="width: 48%; vertical-align: top;">
 					<div style="background-color: #f0fdf4; border-radius: 8px; padding: 16px; border: 1px solid #bbf7d0;">

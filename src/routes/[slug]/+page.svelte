@@ -382,10 +382,10 @@
 								onclick={() => isClickable && handleDateSelect(day.dateStr)}
 								disabled={!isClickable}
 								class="aspect-square flex items-center justify-center text-sm rounded-full transition
-									{!day.isCurrentMonth ? 'text-gray-300' : ''}
-									{isClickable && !isSelected ? 'font-semibold bg-accent-subtle text-border-strong' : ''}
-									{day.isAvailable && !hasSlots && day.isCurrentMonth ? 'text-subtle-foreground' : ''}
-									{!day.isAvailable && day.isCurrentMonth ? 'text-gray-300' : ''}
+								{!day.isCurrentMonth ? 'text-subtle-foreground' : ''}
+								{isClickable && !isSelected ? 'font-semibold bg-accent-subtle text-border-strong' : ''}
+								{day.isAvailable && !hasSlots && day.isCurrentMonth ? 'text-subtle-foreground' : ''}
+								{!day.isAvailable && day.isCurrentMonth ? 'text-subtle-foreground' : ''}
 									{isSelected ? 'bg-primary text-primary-foreground' : ''}"
 							>
 								{day.date.getDate()}

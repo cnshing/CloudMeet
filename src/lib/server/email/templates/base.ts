@@ -165,7 +165,7 @@ export function generateManagementLinks(rescheduleUrl: string, cancelUrl: string
 	<tr>
 		<td align="center">
 			<a href="${rescheduleUrl}" style="display: inline-block; margin: 0 8px; color: ${brandColor}; text-decoration: none; font-size: 14px;">Reschedule</a>
-			<span style="color: #d1d5db;">|</span>
+			<span style="color: #b3b4b1;">|</span>
 			<a href="${cancelUrl}" style="display: inline-block; margin: 0 8px; color: #ef4444; text-decoration: none; font-size: 14px;">Cancel</a>
 		</td>
 	</tr>

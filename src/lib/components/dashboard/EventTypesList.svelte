@@ -54,7 +54,7 @@
 						>
 							View Page
 						</a>
-						<span class="text-gray-300">|</span>
+						<span class="text-subtle-foreground">|</span>
 						<a
 							href="/dashboard/event-types/{eventType.id}"
 							class="text-sm text-accent hover:text-accent"

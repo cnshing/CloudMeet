@@ -38,9 +38,9 @@
 	});
 </script>
 
-<div class="border border-gray-300 rounded-md overflow-hidden focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-transparent">
+<div class="border border-border-medium rounded-md overflow-hidden focus-within:ring-2 focus-within:ring-primary focus-within:border-transparent">
 	<!-- Toolbar -->
-	<div class="flex items-center gap-1 p-2 bg-surface border-b border-gray-300">
+	<div class="flex items-center gap-1 p-2 bg-surface border-b border-border-medium">
 		<button
 			type="button"
 			onclick={() => execCommand('bold')}

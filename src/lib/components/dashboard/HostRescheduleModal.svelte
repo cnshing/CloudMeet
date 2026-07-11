@@ -210,8 +210,8 @@
 									disabled={day.isPast || !day.isCurrentMonth}
 									onclick={() => selectDate(day.date)}
 									class="aspect-square flex items-center justify-center text-sm rounded-lg transition
-										{day.isCurrentMonth ? 'text-foreground' : 'text-gray-300'}
-										{day.isPast ? 'text-gray-300 cursor-not-allowed' : 'hover:bg-accent-subtle'}
+									{day.isCurrentMonth ? 'text-foreground' : 'text-subtle-foreground'}
+									{day.isPast ? 'text-subtle-foreground cursor-not-allowed' : 'hover:bg-accent-subtle'}
 										{day.isToday ? 'font-bold' : ''}
 										{selectedDate === formatDateKey(day.date) ? 'bg-primary text-primary-foreground hover:opacity-90' : ''}"
 								>
