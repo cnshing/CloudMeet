@@ -1,5 +1,6 @@
 import forms from '@tailwindcss/forms';
 import typography from '@tailwindcss/typography';
+import defaultTheme from 'tailwindcss/defaultTheme';
 
 /** @type {import('tailwindcss').Config} */
 export default {
@@ -7,6 +8,10 @@ export default {
   darkMode: 'class',
   theme: {
     extend: {
+      fontFamily: {
+        sans: ['Geist', ...defaultTheme.fontFamily.sans],
+        mono: ['Geist Mono', ...defaultTheme.fontFamily.mono],
+      },
       colors: {
         // ── Primitive Scales ──────────────────────────────────────────────
         //
