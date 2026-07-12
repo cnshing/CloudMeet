@@ -1,124 +1,176 @@
 /**
  * Cancellation email templates
+ *
+ * Colour rule: RED is reserved exclusively for destructive action links/buttons
+ * (e.g. the "Cancel" management link). Informational labels and the cancelled
+ * meeting card use --color-subtle-foreground.
  */
 
+import { root } from '../../../../app.css';
 import type { BookingEmailData } from '../types';
 import { createEmailFormatters } from '../formatters';
-import { generateBaseEmail } from './base';
+import { generateBaseEmail, generateActionButton, badgeCancelled } from './base';
 
-/**
- * Generate HTML email for cancellation
- */
+// ---------------------------------------------------------------------------
+// Shared: cancelled meeting detail card
+// Identical styling used in both the attendee and admin emails.
+// ---------------------------------------------------------------------------
+
+function buildCancelledMeetingCard(
+	eventName: string,
+	formattedDate: string,
+	formattedTime: string
+): string {
+	const calendarIcon = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="${root['--color-subtle-foreground']}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;margin-top:1px;"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>`;
+	const clockIcon    = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="${root['--color-subtle-foreground']}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;margin-top:1px;"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>`;
+
+	return `
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:${root['--color-background']};border-radius:12px;margin-bottom:24px;">
+  <tr>
+    <td style="padding:20px 24px;">
+      <!-- Struck-through event name -->
+      <div style="font-size:16px;font-weight:700;color:${root['--color-subtle-foreground']};margin-bottom:16px;text-decoration:line-through;">${eventName}</div>
+      <!-- Date + time rows with icons — same structure as the attendee card -->
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+        <tr>
+          <td style="padding:0 0 12px 0;">
+            <table role="presentation" cellpadding="0" cellspacing="0"><tr>
+              <td style="vertical-align:top;padding-right:12px;">${calendarIcon}</td>
+              <td style="vertical-align:top;">
+                <div style="color:${root['--color-subtle-foreground']};font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:2px;">Was scheduled for</div>
+                <div style="color:${root['--color-subtle-foreground']};font-size:15px;font-weight:500;text-decoration:line-through;">${formattedDate}</div>
+              </td>
+            </tr></table>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <table role="presentation" cellpadding="0" cellspacing="0"><tr>
+              <td style="vertical-align:top;padding-right:12px;">${clockIcon}</td>
+              <td style="vertical-align:top;">
+                <div style="color:${root['--color-subtle-foreground']};font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:2px;">Time</div>
+                <div style="color:${root['--color-subtle-foreground']};font-size:15px;font-weight:500;text-decoration:line-through;">${formattedTime}</div>
+              </td>
+            </tr></table>
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>`.trim();
+}
+
+// ---------------------------------------------------------------------------
+// Attendee cancellation email
+// ---------------------------------------------------------------------------
+
 export function generateCancellationEmail(data: BookingEmailData): string {
 	const { formatDate, formatTime } = createEmailFormatters(data.timeFormat, data.timezone);
-	const brandColor = data.brandColor || '#3b82f6';
+	const brandColor = data.brandColor || root['--color-primary'];
 
-	const headerContent = `
-		<h1 style="margin: 0; color: #ffffff; font-size: 28px; font-weight: 700;">Meeting Cancelled</h1>
-	`;
+	// Custom message card: neutral bg, subtle left-border and label
+	const customMessageSection = data.customMessage
+		? `
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:${root['--color-surface-2']};border-radius:8px;border-left:3px solid ${root['--color-border-medium']};margin-bottom:24px;">
+  <tr>
+    <td style="padding:14px 18px;">
+      <div style="color:${root['--color-subtle-foreground']};font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:5px;">Message from ${data.hostName}</div>
+      <div style="color:${root['--color-foreground']};font-size:14px;line-height:21px;">${data.customMessage}</div>
+    </td>
+  </tr>
+</table>`
+		: '';
 
-	const customMessageSection = data.customMessage ? `
-		<p style="margin: 0 0 30px; color: #4b5563; font-size: 16px; line-height: 24px; padding: 16px; background-color: #f9fafb; border-radius: 8px; border-left: 4px solid #ef4444;">
-			${data.customMessage}
-		</p>
-	` : '';
+	const cancelledMeetingCard = buildCancelledMeetingCard(
+		data.eventName,
+		formatDate(data.startTime),
+		`${formatTime(data.startTime)} – ${formatTime(data.endTime)}`
+	);
+
+	const rebookButton = data.eventSlug
+		? generateActionButton(`${data.appUrl}/${data.eventSlug}`, 'Book Another Time', brandColor)
+		: '';
 
 	const bodyContent = `
-		<p style="margin: 0 0 20px; color: #4b5563; font-size: 16px; line-height: 24px;">
-			Hi <strong>${data.attendeeName}</strong>,
-		</p>
-		<p style="margin: 0 0 30px; color: #4b5563; font-size: 16px; line-height: 24px;">
-			Your meeting with <strong>${data.hostName}</strong> has been cancelled.
-		</p>
-		${customMessageSection}
-		<table role="presentation" style="width: 100%; border-collapse: collapse; background-color: #f9fafb; border-radius: 8px; border: 1px solid #e5e7eb; margin-bottom: 30px;">
-			<tr>
-				<td style="padding: 24px;">
-					<h2 style="margin: 0 0 16px; color: #111827; font-size: 18px; font-weight: 600; text-decoration: line-through;">Cancelled Meeting</h2>
-					<div style="margin-bottom: 12px;">
-						<div style="color: #6b7280; font-size: 14px; margin-bottom: 4px;">Event</div>
-						<div style="color: #111827; font-size: 16px; font-weight: 500;">${data.eventName}</div>
-					</div>
-					<div style="margin-bottom: 12px;">
-						<div style="color: #6b7280; font-size: 14px; margin-bottom: 4px;">Originally Scheduled</div>
-						<div style="color: #111827; font-size: 16px; font-weight: 500;">${formatDate(data.startTime)} at ${formatTime(data.startTime)}</div>
-					</div>
-				</td>
-			</tr>
-		</table>
-		<p style="margin: 0; color: #6b7280; font-size: 14px; line-height: 20px;">
-			If you'd like to reschedule, please visit <a href="${data.appUrl}/${data.eventSlug || ''}" style="color: ${brandColor}; text-decoration: none;">${data.hostName}'s booking page</a>.
-		</p>
-	`;
+<p style="margin:0 0 8px;color:${root['--color-muted-foreground']};font-size:16px;line-height:24px;">
+  Hi <strong style="color:${root['--color-foreground']};">${data.attendeeName}</strong>,
+</p>
+<p style="margin:0 0 24px;color:${root['--color-muted-foreground']};font-size:15px;line-height:23px;">
+  Your meeting with <strong style="color:${root['--color-foreground']};">${data.hostName}</strong> has been cancelled.
+</p>
+
+${customMessageSection}
+${cancelledMeetingCard}
+${rebookButton}
+
+<p style="margin:0;color:${root['--color-subtle-foreground']};font-size:13px;line-height:20px;text-align:center;">
+  Want to schedule again? Visit <a href="${data.appUrl}/${data.eventSlug || ''}" style="color:${brandColor};text-decoration:none;">${data.hostName}'s booking page</a>.
+</p>
+	`.trim();
 
 	return generateBaseEmail({
 		title: 'Meeting Cancelled',
-		headerGradient: 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)',
-		headerContent,
+		statusBadge: badgeCancelled(),
+		heading: 'Meeting Cancelled',
 		bodyContent,
-		footerContent: `This is an automated email from ${data.hostName}'s meeting scheduler.`,
-		hostName: data.hostName
+		footerContent: `This is an automated email from ${data.hostName}'s meeting scheduler.`
 	});
 }
 
-/**
- * Generate admin cancellation notification email
- */
+// ---------------------------------------------------------------------------
+// Admin cancellation notification
+// ---------------------------------------------------------------------------
+
 export function generateAdminCancellationEmail(data: BookingEmailData): string {
 	const { formatDate, formatTime } = createEmailFormatters(data.timeFormat, data.timezone);
 
-	const customMessageSection = data.customMessage ? `
-		<table role="presentation" style="width: 100%; border-collapse: collapse; background-color: #f9fafb; border-radius: 8px; border: 1px solid #e5e7eb; margin-bottom: 30px;">
-			<tr>
-				<td style="padding: 20px;">
-					<div style="color: #6b7280; font-size: 14px; font-weight: 600; margin-bottom: 8px;">Cancellation reason:</div>
-					<div style="color: #374151; font-size: 15px; line-height: 22px;">${data.customMessage}</div>
-				</td>
-			</tr>
-		</table>
-	` : '';
+	// Custom message: neutral bg, subtle border/label
+	const customMessageSection = data.customMessage
+		? `
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:${root['--color-surface-2']};border-radius:8px;border-left:3px solid ${root['--color-border-medium']};margin-bottom:24px;">
+  <tr>
+    <td style="padding:14px 18px;">
+      <div style="color:${root['--color-subtle-foreground']};font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:5px;">Cancellation reason</div>
+      <div style="color:${root['--color-foreground']};font-size:14px;line-height:21px;">${data.customMessage}</div>
+    </td>
+  </tr>
+</table>`
+		: '';
 
-	const headerContent = `
-		<h1 style="margin: 0; color: #ffffff; font-size: 28px; font-weight: 700;">Booking Cancelled</h1>
-	`;
+	// Attendee info block (name + email)
+	const attendeeInfoCard = `
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:${root['--color-background']};border-radius:12px;margin-bottom:16px;">
+  <tr>
+    <td style="padding:20px 24px;">
+      <div style="color:${root['--color-subtle-foreground']};font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:5px;">Attendee</div>
+      <div style="color:${root['--color-foreground']};font-size:16px;font-weight:700;">${data.attendeeName}</div>
+      <div style="color:${root['--color-muted-foreground']};font-size:14px;margin-top:2px;">${data.attendeeEmail}</div>
+    </td>
+  </tr>
+</table>`.trim();
+
+	// Cancelled meeting card — identical CSS to the attendee email
+	const cancelledMeetingCard = buildCancelledMeetingCard(
+		data.eventName,
+		formatDate(data.startTime),
+		`${formatTime(data.startTime)} – ${formatTime(data.endTime)}`
+	);
 
 	const bodyContent = `
-		<p style="margin: 0 0 20px; color: #4b5563; font-size: 16px; line-height: 24px;">
-			A meeting has been cancelled.
-		</p>
+<p style="margin:0 0 24px;color:${root['--color-muted-foreground']};font-size:15px;line-height:23px;">
+  A booking has been cancelled.
+</p>
 
-		<table role="presentation" style="width: 100%; border-collapse: collapse; background-color: #fef2f2; border-radius: 8px; border: 1px solid #fecaca; margin-bottom: 30px;">
-			<tr>
-				<td style="padding: 24px;">
-					<div style="margin-bottom: 12px;">
-						<div style="color: #991b1b; font-size: 14px; margin-bottom: 4px;">Attendee</div>
-						<div style="color: #111827; font-size: 16px; font-weight: 500;">${data.attendeeName}</div>
-						<div style="color: #6b7280; font-size: 14px;">${data.attendeeEmail}</div>
-					</div>
-
-					<div style="margin-bottom: 12px;">
-						<div style="color: #991b1b; font-size: 14px; margin-bottom: 4px;">Event</div>
-						<div style="color: #111827; font-size: 16px; font-weight: 500;">${data.eventName}</div>
-					</div>
-
-					<div style="margin-bottom: 12px;">
-						<div style="color: #991b1b; font-size: 14px; margin-bottom: 4px;">Was scheduled for</div>
-						<div style="color: #111827; font-size: 16px; font-weight: 500;">${formatDate(data.startTime)}</div>
-						<div style="color: #6b7280; font-size: 14px;">${formatTime(data.startTime)} - ${formatTime(data.endTime)}</div>
-					</div>
-				</td>
-			</tr>
-		</table>
-
-		${customMessageSection}
-	`;
+${attendeeInfoCard}
+${cancelledMeetingCard}
+${customMessageSection}
+	`.trim();
 
 	return generateBaseEmail({
 		title: 'Booking Cancelled',
-		headerGradient: 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)',
-		headerContent,
+		statusBadge: badgeCancelled(),
+		heading: 'Booking Cancelled',
 		bodyContent,
-		footerContent: 'Powered by',
-		hostName: data.hostName
+		footerContent: `Notification for ${data.hostName}'s meeting scheduler.`
 	});
 }
