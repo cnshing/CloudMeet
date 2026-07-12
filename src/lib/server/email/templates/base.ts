@@ -11,7 +11,7 @@
  *  - CTA button:  rounded-full pill   (matching "Schedule Event" button)
  */
 
-import { root } from '../../../../app.css';
+import { root } from '$src/app.css.ts';
 
 // ---------------------------------------------------------------------------
 // Types

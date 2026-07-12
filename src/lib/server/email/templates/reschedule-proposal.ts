@@ -2,7 +2,7 @@
  * Reschedule proposal email template
  */
 
-import { root } from '../../../../app.css';
+import { root } from '$src/app.css.ts';
 import type { RescheduleProposalEmailData } from '../types';
 import {
 	generateBaseEmail,

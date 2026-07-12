@@ -2,7 +2,7 @@
  * Reschedule email templates
  */
 
-import { root } from '../../../../app.css';
+import { root } from '$src/app.css.ts';
 import type { RescheduleEmailData } from '../types';
 import { createEmailFormatters } from '../formatters';
 import {

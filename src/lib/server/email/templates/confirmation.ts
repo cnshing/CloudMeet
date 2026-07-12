@@ -2,7 +2,7 @@
  * Booking confirmation email template
  */
 
-import { root } from '../../../../app.css';
+import { root } from '$src/app.css.ts';
 import type { BookingEmailData } from '../types';
 import { createEmailFormatters } from '../formatters';
 import {
