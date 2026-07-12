@@ -2,6 +2,7 @@
  * Booking confirmation email template
  */
 
+import { root } from '$src/app.css.ts';
 import type { BookingEmailData } from '../types';
 import { createEmailFormatters } from '../formatters';
 import {
@@ -9,7 +10,8 @@ import {
 	generateMeetingDetailsCard,
 	generateYourMessageCard,
 	generateActionButton,
-	generateManagementLinks
+	generateManagementLinks,
+	badgeSuccess
 } from './base';
 
 /**
@@ -18,27 +20,19 @@ import {
 export function generateBookingEmail(data: BookingEmailData): string {
 	const { formatDate, formatTime } = createEmailFormatters(data.timeFormat, data.timezone);
 	const contactEmail = data.hostContactEmail || data.hostEmail;
-	const brandColor = data.brandColor || '#3b82f6';
+	const brandColor = data.brandColor || root['--color-primary'];
 
 	const cancelUrl = `${data.appUrl}/cancel/${data.bookingId}`;
 	const rescheduleUrl = `${data.appUrl}/reschedule/${data.bookingId}`;
-
-	const headerContent = `
-		<div style="width: 64px; height: 64px; margin: 0 auto 20px; background-color: rgba(255,255,255,0.2); border-radius: 50%; display: flex; align-items: center; justify-content: center;">
-			<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-				<path d="M5 13l4 4L19 7"></path>
-			</svg>
-		</div>
-		<h1 style="margin: 0; color: #ffffff; font-size: 28px; font-weight: 700;">Meeting Confirmed!</h1>
-	`;
 
 	const meetingLabel = data.meetingType === 'teams' ? 'Join Microsoft Teams Meeting' : 'Join Google Meet';
 
 	const meetingDetails = generateMeetingDetailsCard({
 		eventName: data.eventName,
+		hostName: data.hostName,
 		eventDescription: data.eventDescription,
 		formattedDate: formatDate(data.startTime),
-		formattedTime: `${formatTime(data.startTime)} - ${formatTime(data.endTime)}`,
+		formattedTime: `${formatTime(data.startTime)} – ${formatTime(data.endTime)}`,
 		meetingUrl: data.meetingUrl,
 		meetingType: data.meetingType,
 		brandColor
@@ -55,30 +49,29 @@ export function generateBookingEmail(data: BookingEmailData): string {
 	const managementLinks = generateManagementLinks(rescheduleUrl, cancelUrl, brandColor);
 
 	const bodyContent = `
-		<p style="margin: 0 0 20px; color: #4b5563; font-size: 16px; line-height: 24px;">
-			Hi <strong>${data.attendeeName}</strong>,
-		</p>
-		<p style="margin: 0 0 30px; color: #4b5563; font-size: 16px; line-height: 24px;">
-			Your meeting with <strong>${data.hostName}</strong> has been confirmed. We're looking forward to speaking with you!
-		</p>
+<p style="margin:0 0 8px;color:${root['--color-muted-foreground']};font-size:16px;line-height:24px;">
+  Hi <strong style="color:${root['--color-foreground']};">${data.attendeeName}</strong>,
+</p>
+<p style="margin:0 0 24px;color:${root['--color-muted-foreground']};font-size:15px;line-height:23px;">
+  Your meeting with <strong style="color:${root['--color-foreground']};">${data.hostName}</strong> has been confirmed. A calendar invitation has been sent to your email address.
+</p>
 
-		${meetingDetails}
-		${attendeeNotes}
-		${actionButton}
-		${managementLinks}
+${meetingDetails}
+${attendeeNotes}
+${actionButton}
+${managementLinks}
 
-		<p style="margin: 0; color: #6b7280; font-size: 14px; line-height: 20px;">
-			If you need to make changes or have any questions, please reply to this email or contact <a href="mailto:${contactEmail}" style="color: ${brandColor}; text-decoration: none;">${contactEmail}</a>.
-		</p>
-	`;
+<p style="margin:16px 0 0;color:${root['--color-subtle-foreground']};font-size:13px;line-height:20px;text-align:center;">
+  Need to make changes? Reply to this email or contact <a href="mailto:${contactEmail}" style="color:${brandColor};text-decoration:none;">${contactEmail}</a>.
+</p>
+	`.trim();
 
 	return generateBaseEmail({
 		title: 'Meeting Confirmed',
-		headerGradient: brandColor,
-		headerContent,
+		statusBadge: badgeSuccess(),
+		heading: 'You\'re scheduled!',
 		bodyContent,
-		footerContent: `This is an automated email from ${data.hostName}'s meeting scheduler.`,
-		hostName: data.hostName
+		footerContent: `This is an automated email from ${data.hostName}'s meeting scheduler.`
 	});
 }
 
@@ -93,16 +86,16 @@ export function generateBookingEmailText(data: BookingEmailData): string {
 	const rescheduleUrl = `${data.appUrl}/reschedule/${data.bookingId}`;
 
 	return `
-Meeting Confirmed!
+You're scheduled!
 
 Hi ${data.attendeeName},
 
-Your meeting with ${data.hostName} has been confirmed. We're looking forward to speaking with you!
+Your meeting with ${data.hostName} has been confirmed. A calendar invitation has been sent to your email address.
 
 MEETING DETAILS
 Event: ${data.eventName}
 ${data.eventDescription ? `Description: ${data.eventDescription}` : ''}
-Time: ${formatDateTime(data.startTime)} - ${formatDateTime(data.endTime)}
+Date & Time: ${formatDateTime(data.startTime)} - ${formatDateTime(data.endTime)}
 ${data.meetingUrl ? `Location: ${data.meetingUrl}` : ''}
 
 ${data.meetingUrl ? `Join Meeting: ${data.meetingUrl}` : ''}
@@ -111,10 +104,10 @@ MANAGE YOUR BOOKING
 Reschedule: ${rescheduleUrl}
 Cancel: ${cancelUrl}
 
-If you need to make changes or have any questions, please reply to this email or contact ${contactEmail}.
+Need to make changes? Reply to this email or contact ${contactEmail}.
 
 ---
 This is an automated email from ${data.hostName}'s meeting scheduler.
-Powered by CloudMeet - https://github.com/dennisklappe/CloudMeet
+Powered by CloudMeet - https://github.com/cnshing/CloudMeet
 	`.trim();
 }

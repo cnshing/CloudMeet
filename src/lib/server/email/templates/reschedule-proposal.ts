@@ -2,7 +2,13 @@
  * Reschedule proposal email template
  */
 
+import { root } from '$src/app.css.ts';
 import type { RescheduleProposalEmailData } from '../types';
+import {
+	generateBaseEmail,
+	generateTimeComparison,
+	badgeProposal
+} from './base';
 
 export function generateRescheduleProposalEmail(data: RescheduleProposalEmailData): string {
 	const formatDate = (date: Date) => date.toLocaleDateString('en-US', {
@@ -17,95 +23,61 @@ export function generateRescheduleProposalEmail(data: RescheduleProposalEmailDat
 		hour12: data.timeFormat === '12h'
 	});
 
-	return `
-<!DOCTYPE html>
-<html>
-<head>
-	<meta charset="utf-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>Reschedule Request</title>
-</head>
-<body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: #f3f4f6;">
-	<table role="presentation" style="width: 100%; border-collapse: collapse;">
-		<tr>
-			<td align="center" style="padding: 40px 20px;">
-				<table role="presentation" style="max-width: 600px; width: 100%; border-collapse: collapse; background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
-					<!-- Header -->
-					<tr>
-						<td style="padding: 40px; background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); text-align: center;">
-							<h1 style="margin: 0; color: #ffffff; font-size: 28px; font-weight: 700;">Reschedule Request</h1>
-						</td>
-					</tr>
+	const brandColor = data.brandColor || root['--color-primary'];
 
-					<!-- Body -->
-					<tr>
-						<td style="padding: 40px;">
-							<p style="margin: 0 0 20px; color: #4b5563; font-size: 16px; line-height: 24px;">
-								Hi <strong>${data.attendeeName}</strong>,
-							</p>
-							<p style="margin: 0 0 30px; color: #4b5563; font-size: 16px; line-height: 24px;">
-								<strong>${data.hostName}</strong> would like to reschedule your meeting.
-							</p>
+	const messageSection = data.message ? `
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:${root['--color-surface-2']};border-radius:8px;border-left:3px solid ${root['--color-accent']};margin-bottom:24px;">
+  <tr>
+    <td style="padding:16px 20px;">
+      <div style="color:${root['--color-border-strong']};font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:6px;">Message from ${data.hostName}</div>
+      <div style="color:${root['--color-foreground']};font-size:14px;line-height:21px;">${data.message}</div>
+    </td>
+  </tr>
+</table>` : '';
 
-							${data.message ? `
-							<div style="margin: 0 0 30px; padding: 16px; background-color: #f9fafb; border-radius: 8px; border-left: 4px solid #f59e0b;">
-								<p style="margin: 0; color: #4b5563; font-size: 15px; line-height: 22px;">${data.message}</p>
-							</div>
-							` : ''}
+	const timeComparison = generateTimeComparison(
+		'Original time',
+		`${formatDate(data.oldStartTime)}\n${formatTime(data.oldStartTime)} – ${formatTime(data.oldEndTime)}`,
+		'Proposed time',
+		`${formatDate(data.newStartTime)}\n${formatTime(data.newStartTime)} – ${formatTime(data.newEndTime)}`
+	);
 
-							<!-- Time comparison -->
-							<table role="presentation" style="width: 100%; border-collapse: collapse; margin-bottom: 30px;">
-								<tr>
-									<td style="width: 48%; vertical-align: top;">
-										<div style="background-color: #fef2f2; border-radius: 8px; padding: 16px; border: 1px solid #fecaca;">
-											<div style="color: #991b1b; font-size: 12px; font-weight: 600; margin-bottom: 8px; text-transform: uppercase;">Original Time</div>
-											<div style="color: #111827; font-size: 15px; font-weight: 500; text-decoration: line-through;">${formatDate(data.oldStartTime)}</div>
-											<div style="color: #6b7280; font-size: 14px; text-decoration: line-through;">${formatTime(data.oldStartTime)} - ${formatTime(data.oldEndTime)}</div>
-										</div>
-									</td>
-									<td style="width: 4%; text-align: center; vertical-align: middle;">
-										<span style="color: #9c9d9b; font-size: 20px;">→</span>
-									</td>
-									<td style="width: 48%; vertical-align: top;">
-										<div style="background-color: #f0fdf4; border-radius: 8px; padding: 16px; border: 1px solid #bbf7d0;">
-											<div style="color: #166534; font-size: 12px; font-weight: 600; margin-bottom: 8px; text-transform: uppercase;">Proposed Time</div>
-											<div style="color: #111827; font-size: 15px; font-weight: 500;">${formatDate(data.newStartTime)}</div>
-											<div style="color: #6b7280; font-size: 14px;">${formatTime(data.newStartTime)} - ${formatTime(data.newEndTime)}</div>
-										</div>
-									</td>
-								</tr>
-							</table>
+	// Accept / Decline pill buttons
+	const actionButtons = `
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:16px;">
+  <tr>
+    <td align="center">
+      <a href="${data.responseUrl}?action=accept" style="display:inline-block;padding:14px 28px;background-color:${root['--color-primary']};color:${root['--color-primary-foreground']};text-decoration:none;border-radius:9999px;font-weight:700;font-size:15px;margin:0 6px;">Accept New Time</a>
+      <a href="${data.responseUrl}?action=decline" style="display:inline-block;padding:14px 28px;background-color:#dc2626;color:#ffffff;text-decoration:none;border-radius:9999px;font-weight:700;font-size:15px;margin:0 6px;">Decline</a>
+    </td>
+  </tr>
+</table>
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:8px;">
+  <tr>
+    <td align="center">
+      <a href="${data.responseUrl}?action=counter" style="color:${brandColor};text-decoration:none;font-size:13px;font-weight:500;">Propose a different time</a>
+    </td>
+  </tr>
+</table>`;
 
-							<!-- Action buttons -->
-							<table role="presentation" style="width: 100%; border-collapse: collapse; margin-bottom: 30px;">
-								<tr>
-									<td align="center">
-										<a href="${data.responseUrl}?action=accept" style="display: inline-block; padding: 14px 28px; background-color: #10b981; color: #ffffff; text-decoration: none; border-radius: 6px; font-weight: 600; font-size: 14px; margin: 0 8px;">Accept New Time</a>
-										<a href="${data.responseUrl}?action=decline" style="display: inline-block; padding: 14px 28px; background-color: #ef4444; color: #ffffff; text-decoration: none; border-radius: 6px; font-weight: 600; font-size: 14px; margin: 0 8px;">Decline</a>
-									</td>
-								</tr>
-							</table>
+	const bodyContent = `
+<p style="margin:0 0 8px;color:${root['--color-muted-foreground']};font-size:16px;line-height:24px;">
+  Hi <strong style="color:${root['--color-foreground']};">${data.attendeeName}</strong>,
+</p>
+<p style="margin:0 0 24px;color:${root['--color-muted-foreground']};font-size:15px;line-height:23px;">
+  <strong style="color:${root['--color-foreground']};">${data.hostName}</strong> would like to reschedule your meeting to a new time.
+</p>
 
-							<p style="margin: 0; color: #6b7280; font-size: 14px; line-height: 20px; text-align: center;">
-								Or <a href="${data.responseUrl}?action=counter" style="color: ${data.brandColor}; text-decoration: none;">propose a different time</a>
-							</p>
-						</td>
-					</tr>
+${messageSection}
+${timeComparison}
+${actionButtons}
+	`.trim();
 
-					<!-- Footer -->
-					<tr>
-						<td style="padding: 30px 40px; background-color: #f9fafb; border-top: 1px solid #e5e7eb;">
-							<p style="margin: 0; color: #6b7280; font-size: 12px; line-height: 18px; text-align: center;">
-								This reschedule request was sent by ${data.hostName}.<br>
-								Powered by <a href="https://github.com/dennisklappe/CloudMeet" style="color: #6b7280; text-decoration: none;">CloudMeet</a>
-							</p>
-						</td>
-					</tr>
-				</table>
-			</td>
-		</tr>
-	</table>
-</body>
-</html>
-	`;
+	return generateBaseEmail({
+		title: 'Reschedule Request',
+		statusBadge: badgeProposal(),
+		heading: 'Reschedule Request',
+		bodyContent,
+		footerContent: `This reschedule request was sent by ${data.hostName}.`
+	});
 }
