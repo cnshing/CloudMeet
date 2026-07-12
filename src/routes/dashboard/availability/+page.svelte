@@ -112,7 +112,7 @@
 		{/if}
 
 		<!-- Timezone Selection -->
-		<div class="bg-surface rounded-lg shadow-sm p-6 mb-6">
+		<div class="bg-surface border border-border rounded-lg shadow-sm p-6 mb-6">
 			<h2 class="text-lg font-semibold text-foreground mb-4">Your Timezone</h2>
 			<p class="text-sm text-muted-foreground mb-4">
 				Set your timezone so that your availability is shown correctly to people booking meetings.
@@ -144,7 +144,7 @@
 			</div>
 		</div>
 
-		<div class="bg-surface rounded-lg shadow-sm p-6 mb-6">
+		<div class="bg-surface border border-border rounded-lg shadow-sm p-6 mb-6">
 			<h2 class="text-lg font-semibold text-foreground mb-4">Weekly Schedule</h2>
 			<p class="text-sm text-muted-foreground mb-6">
 				Set your available hours for each day of the week. People can only book meetings during these times.
@@ -196,7 +196,7 @@
 								...day, enabled: day.day >= 1 && day.day <= 5, startTime: '09:00', endTime: '17:00'
 							}));
 						}}
-						class="px-6 py-2 bg-surface text-muted-foreground rounded-lg hover:bg-surface-2 transition"
+						class="px-6 py-2 bg-surface border border-border text-muted-foreground rounded-lg hover:bg-surface-2 transition"
 					>
 						Set Default Hours (Mon-Fri, 9-5)
 					</button>

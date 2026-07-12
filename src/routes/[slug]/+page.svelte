@@ -472,7 +472,7 @@
 		</div>
 
 		<!-- DESKTOP LAYOUT -->
-		<div class="hidden md:flex bg-surface rounded-2xl shadow-lg overflow-hidden transition-all duration-300 ease-in-out" style="width: {showForm ? '700px' : selectedDate ? '920px' : '650px'}">
+		<div class="hidden md:flex bg-surface border border-border rounded-2xl shadow-lg overflow-hidden transition-all duration-300 ease-in-out" style="width: {showForm ? '700px' : selectedDate ? '920px' : '650px'}">
 			<EventSidebar user={data.user} eventType={data.eventType} {selectedDate} {selectedSlot} {formatTime} />
 
 			<!-- Main Content -->

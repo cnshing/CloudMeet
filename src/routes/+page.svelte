@@ -41,7 +41,7 @@
 					{#each data.eventTypes as eventType}
 						<a
 							href="/{eventType.slug}"
-						class="block bg-surface rounded-lg shadow-sm hover:shadow-md transition-all p-5 border-l-4 border-l-primary hover:translate-x-1"
+						class="block bg-surface border border-border rounded-lg shadow-sm hover:shadow-md transition-all p-5 border-l-4 border-l-primary hover:translate-x-1"
 						>
 							<div class="flex justify-between items-start">
 								<div class="flex-1 min-w-0">
@@ -116,7 +116,7 @@
 
 		<!-- Features -->
 		<div class="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
-			<div class="bg-surface p-8 rounded-xl shadow-sm">
+			<div class="bg-surface border border-border p-8 rounded-xl shadow-sm">
 				<div class="w-12 h-12 bg-accent-subtle rounded-lg flex items-center justify-center mb-4">
 					<svg
 						class="w-6 h-6 text-accent"
@@ -138,7 +138,7 @@
 				</p>
 			</div>
 
-			<div class="bg-surface p-8 rounded-xl shadow-sm">
+			<div class="bg-surface border border-border p-8 rounded-xl shadow-sm">
 				<div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mb-4">
 					<svg
 						class="w-6 h-6 text-green-600"
@@ -160,7 +160,7 @@
 				</p>
 			</div>
 
-			<div class="bg-surface p-8 rounded-xl shadow-sm">
+			<div class="bg-surface border border-border p-8 rounded-xl shadow-sm">
 				<div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mb-4">
 					<svg
 						class="w-6 h-6 text-purple-600"

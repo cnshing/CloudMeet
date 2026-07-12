@@ -59,7 +59,7 @@
 			</div>
 		{:else}
 			<!-- Cancellation Form -->
-			<div class="bg-surface rounded-lg shadow-lg p-8">
+			<div class="bg-surface border border-border rounded-lg shadow-lg p-8">
 				<h1 class="text-2xl font-bold text-foreground mb-6">Cancel Booking</h1>
 
 				{#if form?.error}

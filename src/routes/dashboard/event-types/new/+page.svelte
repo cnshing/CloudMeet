@@ -122,7 +122,7 @@
 			<div class="bg-red-50 border border-red-200 text-red-800 rounded-lg p-4 mb-6">Error: {form.error}</div>
 		{/if}
 
-		<div class="bg-surface rounded-lg shadow-sm p-6">
+		<div class="bg-surface border border-border rounded-lg shadow-sm p-6">
 			<form method="POST" use:enhance={handleSubmit}>
 				<div class="space-y-6">
 					<!-- Event Name -->
@@ -252,7 +252,7 @@
 						<button type="submit" disabled={saving} class="px-6 py-2 bg-primary text-primary-foreground rounded-lg hover:opacity-90 transition disabled:opacity-50">
 							{saving ? 'Creating...' : 'Create Event Type'}
 						</button>
-						<a href="/dashboard" class="px-6 py-2 bg-surface text-muted-foreground rounded-lg hover:bg-surface-2 transition">Cancel</a>
+						<a href="/dashboard" class="px-6 py-2 bg-surface border border-border text-muted-foreground rounded-lg hover:bg-surface-2 transition">Cancel</a>
 					</div>
 				</div>
 			</form>

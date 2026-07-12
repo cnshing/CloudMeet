@@ -189,7 +189,7 @@
 		<Footer class="mt-6" />
 	{:else}
 		<!-- Reschedule Form - matching main booking page layout -->
-		<div class="bg-surface rounded-2xl shadow-lg overflow-hidden flex transition-all duration-300 ease-in-out" style="width: {selectedDate ? '920px' : '650px'}">
+		<div class="bg-surface border border-border rounded-2xl shadow-lg overflow-hidden flex transition-all duration-300 ease-in-out" style="width: {selectedDate ? '920px' : '650px'}">
 			<!-- Left Sidebar -->
 			<div class="w-72 border-r border-border flex flex-col flex-shrink-0">
 				{#if data.booking.coverImage}

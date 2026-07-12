@@ -152,7 +152,7 @@
 		class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
 		onclick={handleBackdropClick}
 	>
-		<div class="bg-surface rounded-xl shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+		<div class="bg-surface border border-border rounded-xl shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
 			<!-- Header -->
 			<div class="p-6 border-b border-border">
 				<div class="flex justify-between items-start">
@@ -277,7 +277,7 @@
 				<button
 					type="button"
 					onclick={onClose}
-					class="px-4 py-2 text-sm font-medium text-muted-foreground bg-surface rounded-lg hover:bg-surface-2 transition"
+					class="px-4 py-2 text-sm font-medium text-muted-foreground bg-surface border border-border rounded-lg hover:bg-surface-2 transition"
 				>
 					Cancel
 				</button>

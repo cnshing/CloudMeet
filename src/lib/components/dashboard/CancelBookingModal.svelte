@@ -51,7 +51,7 @@
 
 {#if show && booking}
 	<div class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-		<div class="bg-surface rounded-lg shadow-xl max-w-md w-full">
+		<div class="bg-surface border border-border rounded-lg shadow-xl max-w-md w-full">
 			<div class="p-6">
 				<h3 class="text-lg font-semibold text-foreground mb-2">Cancel Booking</h3>
 				<p class="text-sm text-muted-foreground mb-4">
