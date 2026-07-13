@@ -152,7 +152,7 @@
 				</div>
 				<h1 class="text-2xl font-semibold text-foreground mb-2">Meeting Rescheduled!</h1>
 				<p class="text-muted-foreground mb-8">Your meeting has been rescheduled. A calendar update has been sent to your email.</p>
-				<div class="bg-background rounded-lg p-6 text-left mb-6">
+				<div class="bg-surface-2 rounded-lg p-6 text-left mb-6">
 					<h3 class="font-semibold text-foreground mb-4">{data.booking.eventName}</h3>
 					<div class="space-y-3 text-sm">
 						<div class="flex items-start gap-3">
@@ -283,7 +283,7 @@
 					<h2 class="text-lg font-semibold text-foreground mb-2 text-center">Confirm Reschedule</h2>
 					{#if selectedSlot}
 						<div class="mb-6 space-y-3">
-							<div class="bg-background rounded-lg p-4 text-sm">
+							<div class="bg-surface-2 rounded-lg p-4 text-sm">
 								<p class="text-xs font-semibold text-subtle-foreground uppercase mb-1">New time</p>
 								<p class="font-medium text-foreground">{formatTimeRange(selectedSlot.start, selectedSlot.end)}</p>
 								<p class="text-muted-foreground">{selectedDate ? formatSelectedDate(selectedDate) : ''}</p>

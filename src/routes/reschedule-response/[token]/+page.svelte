@@ -51,7 +51,7 @@
 		<!-- Accepted Success -->
 		<div class="w-full max-w-md px-4 md:px-0">
 			<ResultState variant="success" title="Meeting Rescheduled!" description="Your meeting has been confirmed for the new time. A calendar update has been sent to your email." class="w-full rounded-2xl">
-				<div class="bg-background rounded-lg p-4 sm:p-6 text-left mb-2">
+				<div class="bg-surface-2 rounded-lg p-4 sm:p-6 text-left mb-2">
 					<h2 class="font-semibold text-foreground mb-3">{data.proposal?.event_name}</h2>
 					<div class="space-y-3 text-sm">
 						<div class="flex items-start gap-3">
@@ -81,7 +81,7 @@
 		<!-- Declined Success -->
 		<div class="w-full max-w-md px-4 md:px-0">
 			<ResultState variant="error" title="Meeting Cancelled" description="The meeting has been cancelled. The host has been notified." class="w-full rounded-2xl">
-				<div class="bg-background rounded-lg p-4 sm:p-6 text-left mb-2">
+				<div class="bg-surface-2 rounded-lg p-4 sm:p-6 text-left mb-2">
 					<h2 class="font-semibold text-foreground mb-3">{data.proposal?.event_name}</h2>
 					<div class="flex items-start gap-3 text-sm">
 						<svg class="w-5 h-5 text-subtle-foreground mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -104,7 +104,7 @@
 		<!-- Already Responded -->
 		<div class="w-full max-w-md px-4 md:px-0">
 			<ResultState variant="warning" title="Already Responded" description="This reschedule request has already been {formatStatus(data.proposal?.status)}." class="w-full rounded-2xl">
-				<div class="bg-background rounded-lg p-4 sm:p-6 text-left mb-2">
+				<div class="bg-surface-2 rounded-lg p-4 sm:p-6 text-left mb-2">
 					<h2 class="font-semibold text-foreground mb-3">{data.proposal?.event_name}</h2>
 					<p class="text-sm text-muted-foreground">With {data.proposal?.host_name}</p>
 				</div>
@@ -122,7 +122,7 @@
 				</div>
 				<h1 class="text-xl sm:text-2xl font-semibold text-foreground mb-2">Propose Different Time</h1>
 				<p class="text-sm sm:text-base text-muted-foreground mb-6">Choose another available time for this meeting.</p>
-				<div class="bg-background rounded-lg p-4 sm:p-6 text-left mb-6">
+				<div class="bg-surface-2 rounded-lg p-4 sm:p-6 text-left mb-6">
 					<h2 class="font-semibold text-foreground mb-1">{data.proposal?.event_name}</h2>
 					<p class="text-sm text-muted-foreground">With {data.proposal?.host_name}</p>
 				</div>
@@ -189,7 +189,7 @@
 						</Alert>
 					{/if}
 
-					<div class="bg-background rounded-xl border border-border overflow-hidden mb-6">
+					<div class="bg-surface-2 rounded-xl border border-border overflow-hidden mb-6">
 						<div class="p-4 border-b border-border">
 							<p class="text-xs font-semibold text-subtle-foreground uppercase mb-3">Original time</p>
 							<div class="flex items-start gap-3 text-sm opacity-70">

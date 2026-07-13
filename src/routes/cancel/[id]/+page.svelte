@@ -56,7 +56,7 @@
 				description={data.alreadyCanceled ? 'This meeting has already been cancelled.' : 'Your meeting has been cancelled successfully. The host has been notified.'}
 				class="w-full rounded-2xl"
 			>
-				<div class="bg-background rounded-lg p-4 sm:p-6 text-left mb-2">
+				<div class="bg-surface-2 rounded-lg p-4 sm:p-6 text-left mb-2">
 					<h2 class="font-semibold text-foreground mb-3">{data.booking.event_name}</h2>
 					<div class="space-y-3 text-sm">
 						<div class="flex items-start gap-3">
