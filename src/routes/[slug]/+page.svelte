@@ -4,9 +4,15 @@
 	import TimezoneSelector from '$lib/components/TimezoneSelector.svelte';
 	import Footer from '$lib/components/Footer.svelte';
 	import { detectTimezone, getTimezoneWithTime } from '$lib/constants/timezones';
-	import { formatDateLocal, formatSelectedDate, createFormatters } from '$lib/utils/dateFormatters';
-	import { BookingCalendar, TimeSlotList, BookingForm, BookingSuccess, EventSidebar } from '$lib/components/booking';
-	import { Alert, Avatar, Button, Spinner } from '$lib/components/ui';
+	import { formatSelectedDate } from '$lib/utils/dateFormatters';
+	import {
+		BookingForm,
+		BookingSuccess,
+		EventSidebar,
+		SchedulingPanel,
+		MobileSchedulingFlow
+	} from '$lib/components/booking';
+	import { Alert, Avatar, Button } from '$lib/components/ui';
 
 	let { data }: { data: PageData } = $props();
 
@@ -19,7 +25,6 @@
 					sanitizedDescription = DOMPurify.sanitize(data.eventType!.description!);
 				});
 			} else {
-				// During SSR, escape basic HTML entities as a fallback
 				sanitizedDescription = data.eventType.description
 					.replace(/&/g, '&amp;')
 					.replace(/</g, '&lt;')
@@ -35,22 +40,13 @@
 	let availableSlots = $state<Array<{ start: string; end: string }>>([]);
 	let loading = $state(false);
 	let showForm = $state(false);
-	let bookingForm = $state({
-		name: '',
-		email: '',
-		notes: ''
-	});
+	let bookingForm = $state({ name: '', email: '', notes: '' });
 	let bookingStatus = $state<'idle' | 'submitting' | 'success' | 'error'>('idle');
 	let bookingError = $state('');
 	let meetingUrl = $state<string | null>(null);
 	let meetingType = $state<'google_meet' | 'teams'>('google_meet');
 
-	// Track which dates have available slots
 	let availableDates = $state<Set<string>>(new Set());
-	let loadingAvailability = $state(false);
-
-	// Mobile step tracking
-	let mobileStep = $state<'calendar' | 'times' | 'form'>('calendar');
 
 	// Timezone state
 	let selectedTimezone = $state(detectTimezone());
@@ -59,7 +55,6 @@
 	// Calendar state
 	let currentMonth = $state(new Date());
 
-	// Date/time formatters
 	const use12Hour = data.user?.timeFormat !== '24h';
 
 	function formatTime(isoStr: string) {
@@ -85,54 +80,6 @@
 		}).format(date);
 	}
 
-	function formatMonthYear(date: Date) {
-		return new Intl.DateTimeFormat('en-US', { month: 'long', year: 'numeric' }).format(date);
-	}
-
-	// Calendar days computation
-	const calendarDays = $derived(() => {
-		const year = currentMonth.getFullYear();
-		const month = currentMonth.getMonth();
-		const firstDay = new Date(year, month, 1);
-		const lastDay = new Date(year, month + 1, 0);
-		const startPadding = (firstDay.getDay() + 6) % 7;
-		const days: Array<{ date: Date; isCurrentMonth: boolean; isAvailable: boolean; dateStr: string }> = [];
-		for (let i = 0; i < startPadding; i++) {
-			const date = new Date(year, month, i - startPadding + 1);
-			days.push({
-				date,
-				isCurrentMonth: false,
-				isAvailable: false,
-				dateStr: formatDateLocal(date)
-			});
-		}
-
-		const today = new Date();
-		today.setHours(0, 0, 0, 0);
-		for (let i = 1; i <= lastDay.getDate(); i++) {
-			const date = new Date(year, month, i);
-			const dateStr = formatDateLocal(date);
-			const isAvailable = date >= today && date <= new Date(today.getTime() + 60 * 24 * 60 * 60 * 1000);
-			days.push({
-				date,
-				isCurrentMonth: true,
-				isAvailable,
-				dateStr
-			});
-		}
-		const remaining = 42 - days.length;
-		for (let i = 1; i <= remaining; i++) {
-			const date = new Date(year, month + 1, i);
-			days.push({
-				date,
-				isCurrentMonth: false,
-				isAvailable: false,
-				dateStr: formatDateLocal(date)
-			});
-		}
-		return days;
-	});
-
 	function prevMonth() {
 		currentMonth = new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1, 1);
 		fetchMonthAvailability();
@@ -144,23 +91,17 @@
 	}
 
 	async function fetchMonthAvailability() {
-		loadingAvailability = true;
-
 		try {
 			const year = currentMonth.getFullYear();
 			const month = currentMonth.getMonth() + 1;
 			const monthStr = `${year}-${String(month).padStart(2, '0')}`;
-
 			const response = await fetch(`/api/availability/month?event=${data.slug}&month=${monthStr}`);
 			if (!response.ok) throw new Error('Failed to fetch availability');
-
 			const result = await response.json() as { availableDates?: string[] };
 			availableDates = new Set(result.availableDates || []);
 		} catch (error) {
 			console.error('Error fetching month availability:', error);
 			availableDates = new Set();
-		} finally {
-			loadingAvailability = false;
 		}
 	}
 
@@ -173,8 +114,6 @@
 		selectedSlot = null;
 		showForm = false;
 		loading = true;
-		mobileStep = 'times';
-
 		try {
 			const response = await fetch(`/api/availability?event=${data.slug}&date=${dateStr}`);
 			if (!response.ok) throw new Error('Failed to fetch availability');
@@ -192,28 +131,15 @@
 		selectedSlot = slot;
 	}
 
+	/** Desktop only: show the booking form panel. Mobile step is managed by MobileSchedulingFlow. */
 	function confirmSlot() {
 		showForm = true;
-		mobileStep = 'form';
-	}
-
-	function goBackMobile() {
-		if (mobileStep === 'form') {
-			mobileStep = 'times';
-			showForm = false;
-		} else if (mobileStep === 'times') {
-			mobileStep = 'calendar';
-			selectedDate = null;
-			selectedSlot = null;
-			availableSlots = [];
-		}
 	}
 
 	async function handleSubmit(e: Event) {
 		e.preventDefault();
 		bookingStatus = 'submitting';
 		bookingError = '';
-
 		try {
 			const response = await fetch('/api/bookings', {
 				method: 'POST',
@@ -228,12 +154,10 @@
 					timezone: selectedTimezone
 				})
 			});
-
 			if (!response.ok) {
 				const errData = await response.json() as { message?: string };
 				throw new Error(errData.message || 'Failed to create booking');
 			}
-
 			const result = await response.json() as { meetingUrl?: string; meetingType?: 'google_meet' | 'teams' };
 			meetingUrl = result.meetingUrl || null;
 			meetingType = result.meetingType || 'google_meet';
@@ -244,13 +168,10 @@
 			bookingStatus = 'error';
 		}
 	}
-
-	const weekDays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 </script>
 
 <svelte:head>
 	<title>{data.eventType?.name || 'Book a Meeting'}</title>
-	<!-- Static favicon using design system primary color -->
 	<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,{encodeURIComponent(`<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><defs><linearGradient id='grad' x1='0%' y1='0%' x2='100%' y2='100%'><stop offset='0%' style='stop-color:#86c322;stop-opacity:1'/><stop offset='100%' style='stop-color:#628c20;stop-opacity:1'/></linearGradient></defs><circle cx='16' cy='16' r='15' fill='url(%23grad)'/><rect x='7' y='9' width='18' height='15' rx='2' fill='white' opacity='0.95'/><rect x='7' y='9' width='18' height='5' rx='2' fill='white'/><rect x='7' y='12' width='18' height='2' fill='#86c322'/><rect x='10' y='6' width='2.5' height='5' rx='1' fill='white'/><rect x='19.5' y='6' width='2.5' height='5' rx='1' fill='white'/><circle cx='16' cy='18' r='4' fill='none' stroke='#628c20' stroke-width='1.5'/><line x1='16' y1='18' x2='16' y2='16' stroke='#628c20' stroke-width='1.5' stroke-linecap='round'/><line x1='16' y1='18' x2='18' y2='18' stroke='#628c20' stroke-width='1.5' stroke-linecap='round'/></svg>`)}" />
 </svelte:head>
 
@@ -259,40 +180,45 @@
 		<BookingSuccess eventName={data.eventType?.name || 'Meeting'} selectedDate={selectedDate!} selectedSlot={selectedSlot!} {meetingUrl} {meetingType} {formatTimeRange} {formatSelectedDate} />
 		<Footer class="mt-6" />
 	{:else}
-		<!-- MOBILE LAYOUT -->
-		<div class="md:hidden min-h-screen w-full bg-surface">
-			{#if data.eventType?.cover_image}
-				<div class="px-6 pt-6 flex justify-center">
-					<img src={data.eventType.cover_image} alt="" class="max-h-16 w-auto object-contain" />
-				</div>
-				<div class="border-b border-border mx-6 mt-4"></div>
-			{/if}
 
-			<!-- Back button for non-calendar steps -->
-			{#if mobileStep !== 'calendar'}
-				<div class="px-6 py-4">
-					<button onclick={goBackMobile} class="flex items-center gap-2 text-muted-foreground hover:text-foreground" aria-label="Go back">
-						<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
-						</svg>
-						<span class="text-sm">Back</span>
-					</button>
-				</div>
-			{/if}
+		<!-- ════════════════════════════════════════════ MOBILE ════ -->
+		<MobileSchedulingFlow
+			{selectedDate}
+			{selectedSlot}
+			{availableSlots}
+			{availableDates}
+			{currentMonth}
+			{loading}
+			{selectedTimezone}
+			{showTimezoneDropdown}
+			{use12Hour}
+			{formatTime}
+			onDateSelect={handleDateSelect}
+			onSelectSlot={selectSlot}
+			onConfirmSlot={() => {/* step managed by component */}}
+			onPrevMonth={prevMonth}
+			onNextMonth={nextMonth}
+			onTimezoneToggle={() => showTimezoneDropdown = !showTimezoneDropdown}
+			onTimezoneSelect={(tz) => selectedTimezone = tz}
+			onTimezoneClose={() => showTimezoneDropdown = false}
+		>
+			{#snippet calendarHeader({ selectedTimezone: tz, use12Hour: u12, showTimezoneDropdown: showTz, onTimezoneToggle: tzToggle, onTimezoneSelect: tzSelect, onTimezoneClose: tzClose })}
+				{#if data.eventType?.cover_image}
+					<div class="px-6 pt-6 flex justify-center">
+						<img src={data.eventType.cover_image} alt="" class="max-h-16 w-auto object-contain" />
+					</div>
+					<div class="border-b border-border mx-6 mt-4"></div>
+				{/if}
 
-			<!-- Profile Image centered with name below -->
-			{#if mobileStep === 'calendar'}
 				<div class="flex flex-col items-center pt-8 pb-6 px-6">
 					<Avatar src={data.user?.profileImage} name={data.user?.name} size="lg" fallback="M" class="border-4 border-surface shadow-lg" />
 					<p class="mt-4 text-base font-semibold text-muted-foreground">{data.user?.name || 'Host'}</p>
 				</div>
 
-				<!-- Meeting Title -->
 				<div class="px-6 pb-5">
 					<h1 class="text-2xl font-bold text-foreground text-center">{data.eventType?.name || 'Meeting'}</h1>
 				</div>
 
-				<!-- Meeting Details List -->
 				<div class="px-6 pb-5">
 					<ul class="space-y-3 text-sm text-muted-foreground">
 						<li class="flex items-center gap-3">
@@ -311,124 +237,33 @@
 							<svg class="w-5 h-5 text-subtle-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
 							</svg>
-							<button type="button" onclick={() => showTimezoneDropdown = !showTimezoneDropdown} class="flex items-center gap-1 hover:text-foreground transition">
-								<span>{getTimezoneWithTime(selectedTimezone, use12Hour)}</span>
+							<button type="button" onclick={tzToggle} class="flex items-center gap-1 hover:text-foreground transition">
+								<span>{getTimezoneWithTime(tz, u12)}</span>
 								<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
 								</svg>
 							</button>
 						</li>
 					</ul>
-					{#if showTimezoneDropdown}
+					{#if showTz}
 						<div class="mt-2">
 							<TimezoneSelector
-								{selectedTimezone}
-								onSelect={(tz) => selectedTimezone = tz}
-								onClose={() => showTimezoneDropdown = false}
+								selectedTimezone={tz}
+								onSelect={tzSelect}
+								onClose={tzClose}
 							/>
 						</div>
 					{/if}
 				</div>
 
-				<!-- Description -->
 				{#if data.eventType?.description}
 					<div class="px-6 pb-5 text-sm text-muted-foreground prose prose-sm max-w-none">
 						{@html sanitizedDescription}
 					</div>
 				{/if}
+			{/snippet}
 
-				<!-- Breakline / Divider -->
-				<div class="border-b border-border mx-6 mb-6"></div>
-
-				<!-- Calendar with arrows around month name -->
-				<div class="px-6 pb-8">
-					<h2 class="text-lg font-semibold text-foreground mb-5 text-center">Select a Date & Time</h2>
-
-					<!-- Month navigation with arrows on sides -->
-					<div class="flex items-center justify-between mb-4">
-						<button onclick={prevMonth} class="p-2 hover:bg-surface-2 rounded-full transition" aria-label="Previous month">
-							<svg class="w-5 h-5 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
-							</svg>
-						</button>
-						<h3 class="text-base font-semibold text-foreground">{formatMonthYear(currentMonth)}</h3>
-						<button onclick={nextMonth} class="p-2 hover:bg-surface-2 rounded-full transition" aria-label="Next month">
-							<svg class="w-5 h-5 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-							</svg>
-						</button>
-					</div>
-
-					<!-- Weekday headers -->
-					<div class="grid grid-cols-7 gap-1 mb-2">
-						{#each weekDays as day}
-							<div class="text-center text-xs font-medium text-subtle-foreground py-2">{day}</div>
-						{/each}
-					</div>
-
-					<!-- Calendar grid -->
-					<div class="grid grid-cols-7 gap-1">
-						{#each calendarDays() as day}
-							{@const hasSlots = availableDates.has(day.dateStr)}
-							{@const isClickable = day.isAvailable && hasSlots}
-							{@const isSelected = selectedDate === day.dateStr}
-							<button
-								type="button"
-								onclick={() => isClickable && handleDateSelect(day.dateStr)}
-								disabled={!isClickable}
-								class="aspect-square flex items-center justify-center text-sm rounded-full transition
-								{!day.isCurrentMonth ? 'text-subtle-foreground' : ''}
-								{isClickable && !isSelected ? 'font-semibold bg-accent-subtle text-border-strong' : ''}
-								{day.isAvailable && !hasSlots && day.isCurrentMonth ? 'text-subtle-foreground' : ''}
-								{!day.isAvailable && day.isCurrentMonth ? 'text-subtle-foreground' : ''}
-									{isSelected ? 'bg-primary text-primary-foreground' : ''}"
-							>
-								{day.date.getDate()}
-							</button>
-						{/each}
-					</div>
-				</div>
-			{/if}
-
-			<!-- Mobile Time Slots -->
-			{#if mobileStep === 'times'}
-				<div class="px-6 pb-8">
-					<h2 class="text-lg font-semibold text-foreground mb-2 text-center">Select a Time</h2>
-					<p class="text-sm text-subtle-foreground text-center mb-6">{selectedDate ? formatSelectedDate(selectedDate) : ''}</p>
-					{#if loading}
-						<div class="flex items-center justify-center py-8">
-							<Spinner />
-						</div>
-					{:else if availableSlots.length === 0}
-						<p class="text-sm text-subtle-foreground py-4 text-center">No available times for this date</p>
-					{:else}
-						<div class="grid grid-cols-2 gap-3">
-							{#each availableSlots as slot}
-								{@const isSelected = selectedSlot === slot}
-								<button type="button" onclick={() => selectSlot(slot)}
-									class="py-3 px-4 border-2 rounded-lg text-sm font-semibold transition {isSelected ? 'border-foreground bg-foreground text-background' : 'border-primary text-primary hover:bg-accent-subtle'}"
-								>
-									{formatTime(slot.start)}
-								</button>
-							{/each}
-						</div>
-						{#if selectedSlot}
-							<Button
-								type="button"
-								onclick={confirmSlot}
-								fullWidth
-								pill
-								class="mt-6 py-3 px-6 font-semibold hover:bg-border-strong"
-							>
-								Next
-							</Button>
-						{/if}
-					{/if}
-				</div>
-			{/if}
-
-			<!-- Mobile Booking Form -->
-			{#if mobileStep === 'form'}
+			{#snippet confirmStep()}
 				<div class="px-6 pb-8">
 					{#if bookingError}
 						<Alert variant="error" class="p-3 mb-4">{bookingError}</Alert>
@@ -461,74 +296,43 @@
 						</Button>
 					</form>
 				</div>
-			{/if}
+			{/snippet}
+		</MobileSchedulingFlow>
 
-			<!-- Mobile Footer -->
-			<Footer class="px-6 pb-8" />
-		</div>
-
-		<!-- DESKTOP LAYOUT -->
+		<!-- ════════════════════════════════════════════ DESKTOP ═══ -->
 		<div class="hidden md:flex bg-surface border border-border rounded-2xl shadow-lg overflow-hidden transition-all duration-300 ease-in-out" style="width: {showForm ? '700px' : selectedDate ? '920px' : '650px'}">
 			<EventSidebar user={data.user} eventType={data.eventType} {selectedDate} {selectedSlot} {formatTime} />
 
-			<!-- Main Content -->
 			<div class="flex-1 p-6">
 				{#if bookingError}
-					<Alert variant="error" class="mb-6 max-w-2xl">
-						{bookingError}
-					</Alert>
+					<Alert variant="error" class="mb-6 max-w-2xl">{bookingError}</Alert>
 				{/if}
 
 				{#if showForm}
 					<BookingForm bind:bookingForm {bookingStatus} {bookingError} onSubmit={handleSubmit} />
 				{:else}
-					<div class="flex items-stretch">
-						<div class="w-80">
-							<h2 class="text-xl font-semibold text-foreground mb-6">Select a Date & Time</h2>
-
-							<BookingCalendar
-								{currentMonth}
-								{selectedDate}
-								{availableDates}
-								onDateSelect={handleDateSelect}
-								onPrevMonth={prevMonth}
-								onNextMonth={nextMonth}
-							/>
-
-							<div class="mt-6 relative">
-								<p class="text-sm font-semibold text-foreground mb-2">Time zone</p>
-								<button type="button" onclick={() => showTimezoneDropdown = !showTimezoneDropdown}
-									class="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition">
-									<svg class="w-4 h-4 text-subtle-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-										<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-									</svg>
-									<span>{getTimezoneWithTime(selectedTimezone, use12Hour)}</span>
-									<svg class="w-4 h-4 text-subtle-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-										<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-									</svg>
-								</button>
-								{#if showTimezoneDropdown}
-									<TimezoneSelector
-										{selectedTimezone}
-										onSelect={(tz) => selectedTimezone = tz}
-										onClose={() => showTimezoneDropdown = false}
-									/>
-								{/if}
-							</div>
-						</div>
-
-						{#if selectedDate}
-							<TimeSlotList
-								{selectedDate}
-								{availableSlots}
-								{selectedSlot}
-								{loading}
-								{formatTime}
-								onSelectSlot={selectSlot}
-								onConfirm={confirmSlot}
-							/>
-						{/if}
-					</div>
+					<SchedulingPanel
+						heading="Select a Date & Time"
+						{currentMonth}
+						{selectedDate}
+						{availableDates}
+						{availableSlots}
+						{selectedSlot}
+						{loading}
+						{selectedTimezone}
+						{showTimezoneDropdown}
+						{use12Hour}
+						{formatTime}
+						onDateSelect={handleDateSelect}
+						onPrevMonth={prevMonth}
+						onNextMonth={nextMonth}
+						onSelectSlot={selectSlot}
+						onTimezoneToggle={() => showTimezoneDropdown = !showTimezoneDropdown}
+						onTimezoneSelect={(tz) => selectedTimezone = tz}
+						onTimezoneClose={() => showTimezoneDropdown = false}
+						showSlotConfirmButton={true}
+						onConfirm={confirmSlot}
+					/>
 				{/if}
 			</div>
 		</div>

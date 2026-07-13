@@ -14,7 +14,16 @@
 		loading: boolean;
 		formatTime: (isoStr: string) => string;
 		onSelectSlot: (slot: TimeSlot) => void;
-		onConfirm: () => void;
+		/** Called when the user clicks "Next" after selecting a slot. Only relevant when showConfirmButton is true. */
+		onConfirm?: () => void;
+		/**
+		 * Whether to show an inline "Next" confirm button next to the selected slot.
+		 * Set to false for reschedule flows where the confirm action is a page-level button.
+		 * Defaults to true.
+		 */
+		showConfirmButton?: boolean;
+		/** Label for the empty-slots message. Defaults to "No available times". */
+		emptyLabel?: string;
 	}
 
 	let {
@@ -24,7 +33,9 @@
 		loading,
 		formatTime,
 		onSelectSlot,
-		onConfirm
+		onConfirm,
+		showConfirmButton = true,
+		emptyLabel = 'No available times'
 	}: Props = $props();
 </script>
 
@@ -38,7 +49,7 @@
 			<Spinner />
 		</div>
 	{:else if availableSlots.length === 0}
-		<p class="text-sm text-subtle-foreground py-4">No available times</p>
+		<p class="text-sm text-subtle-foreground py-4">{emptyLabel}</p>
 	{:else}
 		<div class="space-y-2 overflow-y-auto flex-1 pr-2 pb-2 scrollbar-thin">
 			{#each availableSlots as slot}
@@ -47,13 +58,15 @@
 						<Button type="button" variant="outline" class="flex-1 py-2.5 px-3 border-2 border-foreground bg-foreground text-background text-sm font-semibold hover:bg-foreground">
 							{formatTime(slot.start)}
 						</Button>
-						<Button
-							type="button"
-							onclick={onConfirm}
-							class="flex-1 py-2.5 px-3 text-sm font-semibold hover:bg-border-strong"
-						>
-							Next
-						</Button>
+						{#if showConfirmButton && onConfirm}
+							<Button
+								type="button"
+								onclick={onConfirm}
+								class="flex-1 py-2.5 px-3 text-sm font-semibold hover:bg-border-strong"
+							>
+								Next
+							</Button>
+						{/if}
 					</div>
 				{:else}
 					<Button
