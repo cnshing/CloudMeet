@@ -57,8 +57,8 @@ export function buildBookingVariables(data: BookingEmailData): EmailVariableMap 
 		attendee_email: data.attendeeEmail,
 		date: formatDate(data.startTime),
 		time: `${formatTime(data.startTime)} \u2013 ${formatTime(data.endTime)}`,
-		start_time: formatDateTime(data.startTime),
-		end_time: formatDateTime(data.endTime),
+		start_time: formatTime(data.startTime),
+		end_time: formatTime(data.endTime),
 		meeting_url: data.meetingUrl || '',
 		attendee_notes: data.attendeeNotes || '',
 		cancellation_reason: data.cancellationReason || '',
@@ -78,8 +78,8 @@ export function buildRescheduleVariables(data: RescheduleEmailData): EmailVariab
 		...buildBookingVariables(data),
 		previous_date: formatDate(data.oldStartTime),
 		previous_time: `${formatTime(data.oldStartTime)} \u2013 ${formatTime(data.oldEndTime)}`,
-		previous_start_time: formatDateTime(data.oldStartTime),
-		previous_end_time: formatDateTime(data.oldEndTime)
+		previous_start_time: formatTime(data.oldStartTime),
+		previous_end_time: formatTime(data.oldEndTime)
 	};
 }
 
