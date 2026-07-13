@@ -212,7 +212,8 @@ export const actions: Actions = {
 									hostEmail: fullBooking.host_email,
 									hostContactEmail: fullBooking.contact_email || undefined,
 									appUrl: env.APP_URL || '',
-									customMessage: reason || template?.custom_message,
+									customMessage: template?.custom_message || null,
+									cancellationReason: reason,
 									timeFormat,
 									brandColor: fullBooking.brand_color || undefined
 								},
