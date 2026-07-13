@@ -24,7 +24,7 @@ export const load: PageServerLoad = async ({ params, url, platform }) => {
 			b.attendee_name, b.attendee_email, b.start_time as original_start_time, b.end_time as original_end_time,
 			b.google_event_id, b.attendee_notes,
 			e.name as event_name, e.slug as event_slug, e.duration_minutes,
-			u.id as user_id, u.name as host_name, u.email as host_email, u.brand_color, u.settings
+			u.id as user_id, u.name as host_name, u.email as host_email, u.profile_image as host_profile_image, u.brand_color, u.settings
 			FROM reschedule_proposals p
 			JOIN bookings b ON p.booking_id = b.id
 			JOIN event_types e ON b.event_type_id = e.id
@@ -52,9 +52,11 @@ export const load: PageServerLoad = async ({ params, url, platform }) => {
 			user_id: string;
 			host_name: string;
 			host_email: string;
+			host_profile_image: string | null;
 			brand_color: string | null;
 			settings: string | null;
 		}>();
+
 
 	if (!proposal) {
 		throw error(404, 'Reschedule proposal not found or has expired');

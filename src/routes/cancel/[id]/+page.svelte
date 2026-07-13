@@ -92,7 +92,8 @@
 			<div class="md:hidden min-h-screen w-full bg-surface">
 				<div class="px-6 pt-8 pb-6">
 					<div class="flex flex-col items-center text-center">
-						<Avatar name={data.booking.host_name} size="lg" fallback="H" class="border-4 border-surface shadow-lg" />
+						<Avatar src={data.booking.host_profile_image} name={data.booking.host_name} size="lg" fallback="H" class="border-4 border-surface shadow-lg" />
+
 						<p class="mt-4 text-base font-semibold text-muted-foreground">{data.booking.host_name}</p>
 						<h1 class="mt-2 text-2xl font-bold text-foreground">{data.booking.event_name}</h1>
 					</div>
@@ -170,7 +171,8 @@
 				<div class="w-72 border-r border-border flex flex-col flex-shrink-0">
 					<div class="flex-1 p-6">
 						<div class="mb-6">
-							<Avatar name={data.booking.host_name} size="sm" fallback="H" class="mb-3" />
+							<Avatar src={data.booking.host_profile_image} name={data.booking.host_name} size="sm" fallback="H" class="mb-3" />
+
 							<p class="text-sm font-medium text-muted-foreground mb-1">{data.booking.host_name}</p>
 							<h1 class="text-2xl font-bold text-foreground">{data.booking.event_name}</h1>
 						</div>

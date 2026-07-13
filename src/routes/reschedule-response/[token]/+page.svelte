@@ -137,7 +137,8 @@
 				<div class="md:w-72 md:border-r md:border-border flex flex-col flex-shrink-0">
 					<div class="flex-1 p-6 md:p-6">
 						<div class="flex flex-col items-center text-center md:items-start md:text-left mb-6">
-							<Avatar name={data.proposal?.host_name} size="sm" fallback="H" class="mb-3" />
+							<Avatar src={data.proposal?.host_profile_image} name={data.proposal?.host_name} size="sm" fallback="H" class="mb-3" />
+
 							<p class="text-sm font-medium text-muted-foreground mb-1">{data.proposal?.host_name}</p>
 							<h1 class="text-2xl font-bold text-foreground">{data.proposal?.event_name}</h1>
 						</div>
