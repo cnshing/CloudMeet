@@ -154,6 +154,9 @@
 	];
 
 	function getExtraVariables(type: string): string[] {
+		if (type === 'cancellation') {
+			return ['{cancellation_reason}'];
+		}
 		if (type === 'reschedule') {
 			return ['{previous_date}', '{previous_time}', '{previous_start_time}', '{previous_end_time}'];
 		}
