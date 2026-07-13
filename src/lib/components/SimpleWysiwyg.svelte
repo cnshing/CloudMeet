@@ -29,16 +29,20 @@
 		updateValue();
 	}
 
-	// Standard rich-text editor convention:
-	//   Enter        -> new paragraph (normal spacing, for separating ideas)
-	//   Shift+Enter  -> soft line break within the current paragraph
+	// Inverted convention (per request):
+	//   Enter        -> soft line break within the current paragraph
+	//   Shift+Enter  -> new paragraph (normal spacing, for separating ideas)
 	function handleKeydown(e: KeyboardEvent) {
-		if (e.key === 'Enter' && e.shiftKey) {
-			e.preventDefault();
+		if (e.key !== 'Enter') return;
+		e.preventDefault();
+		if (e.shiftKey) {
+			document.execCommand('insertParagraph');
+		} else {
 			document.execCommand('insertLineBreak');
-			updateValue();
 		}
+		updateValue();
 	}
+
 
 
 	function normalizeUrl(url: string): string {
