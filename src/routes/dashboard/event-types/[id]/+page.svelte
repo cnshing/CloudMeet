@@ -17,7 +17,16 @@
 	let saving = $state(false);
 	let uploadingCover = $state(false);
 
+	// Scheduling limits - pre-populated from saved values (converted to friendly unit)
+	let minNoticeEnabled = $state(data.eventType.min_notice_enabled === 1);
+	let minNoticeValue = $state(data.minNoticeValue);
+	let minNoticeUnit = $state<'minutes' | 'hours' | 'days'>(data.minNoticeUnit);
+	let bookingWindowEnabled = $state(data.eventType.booking_window_enabled === 1);
+	let bookingWindowValue = $state(data.bookingWindowValue);
+	let bookingWindowUnit = $state<'days' | 'weeks' | 'months'>(data.bookingWindowUnit);
+
 	// Check which calendars are available
+
 	const hasGoogle = data.googleConnected;
 	const hasOutlook = data.outlookConnected && data.outlookConfigured;
 
@@ -247,10 +256,62 @@
 						</div>
 					{/if}
 
+					<!-- Scheduling Limits -->
+					<div class="border-t border-border pt-6">
+						<h3 class="text-sm font-medium text-foreground mb-4">Scheduling Limits</h3>
+
+						<!-- Minimum notice -->
+						<div class="mb-4">
+							<div class="flex items-start">
+								<input type="checkbox" id="min_notice_enabled" name="min_notice_enabled" bind:checked={minNoticeEnabled} class="h-4 w-4 text-primary rounded border-border-medium mt-0.5" />
+								<div class="ml-2">
+									<label for="min_notice_enabled" class="text-sm text-muted-foreground">Require minimum scheduling notice</label>
+									<p class="text-xs text-subtle-foreground mt-1">Prevent bookings within a certain amount of time from now (e.g. can't book within the next 3 days).</p>
+								</div>
+							</div>
+							{#if minNoticeEnabled}
+								<div class="mt-3 ml-6 flex items-center gap-2">
+									<input type="number" name="min_notice_value" min="1" step="1" bind:value={minNoticeValue}
+										class="w-24 px-3 py-2 border border-border-medium rounded-md focus:ring-2 focus:ring-primary focus:border-transparent" />
+									<select name="min_notice_unit" bind:value={minNoticeUnit}
+										class="px-3 py-2 border border-border-medium rounded-md focus:ring-2 focus:ring-primary focus:border-transparent">
+										<option value="minutes">Minutes</option>
+										<option value="hours">Hours</option>
+										<option value="days">Days</option>
+									</select>
+								</div>
+							{/if}
+						</div>
+
+						<!-- Booking window -->
+						<div>
+							<div class="flex items-start">
+								<input type="checkbox" id="booking_window_enabled" name="booking_window_enabled" bind:checked={bookingWindowEnabled} class="h-4 w-4 text-primary rounded border-border-medium mt-0.5" />
+								<div class="ml-2">
+									<label for="booking_window_enabled" class="text-sm text-muted-foreground">Limit how far in advance people can book</label>
+									<p class="text-xs text-subtle-foreground mt-1">Prevent bookings beyond a certain date (e.g. can't book more than 1 month ahead).</p>
+								</div>
+							</div>
+							{#if bookingWindowEnabled}
+								<div class="mt-3 ml-6 flex items-center gap-2">
+									<input type="number" name="booking_window_value" min="1" step="1" bind:value={bookingWindowValue}
+										class="w-24 px-3 py-2 border border-border-medium rounded-md focus:ring-2 focus:ring-primary focus:border-transparent" />
+									<select name="booking_window_unit" bind:value={bookingWindowUnit}
+										class="px-3 py-2 border border-border-medium rounded-md focus:ring-2 focus:ring-primary focus:border-transparent">
+										<option value="days">Days</option>
+										<option value="weeks">Weeks</option>
+										<option value="months">Months</option>
+									</select>
+								</div>
+							{/if}
+						</div>
+					</div>
+
 					<!-- Is Active -->
 					<div class="space-y-4 border-t border-border pt-6">
 						<div class="flex items-start">
 							<input type="checkbox" id="is_listed" name="is_listed" bind:checked={isListed} class="h-4 w-4 text-primary rounded border-border-medium mt-0.5" />
+
 							<div class="ml-2">
 								<label for="is_listed" class="text-sm text-muted-foreground">Show on public booking page</label>
 								<p class="text-xs text-subtle-foreground mt-1">Turn this off to make the event unlisted. Anyone with the direct link can still book it.</p>

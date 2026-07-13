@@ -9,6 +9,8 @@ import { createCalendarEvent, getValidAccessToken } from '$lib/server/google-cal
 import { createOutlookCalendarEvent, getValidOutlookAccessToken } from '$lib/server/outlook-calendar';
 import { sendBookingEmail, sendAdminNotificationEmail, getEmailTemplates, getEmailConfig, isEmailEnabled, type EmailTemplateType } from '$lib/server/email';
 import { isValidEmail, validateLength, validateFields, MAX_LENGTHS } from '$lib/server/validation';
+import { getSchedulingLimits, getSchedulingLimitError } from '$lib/server/scheduling-limits';
+
 
 export const POST: RequestHandler = async ({ request, platform }) => {
 	const env = platform?.env;
@@ -83,13 +85,38 @@ export const POST: RequestHandler = async ({ request, platform }) => {
 		}
 
 		const eventType = await db
-			.prepare('SELECT id, name, duration_minutes as duration, description, invite_calendar FROM event_types WHERE user_id = ? AND slug = ? AND is_active = 1')
+			.prepare(
+				`SELECT id, name, duration_minutes as duration, description, invite_calendar,
+					min_notice_enabled, min_notice_minutes, booking_window_enabled, booking_window_days
+				FROM event_types WHERE user_id = ? AND slug = ? AND is_active = 1`
+			)
 			.bind(user.id, eventSlug)
-			.first<{ id: string; name: string; duration: number; description: string; invite_calendar: string | null }>();
+			.first<{
+				id: string;
+				name: string;
+				duration: number;
+				description: string;
+				invite_calendar: string | null;
+				min_notice_enabled: number | null;
+				min_notice_minutes: number | null;
+				booking_window_enabled: number | null;
+				booking_window_days: number | null;
+			}>();
 
 		if (!eventType) {
 			throw error(404, 'Event type not found or inactive');
 		}
+
+		// Re-validate scheduling limits server-side so they can't be bypassed via
+		// a direct API call. This endpoint is always attendee-facing (the host's
+		// "Propose New Time" flow uses /api/bookings/propose-reschedule instead),
+		// so there is no bypass here.
+		const schedulingLimits = getSchedulingLimits(eventType);
+		const limitError = getSchedulingLimitError(new Date(startTime), schedulingLimits);
+		if (limitError) {
+			throw error(400, limitError);
+		}
+
 
 		// Parse user settings for global calendar defaults
 		let userSettings: { defaultInviteCalendar?: string } = {};

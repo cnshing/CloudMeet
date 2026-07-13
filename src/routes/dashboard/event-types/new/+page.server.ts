@@ -6,6 +6,8 @@ import { redirect, fail } from '@sveltejs/kit';
 import type { PageServerLoad, Actions } from './$types';
 import { getCurrentUser } from '$lib/server/auth';
 import { validateLength, validateFields, MAX_LENGTHS } from '$lib/server/validation';
+import { convertToMinutes, convertToDays } from '$lib/server/scheduling-limits';
+
 
 export const load: PageServerLoad = async (event) => {
 	const userId = await getCurrentUser(event);
@@ -80,9 +82,41 @@ export const actions: Actions = {
 		const availabilityCalendars = overrideCalendarSettings ? (formData.get('availability_calendars') || 'both') : null;
 		const inviteCalendar = overrideCalendarSettings ? (formData.get('invite_calendar') || 'google') : null;
 
+		// Scheduling limits (both off by default)
+		const minNoticeEnabled = formData.get('min_notice_enabled') === 'on';
+		const minNoticeValue = parseFloat(formData.get('min_notice_value')?.toString() || '3');
+		const minNoticeUnit = formData.get('min_notice_unit')?.toString() || 'days';
+		const bookingWindowEnabled = formData.get('booking_window_enabled') === 'on';
+		const bookingWindowValue = parseFloat(formData.get('booking_window_value')?.toString() || '30');
+		const bookingWindowUnit = formData.get('booking_window_unit')?.toString() || 'days';
+
 		if (!name || !slug || !duration) {
 			return fail(400, { error: 'Missing required fields' });
 		}
+
+		// Validate & convert scheduling limit inputs
+		if (minNoticeEnabled && (!Number.isFinite(minNoticeValue) || minNoticeValue <= 0)) {
+			return fail(400, { error: 'Minimum notice must be a positive number' });
+		}
+		if (bookingWindowEnabled && (!Number.isFinite(bookingWindowValue) || bookingWindowValue <= 0)) {
+			return fail(400, { error: 'Booking window must be a positive number' });
+		}
+
+		const minNoticeMinutes = minNoticeEnabled
+			? Math.round(convertToMinutes(minNoticeValue, minNoticeUnit))
+			: 4320;
+		const bookingWindowDays = bookingWindowEnabled
+			? Math.round(convertToDays(bookingWindowValue, bookingWindowUnit))
+			: 30;
+
+		// Sanity caps: min notice up to 90 days, booking window up to 2 years
+		if (minNoticeEnabled && minNoticeMinutes > 90 * 24 * 60) {
+			return fail(400, { error: 'Minimum notice cannot exceed 90 days' });
+		}
+		if (bookingWindowEnabled && bookingWindowDays > 730) {
+			return fail(400, { error: 'Booking window cannot exceed 2 years' });
+		}
+
 
 		// Validate input lengths
 		const lengthError = validateFields([
@@ -114,11 +148,21 @@ export const actions: Actions = {
 			// Insert new event type
 			await db
 				.prepare(
-					`INSERT INTO event_types (user_id, name, slug, duration_minutes, description, is_active, is_listed, cover_image, availability_calendars, invite_calendar, created_at)
-					VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)`
+					`INSERT INTO event_types (
+						user_id, name, slug, duration_minutes, description, is_active, is_listed, cover_image,
+						availability_calendars, invite_calendar,
+						min_notice_enabled, min_notice_minutes, booking_window_enabled, booking_window_days,
+						created_at
+					)
+					VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)`
 				)
-				.bind(userId, name, slugStr, parseInt(duration.toString()), description, isActive ? 1 : 0, isListed ? 1 : 0, coverImage, availabilityCalendars, inviteCalendar)
+				.bind(
+					userId, name, slugStr, parseInt(duration.toString()), description, isActive ? 1 : 0, isListed ? 1 : 0, coverImage,
+					availabilityCalendars, inviteCalendar,
+					minNoticeEnabled ? 1 : 0, minNoticeMinutes, bookingWindowEnabled ? 1 : 0, bookingWindowDays
+				)
 				.run();
+
 
 			throw redirect(302, '/dashboard');
 		} catch (error: any) {

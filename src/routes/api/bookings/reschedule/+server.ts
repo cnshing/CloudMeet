@@ -7,6 +7,8 @@ import { json, error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { createCalendarEvent, cancelCalendarEvent, getValidAccessToken } from '$lib/server/google-calendar';
 import { sendRescheduleEmail, sendAdminRescheduleNotification, getEmailTemplates, getEmailConfig, isEmailEnabled } from '$lib/server/email';
+import { getSchedulingLimits, getSchedulingLimitError } from '$lib/server/scheduling-limits';
+
 
 export const POST: RequestHandler = async ({ request, platform }) => {
 	const env = platform?.env;
@@ -37,6 +39,7 @@ export const POST: RequestHandler = async ({ request, platform }) => {
 				b.attendee_name, b.attendee_email, b.attendee_notes, b.google_event_id,
 				e.name as event_name, e.slug as event_slug, e.description as event_description,
 				e.duration_minutes as duration,
+				e.min_notice_enabled, e.min_notice_minutes, e.booking_window_enabled, e.booking_window_days,
 				u.id as host_user_id, u.name as host_name, u.email as host_email,
 				u.contact_email, u.settings, u.brand_color
 				FROM bookings b
@@ -59,6 +62,10 @@ export const POST: RequestHandler = async ({ request, platform }) => {
 				event_slug: string;
 				event_description: string | null;
 				duration: number;
+				min_notice_enabled: number | null;
+				min_notice_minutes: number | null;
+				booking_window_enabled: number | null;
+				booking_window_days: number | null;
 				host_user_id: string;
 				host_name: string;
 				host_email: string;
@@ -71,10 +78,21 @@ export const POST: RequestHandler = async ({ request, platform }) => {
 			throw error(404, 'Booking not found or already cancelled');
 		}
 
+		// Re-validate scheduling limits server-side so they can't be bypassed via
+		// a direct API call. This endpoint is the attendee-facing reschedule flow
+		// (the host's "Propose New Time" flow uses /api/bookings/propose-reschedule
+		// instead, which requires attendee acceptance), so there is no bypass here.
+		const schedulingLimits = getSchedulingLimits(originalBooking);
+		const limitError = getSchedulingLimitError(new Date(newStartTime), schedulingLimits);
+		if (limitError) {
+			throw error(400, limitError);
+		}
+
 		const newStartDateTime = new Date(newStartTime);
 		const newEndDateTime = new Date(newEndTime);
 		const oldStartDateTime = new Date(originalBooking.start_time);
 		const oldEndDateTime = new Date(originalBooking.end_time);
+
 
 		// Check for conflicts with existing bookings (excluding the original booking)
 		const conflict = await db

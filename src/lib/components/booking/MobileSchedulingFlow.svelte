@@ -106,9 +106,13 @@
 		for (let i = 1; i <= lastDay.getDate(); i++) {
 			const date = new Date(year, month, i);
 			const dateStr = formatDateLocal(date);
-			const isAvailable = date >= today && date <= new Date(today.getTime() + 60 * 24 * 60 * 60 * 1000);
+			// No client-side upper bound cap here - the backend's `availableDates`
+			// (which reflects per-event-type booking window limits) is the source
+			// of truth for which future dates are actually clickable.
+			const isAvailable = date >= today;
 			days.push({ date, isCurrentMonth: true, isAvailable, dateStr });
 		}
+
 
 		const remaining = 42 - days.length;
 		for (let i = 1; i <= remaining; i++) {

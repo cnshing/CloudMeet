@@ -6,6 +6,8 @@ import { redirect, fail, error } from '@sveltejs/kit';
 import type { PageServerLoad, Actions } from './$types';
 import { getCurrentUser } from '$lib/server/auth';
 import { validateLength, validateFields, MAX_LENGTHS } from '$lib/server/validation';
+import { convertToMinutes, convertToDays, minutesToFriendlyUnit, daysToFriendlyUnit } from '$lib/server/scheduling-limits';
+
 
 export const load: PageServerLoad = async (event) => {
 	const userId = await getCurrentUser(event);
@@ -45,7 +47,8 @@ export const load: PageServerLoad = async (event) => {
 	const eventType = await db
 		.prepare(
 			`SELECT id, name, slug, duration_minutes as duration, description, is_active, is_listed, cover_image,
-				availability_calendars, invite_calendar
+				availability_calendars, invite_calendar,
+				min_notice_enabled, min_notice_minutes, booking_window_enabled, booking_window_days
 			FROM event_types
 			WHERE id = ? AND user_id = ?`
 		)
@@ -61,14 +64,27 @@ export const load: PageServerLoad = async (event) => {
 			cover_image: string | null;
 			availability_calendars: string | null;
 			invite_calendar: string | null;
+			min_notice_enabled: number | null;
+			min_notice_minutes: number | null;
+			booking_window_enabled: number | null;
+			booking_window_days: number | null;
 		}>();
+
 
 	if (!eventType) {
 		throw error(404, 'Event type not found');
 	}
 
+	// Convert stored minutes/days back to friendliest unit for editor display
+	const minNoticeFriendly = minutesToFriendlyUnit(eventType.min_notice_minutes ?? 4320);
+	const bookingWindowFriendly = daysToFriendlyUnit(eventType.booking_window_days ?? 30);
+
 	return {
 		eventType,
+		minNoticeValue: minNoticeFriendly.value,
+		minNoticeUnit: minNoticeFriendly.unit,
+		bookingWindowValue: bookingWindowFriendly.value,
+		bookingWindowUnit: bookingWindowFriendly.unit,
 		googleConnected: !!user?.google_refresh_token,
 		outlookConnected: !!user?.outlook_refresh_token,
 		outlookConfigured,
@@ -76,6 +92,7 @@ export const load: PageServerLoad = async (event) => {
 		defaultInviteCalendar: userSettings.defaultInviteCalendar
 	};
 };
+
 
 export const actions: Actions = {
 	default: async (event) => {
@@ -115,9 +132,41 @@ export const actions: Actions = {
 		const availabilityCalendars = overrideCalendarSettings ? (formData.get('availability_calendars') || 'both') : null;
 		const inviteCalendar = overrideCalendarSettings ? (formData.get('invite_calendar') || 'google') : null;
 
+		// Scheduling limits (both off by default)
+		const minNoticeEnabled = formData.get('min_notice_enabled') === 'on';
+		const minNoticeValue = parseFloat(formData.get('min_notice_value')?.toString() || '3');
+		const minNoticeUnit = formData.get('min_notice_unit')?.toString() || 'days';
+		const bookingWindowEnabled = formData.get('booking_window_enabled') === 'on';
+		const bookingWindowValue = parseFloat(formData.get('booking_window_value')?.toString() || '30');
+		const bookingWindowUnit = formData.get('booking_window_unit')?.toString() || 'days';
+
 		if (!name || !slug || !duration) {
 			return fail(400, { error: 'Missing required fields' });
 		}
+
+		// Validate & convert scheduling limit inputs
+		if (minNoticeEnabled && (!Number.isFinite(minNoticeValue) || minNoticeValue <= 0)) {
+			return fail(400, { error: 'Minimum notice must be a positive number' });
+		}
+		if (bookingWindowEnabled && (!Number.isFinite(bookingWindowValue) || bookingWindowValue <= 0)) {
+			return fail(400, { error: 'Booking window must be a positive number' });
+		}
+
+		const minNoticeMinutes = minNoticeEnabled
+			? Math.round(convertToMinutes(minNoticeValue, minNoticeUnit))
+			: 4320;
+		const bookingWindowDays = bookingWindowEnabled
+			? Math.round(convertToDays(bookingWindowValue, bookingWindowUnit))
+			: 30;
+
+		// Sanity caps: min notice up to 90 days, booking window up to 2 years
+		if (minNoticeEnabled && minNoticeMinutes > 90 * 24 * 60) {
+			return fail(400, { error: 'Minimum notice cannot exceed 90 days' });
+		}
+		if (bookingWindowEnabled && bookingWindowDays > 730) {
+			return fail(400, { error: 'Booking window cannot exceed 2 years' });
+		}
+
 
 		// Validate input lengths
 		const lengthError = validateFields([
@@ -153,7 +202,8 @@ export const actions: Actions = {
 				.prepare(
 					`UPDATE event_types
 					SET name = ?, slug = ?, duration_minutes = ?, description = ?, is_active = ?, is_listed = ?, cover_image = ?,
-						availability_calendars = ?, invite_calendar = ?
+						availability_calendars = ?, invite_calendar = ?,
+						min_notice_enabled = ?, min_notice_minutes = ?, booking_window_enabled = ?, booking_window_days = ?
 					WHERE id = ? AND user_id = ?`
 				)
 				.bind(
@@ -166,10 +216,15 @@ export const actions: Actions = {
 					coverImage ? coverImage.toString() : null,
 					availabilityCalendars ? availabilityCalendars.toString() : null,
 					inviteCalendar ? inviteCalendar.toString() : null,
+					minNoticeEnabled ? 1 : 0,
+					minNoticeMinutes,
+					bookingWindowEnabled ? 1 : 0,
+					bookingWindowDays,
 					eventTypeId,
 					userId
 				)
 				.run();
+
 
 			throw redirect(302, '/dashboard');
 		} catch (error: any) {
