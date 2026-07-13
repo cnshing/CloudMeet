@@ -35,7 +35,7 @@
 		<h1 class="text-xl sm:text-2xl font-semibold text-foreground mb-2">You are scheduled</h1>
 		<p class="text-muted-foreground mb-6 sm:mb-8 text-sm sm:text-base">A calendar invitation has been sent to your email address.</p>
 
-		<div class="bg-background rounded-lg p-4 sm:p-6 text-left mb-6">
+		<div class="bg-surface-2 rounded-lg p-4 sm:p-6 text-left mb-6">
 			<h3 class="font-semibold text-foreground mb-3 sm:mb-4">{eventName}</h3>
 			<div class="space-y-3 text-sm">
 				<div class="flex items-start gap-3">
