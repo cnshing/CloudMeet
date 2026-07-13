@@ -153,6 +153,12 @@ function mergeBusySlots(slots: BusySlot[]): BusySlot[] {
 }
 
 /**
+ * Controls whether/how Google emails attendees about the change.
+ * 'all' sends the standard invite/update/cancellation email (with .ics) to all attendees.
+ */
+export type SendUpdatesPolicy = 'all' | 'externalOnly' | 'none';
+
+/**
  * Create a calendar event (for bookings)
  */
 export async function createCalendarEvent(
@@ -170,10 +176,11 @@ export async function createCalendarEvent(
 			};
 		};
 	},
-	calendarId: string = 'primary'
+	calendarId: string = 'primary',
+	sendUpdates: SendUpdatesPolicy = 'all'
 ): Promise<CalendarEvent> {
 	const response = await fetch(
-		`https://www.googleapis.com/calendar/v3/calendars/${encodeURIComponent(calendarId)}/events?conferenceDataVersion=1`,
+		`https://www.googleapis.com/calendar/v3/calendars/${encodeURIComponent(calendarId)}/events?conferenceDataVersion=1&sendUpdates=${sendUpdates}`,
 		{
 			method: 'POST',
 			headers: {
@@ -194,6 +201,11 @@ export async function createCalendarEvent(
 
 /**
  * Update a calendar event
+ *
+ * Updating (rather than deleting + recreating) preserves the event's UID,
+ * so Google sends attendees a single "event updated" notification/.ics tied
+ * to the same calendar entry, instead of a cancellation followed by a brand
+ * new invite.
  */
 export async function updateCalendarEvent(
 	accessToken: string,
@@ -204,11 +216,13 @@ export async function updateCalendarEvent(
 		start: { dateTime: string; timeZone: string };
 		end: { dateTime: string; timeZone: string };
 		status: string;
+		attendees: Array<{ email: string }>;
 	}>,
-	calendarId: string = 'primary'
+	calendarId: string = 'primary',
+	sendUpdates: SendUpdatesPolicy = 'all'
 ): Promise<CalendarEvent> {
 	const response = await fetch(
-		`https://www.googleapis.com/calendar/v3/calendars/${encodeURIComponent(calendarId)}/events/${eventId}`,
+		`https://www.googleapis.com/calendar/v3/calendars/${encodeURIComponent(calendarId)}/events/${eventId}?sendUpdates=${sendUpdates}`,
 		{
 			method: 'PATCH',
 			headers: {
@@ -233,10 +247,11 @@ export async function updateCalendarEvent(
 export async function cancelCalendarEvent(
 	accessToken: string,
 	eventId: string,
-	calendarId: string = 'primary'
+	calendarId: string = 'primary',
+	sendUpdates: SendUpdatesPolicy = 'all'
 ): Promise<void> {
 	const response = await fetch(
-		`https://www.googleapis.com/calendar/v3/calendars/${encodeURIComponent(calendarId)}/events/${eventId}`,
+		`https://www.googleapis.com/calendar/v3/calendars/${encodeURIComponent(calendarId)}/events/${eventId}?sendUpdates=${sendUpdates}`,
 		{
 			method: 'DELETE',
 			headers: {
@@ -245,7 +260,8 @@ export async function cancelCalendarEvent(
 		}
 	);
 
-	if (!response.ok) {
+	// Google returns 410 Gone if the event was already deleted - treat as success
+	if (!response.ok && response.status !== 410 && response.status !== 404) {
 		const error = await response.text();
 		throw new Error(`Failed to cancel calendar event: ${error}`);
 	}

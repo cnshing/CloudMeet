@@ -218,6 +218,64 @@ export async function createOutlookCalendarEvent(
 }
 
 /**
+ * Update an existing Outlook calendar event (e.g. for reschedules).
+ *
+ */
+export async function updateOutlookCalendarEvent(
+	accessToken: string,
+	eventId: string,
+	updates: {
+		summary?: string;
+		description?: string;
+		startTime?: string;
+		endTime?: string;
+	}
+): Promise<OutlookCalendarEvent> {
+	const body: Record<string, unknown> = {};
+
+	if (updates.summary !== undefined) {
+		body.subject = updates.summary;
+	}
+	if (updates.description !== undefined) {
+		body.body = {
+			contentType: 'text',
+			content: updates.description
+		};
+	}
+	if (updates.startTime !== undefined) {
+		body.start = {
+			dateTime: updates.startTime.replace('Z', ''),
+			timeZone: 'UTC'
+		};
+	}
+	if (updates.endTime !== undefined) {
+		body.end = {
+			dateTime: updates.endTime.replace('Z', ''),
+			timeZone: 'UTC'
+		};
+	}
+
+	const response = await fetch(
+		`https://graph.microsoft.com/v1.0/me/events/${eventId}`,
+		{
+			method: 'PATCH',
+			headers: {
+				Authorization: `Bearer ${accessToken}`,
+				'Content-Type': 'application/json'
+			},
+			body: JSON.stringify(body)
+		}
+	);
+
+	if (!response.ok) {
+		const error = await response.text();
+		throw new Error(`Failed to update Outlook calendar event: ${error}`);
+	}
+
+	return response.json();
+}
+
+/**
  * Cancel/delete an Outlook calendar event
  */
 export async function cancelOutlookCalendarEvent(

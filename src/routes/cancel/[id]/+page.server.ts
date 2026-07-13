@@ -5,7 +5,9 @@
 import { error, redirect, fail } from '@sveltejs/kit';
 import type { PageServerLoad, Actions } from './$types';
 import { cancelCalendarEvent, getValidAccessToken } from '$lib/server/google-calendar';
+import { cancelOutlookCalendarEvent, getValidOutlookAccessToken } from '$lib/server/outlook-calendar';
 import { sendCancellationEmail, sendAdminCancellationNotification, getEmailTemplates, getEmailConfig, isEmailEnabled } from '$lib/server/email';
+
 
 export const load: PageServerLoad = async ({ params, platform }) => {
 	const db = platform?.env?.DB;
@@ -76,7 +78,7 @@ export const actions: Actions = {
 			// Get booking and user details
 			const booking = await db
 				.prepare(
-					`SELECT b.id, b.user_id, b.google_event_id, b.status
+					`SELECT b.id, b.user_id, b.google_event_id, b.outlook_event_id, b.status
 					FROM bookings b
 					WHERE b.id = ?`
 				)
@@ -85,6 +87,7 @@ export const actions: Actions = {
 					id: string;
 					user_id: string;
 					google_event_id: string | null;
+					outlook_event_id: string | null;
 					status: string;
 				}>();
 
@@ -109,6 +112,22 @@ export const actions: Actions = {
 				} catch (err) {
 					console.error('Failed to cancel Google Calendar event:', err);
 					// Continue with database cancellation even if Google Calendar fails
+				}
+			}
+
+			// Cancel in Outlook Calendar if event exists
+			if (booking.outlook_event_id && env.MICROSOFT_CLIENT_ID && env.MICROSOFT_CLIENT_SECRET) {
+				try {
+					const outlookToken = await getValidOutlookAccessToken(
+						db,
+						booking.user_id,
+						env.MICROSOFT_CLIENT_ID,
+						env.MICROSOFT_CLIENT_SECRET
+					);
+					await cancelOutlookCalendarEvent(outlookToken, booking.outlook_event_id);
+				} catch (err) {
+					console.error('Failed to cancel Outlook Calendar event:', err);
+					// Continue with database cancellation even if Outlook Calendar fails
 				}
 			}
 

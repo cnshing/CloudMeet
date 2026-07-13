@@ -5,8 +5,10 @@
 
 import { error, redirect, fail } from '@sveltejs/kit';
 import type { PageServerLoad, Actions } from './$types';
-import { createCalendarEvent, cancelCalendarEvent, getValidAccessToken } from '$lib/server/google-calendar';
+import { createCalendarEvent, updateCalendarEvent, cancelCalendarEvent, getValidAccessToken } from '$lib/server/google-calendar';
+import { updateOutlookCalendarEvent, cancelOutlookCalendarEvent, getValidOutlookAccessToken } from '$lib/server/outlook-calendar';
 import { getEmailConfig, sendAdminRescheduleNotification, sendAdminCancellationNotification } from '$lib/server/email';
+
 
 export const load: PageServerLoad = async ({ params, url, platform }) => {
 	const db = platform?.env?.DB;
@@ -92,7 +94,7 @@ export const actions: Actions = {
 			const proposal = await db
 				.prepare(
 					`SELECT p.id, p.booking_id, p.proposed_start_time, p.proposed_end_time, p.status,
-					b.attendee_name, b.attendee_email, b.google_event_id, b.attendee_notes,
+					b.attendee_name, b.attendee_email, b.google_event_id, b.outlook_event_id, b.meeting_url, b.attendee_notes,
 					b.start_time as original_start_time, b.end_time as original_end_time,
 					e.id as event_type_id, e.name as event_name, e.description as event_description, e.duration_minutes,
 					u.id as user_id, u.name as host_name, u.email as host_email, u.contact_email, u.brand_color, u.settings
@@ -112,6 +114,8 @@ export const actions: Actions = {
 					attendee_name: string;
 					attendee_email: string;
 					google_event_id: string | null;
+					outlook_event_id: string | null;
+					meeting_url: string | null;
 					attendee_notes: string | null;
 					original_start_time: string;
 					original_end_time: string;
@@ -131,7 +135,18 @@ export const actions: Actions = {
 				return fail(400, { error: 'Proposal already responded to or expired' });
 			}
 
-			// Cancel old Google Calendar event if exists
+			// Update the existing calendar event in place (preserving its UID/meeting
+			// link) rather than deleting and recreating it, so attendees get a single
+			// "event updated" notification tied to the same calendar entry.
+			let newGoogleEventId: string | null = proposal.google_event_id;
+			let newOutlookEventId: string | null = proposal.outlook_event_id;
+			let newMeetingUrl: string | null = proposal.meeting_url;
+
+			const summary = `${proposal.event_name} with ${proposal.attendee_name}`;
+			const description = proposal.attendee_notes || '';
+			const newStartIso = new Date(proposal.proposed_start_time).toISOString();
+			const newEndIso = new Date(proposal.proposed_end_time).toISOString();
+
 			if (proposal.google_event_id) {
 				try {
 					const accessToken = await getValidAccessToken(
@@ -140,63 +155,81 @@ export const actions: Actions = {
 						env.GOOGLE_CLIENT_ID,
 						env.GOOGLE_CLIENT_SECRET
 					);
-					await cancelCalendarEvent(accessToken, proposal.google_event_id);
+
+					const calendarEvent = await updateCalendarEvent(accessToken, proposal.google_event_id, {
+						summary,
+						description,
+						start: { dateTime: newStartIso, timeZone: 'UTC' },
+						end: { dateTime: newEndIso, timeZone: 'UTC' }
+					});
+
+					newMeetingUrl = calendarEvent.hangoutLink || calendarEvent.htmlLink || newMeetingUrl;
 				} catch (err) {
-					console.error('Failed to cancel old calendar event:', err);
+					console.error('Failed to update Google calendar event:', err);
 				}
-			}
+			} else if (proposal.outlook_event_id && env.MICROSOFT_CLIENT_ID && env.MICROSOFT_CLIENT_SECRET) {
+				try {
+					const outlookToken = await getValidOutlookAccessToken(
+						db,
+						proposal.user_id,
+						env.MICROSOFT_CLIENT_ID,
+						env.MICROSOFT_CLIENT_SECRET
+					);
 
-			// Create new Google Calendar event
-			let newMeetingUrl: string | null = null;
-			let newGoogleEventId: string | null = null;
+					await updateOutlookCalendarEvent(outlookToken, proposal.outlook_event_id, {
+						summary,
+						description,
+						startTime: newStartIso,
+						endTime: newEndIso
+					});
+				} catch (err) {
+					console.error('Failed to update Outlook calendar event:', err);
+				}
+			} else {
+				// No existing calendar event - best-effort create a fresh Google event
+				try {
+					const accessToken = await getValidAccessToken(
+						db,
+						proposal.user_id,
+						env.GOOGLE_CLIENT_ID,
+						env.GOOGLE_CLIENT_SECRET
+					);
 
-			try {
-				const accessToken = await getValidAccessToken(
-					db,
-					proposal.user_id,
-					env.GOOGLE_CLIENT_ID,
-					env.GOOGLE_CLIENT_SECRET
-				);
-
-				const calendarEvent = await createCalendarEvent(accessToken, {
-					summary: `${proposal.event_name} with ${proposal.attendee_name}`,
-					description: proposal.attendee_notes || '',
-					start: {
-						dateTime: new Date(proposal.proposed_start_time).toISOString(),
-						timeZone: 'UTC'
-					},
-					end: {
-						dateTime: new Date(proposal.proposed_end_time).toISOString(),
-						timeZone: 'UTC'
-					},
-					attendees: [
-						{ email: proposal.attendee_email }
-					],
-					conferenceData: {
-						createRequest: {
-							requestId: crypto.randomUUID(),
-							conferenceSolutionKey: { type: 'hangoutsMeet' }
+					const calendarEvent = await createCalendarEvent(accessToken, {
+						summary,
+						description,
+						start: { dateTime: newStartIso, timeZone: 'UTC' },
+						end: { dateTime: newEndIso, timeZone: 'UTC' },
+						attendees: [
+							{ email: proposal.attendee_email }
+						],
+						conferenceData: {
+							createRequest: {
+								requestId: crypto.randomUUID(),
+								conferenceSolutionKey: { type: 'hangoutsMeet' }
+							}
 						}
-					}
-				});
+					});
 
-				newGoogleEventId = calendarEvent.id;
-				newMeetingUrl = calendarEvent.hangoutLink || null;
-			} catch (err) {
-				console.error('Failed to create new calendar event:', err);
+					newGoogleEventId = calendarEvent.id;
+					newMeetingUrl = calendarEvent.hangoutLink || null;
+				} catch (err) {
+					console.error('Failed to create new calendar event:', err);
+				}
 			}
 
 			// Update the original booking with new times
 			await db
 				.prepare(
 					`UPDATE bookings
-					SET start_time = ?, end_time = ?, status = 'confirmed', google_event_id = ?, meeting_url = ?
+					SET start_time = ?, end_time = ?, status = 'confirmed', google_event_id = ?, outlook_event_id = ?, meeting_url = ?
 					WHERE id = ?`
 				)
 				.bind(
 					proposal.proposed_start_time,
 					proposal.proposed_end_time,
 					newGoogleEventId,
+					newOutlookEventId,
 					newMeetingUrl,
 					proposal.booking_id
 				)
@@ -272,7 +305,7 @@ export const actions: Actions = {
 			const proposal = await db
 				.prepare(
 					`SELECT p.id, p.booking_id, p.status, p.proposed_start_time, p.proposed_end_time,
-					b.google_event_id, b.attendee_name, b.attendee_email, b.attendee_notes,
+					b.google_event_id, b.outlook_event_id, b.attendee_name, b.attendee_email, b.attendee_notes,
 					b.start_time as original_start_time, b.end_time as original_end_time,
 					e.name as event_name, e.description as event_description,
 					u.id as user_id, u.name as host_name, u.email as host_email, u.brand_color, u.settings
@@ -290,6 +323,7 @@ export const actions: Actions = {
 					proposed_start_time: string;
 					proposed_end_time: string;
 					google_event_id: string | null;
+					outlook_event_id: string | null;
 					attendee_name: string;
 					attendee_email: string;
 					attendee_notes: string | null;
@@ -320,6 +354,21 @@ export const actions: Actions = {
 					await cancelCalendarEvent(accessToken, proposal.google_event_id);
 				} catch (err) {
 					console.error('Failed to cancel calendar event:', err);
+				}
+			}
+
+			// Cancel Outlook Calendar event if exists
+			if (proposal.outlook_event_id && env.MICROSOFT_CLIENT_ID && env.MICROSOFT_CLIENT_SECRET) {
+				try {
+					const outlookToken = await getValidOutlookAccessToken(
+						db,
+						proposal.user_id,
+						env.MICROSOFT_CLIENT_ID,
+						env.MICROSOFT_CLIENT_SECRET
+					);
+					await cancelOutlookCalendarEvent(outlookToken, proposal.outlook_event_id);
+				} catch (err) {
+					console.error('Failed to cancel Outlook calendar event:', err);
 				}
 			}
 

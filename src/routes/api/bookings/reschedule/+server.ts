@@ -5,9 +5,11 @@
 
 import { json, error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
-import { createCalendarEvent, cancelCalendarEvent, getValidAccessToken } from '$lib/server/google-calendar';
+import { createCalendarEvent, updateCalendarEvent, getValidAccessToken } from '$lib/server/google-calendar';
+import { updateOutlookCalendarEvent, getValidOutlookAccessToken } from '$lib/server/outlook-calendar';
 import { sendRescheduleEmail, sendAdminRescheduleNotification, getEmailTemplates, getEmailConfig, isEmailEnabled } from '$lib/server/email';
 import { getSchedulingLimits, getSchedulingLimitError } from '$lib/server/scheduling-limits';
+
 
 
 export const POST: RequestHandler = async ({ request, platform }) => {
@@ -37,6 +39,7 @@ export const POST: RequestHandler = async ({ request, platform }) => {
 			.prepare(
 				`SELECT b.id, b.user_id, b.event_type_id, b.start_time, b.end_time,
 				b.attendee_name, b.attendee_email, b.attendee_notes, b.google_event_id,
+				b.outlook_event_id, b.meeting_url,
 				e.name as event_name, e.slug as event_slug, e.description as event_description,
 				e.duration_minutes as duration,
 				e.min_notice_enabled, e.min_notice_minutes, e.booking_window_enabled, e.booking_window_days,
@@ -58,6 +61,8 @@ export const POST: RequestHandler = async ({ request, platform }) => {
 				attendee_email: string;
 				attendee_notes: string | null;
 				google_event_id: string | null;
+				outlook_event_id: string | null;
+				meeting_url: string | null;
 				event_name: string;
 				event_slug: string;
 				event_description: string | null;
@@ -73,6 +78,7 @@ export const POST: RequestHandler = async ({ request, platform }) => {
 				settings: string | null;
 				brand_color: string | null;
 			}>();
+
 
 		if (!originalBooking) {
 			throw error(404, 'Booking not found or already cancelled');
@@ -118,56 +124,95 @@ export const POST: RequestHandler = async ({ request, platform }) => {
 			throw error(409, 'This time slot is no longer available');
 		}
 
-		// Cancel old Google Calendar event and create new one
-		let newCalendarEventId: string | null = null;
-		let newMeetingUrl: string | null = null;
+		// Update the existing calendar event in place (preserving its UID/meeting
+		// link) rather than deleting and recreating it. This ensures Google/Outlook
+		// send attendees a single "event updated" notification (with a corresponding
+		// .ics) tied to the same calendar entry, instead of a cancellation followed
+		// by a brand new invite.
+		let newGoogleEventId: string | null = originalBooking.google_event_id;
+		let newOutlookEventId: string | null = originalBooking.outlook_event_id;
+		let newMeetingUrl: string | null = originalBooking.meeting_url;
 
-		try {
-			const accessToken = await getValidAccessToken(
-				db,
-				originalBooking.user_id,
-				env.GOOGLE_CLIENT_ID,
-				env.GOOGLE_CLIENT_SECRET
-			);
+		const notes = originalBooking.attendee_notes;
+		const summary = `${originalBooking.event_name} with ${originalBooking.attendee_name}`;
+		const description = `${originalBooking.event_description || ''}\n\nAttendee: ${originalBooking.attendee_name} (${originalBooking.attendee_email})${notes ? `\n\nNotes from attendee:\n${notes}` : ''}`;
 
-			// Cancel old calendar event if it exists
-			if (originalBooking.google_event_id) {
-				try {
-					await cancelCalendarEvent(accessToken, originalBooking.google_event_id);
-				} catch (err) {
-					console.error('Error cancelling old Google Calendar event:', err);
-				}
+		if (originalBooking.google_event_id) {
+			// Update the existing Google Calendar event in place
+			try {
+				const accessToken = await getValidAccessToken(
+					db,
+					originalBooking.user_id,
+					env.GOOGLE_CLIENT_ID,
+					env.GOOGLE_CLIENT_SECRET
+				);
+
+				const calendarEvent = await updateCalendarEvent(accessToken, originalBooking.google_event_id, {
+					summary,
+					description,
+					start: { dateTime: newStartDateTime.toISOString(), timeZone: 'UTC' },
+					end: { dateTime: newEndDateTime.toISOString(), timeZone: 'UTC' }
+				});
+
+				newMeetingUrl = calendarEvent.hangoutLink || calendarEvent.htmlLink || newMeetingUrl;
+			} catch (err) {
+				console.error('Error updating Google Calendar event:', err);
+				// Keep the existing event ID even if the update failed - we don't
+				// want to silently orphan the calendar event on a transient error.
 			}
+		} else if (originalBooking.outlook_event_id && env.MICROSOFT_CLIENT_ID && env.MICROSOFT_CLIENT_SECRET) {
+			// Update the existing Outlook Calendar event in place
+			try {
+				const outlookToken = await getValidOutlookAccessToken(
+					db,
+					originalBooking.user_id,
+					env.MICROSOFT_CLIENT_ID,
+					env.MICROSOFT_CLIENT_SECRET
+				);
 
-			// Create new calendar event
-			const notes = originalBooking.attendee_notes;
-			const calendarEvent = await createCalendarEvent(accessToken, {
-				summary: `${originalBooking.event_name} with ${originalBooking.attendee_name}`,
-				description: `${originalBooking.event_description || ''}\n\nAttendee: ${originalBooking.attendee_name} (${originalBooking.attendee_email})${notes ? `\n\nNotes from attendee:\n${notes}` : ''}`,
-				start: {
-					dateTime: newStartDateTime.toISOString(),
-					timeZone: 'UTC'
-				},
-				end: {
-					dateTime: newEndDateTime.toISOString(),
-					timeZone: 'UTC'
-				},
-				attendees: [
-					{ email: originalBooking.attendee_email }
-				],
-				conferenceData: {
-					createRequest: {
-						requestId: crypto.randomUUID(),
-						conferenceSolutionKey: { type: 'hangoutsMeet' }
+				await updateOutlookCalendarEvent(outlookToken, originalBooking.outlook_event_id, {
+					summary,
+					description,
+					startTime: newStartDateTime.toISOString(),
+					endTime: newEndDateTime.toISOString()
+				});
+			} catch (err) {
+				console.error('Error updating Outlook Calendar event:', err);
+			}
+		} else {
+			// No existing calendar event (e.g. calendar creation failed when the
+			// booking was originally made) - best-effort create a fresh Google
+			// Calendar event so the meeting isn't left without any calendar entry.
+			try {
+				const accessToken = await getValidAccessToken(
+					db,
+					originalBooking.user_id,
+					env.GOOGLE_CLIENT_ID,
+					env.GOOGLE_CLIENT_SECRET
+				);
+
+				const calendarEvent = await createCalendarEvent(accessToken, {
+					summary,
+					description,
+					start: { dateTime: newStartDateTime.toISOString(), timeZone: 'UTC' },
+					end: { dateTime: newEndDateTime.toISOString(), timeZone: 'UTC' },
+					attendees: [
+						{ email: originalBooking.attendee_email }
+					],
+					conferenceData: {
+						createRequest: {
+							requestId: crypto.randomUUID(),
+							conferenceSolutionKey: { type: 'hangoutsMeet' }
+						}
 					}
-				}
-			});
+				});
 
-			newCalendarEventId = calendarEvent.id;
-			newMeetingUrl = calendarEvent.hangoutLink || calendarEvent.htmlLink || null;
-		} catch (err) {
-			console.error('Error with Google Calendar:', err);
-			// Continue without calendar event if there's an error
+				newGoogleEventId = calendarEvent.id;
+				newMeetingUrl = calendarEvent.hangoutLink || calendarEvent.htmlLink || null;
+			} catch (err) {
+				console.error('Error creating Google Calendar event:', err);
+				// Continue without calendar event if there's an error
+			}
 		}
 
 		// Update the booking with new times (keeping attendee info) and set status to confirmed
@@ -177,6 +222,7 @@ export const POST: RequestHandler = async ({ request, platform }) => {
 					start_time = ?,
 					end_time = ?,
 					google_event_id = ?,
+					outlook_event_id = ?,
 					meeting_url = ?,
 					status = 'confirmed'
 				WHERE id = ?`
@@ -184,7 +230,8 @@ export const POST: RequestHandler = async ({ request, platform }) => {
 			.bind(
 				newStartTime,
 				newEndTime,
-				newCalendarEventId,
+				newGoogleEventId,
+				newOutlookEventId,
 				newMeetingUrl,
 				bookingId
 			)
