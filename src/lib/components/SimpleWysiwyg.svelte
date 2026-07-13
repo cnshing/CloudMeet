@@ -29,6 +29,18 @@
 		updateValue();
 	}
 
+	// Standard rich-text editor convention:
+	//   Enter        -> new paragraph (normal spacing, for separating ideas)
+	//   Shift+Enter  -> soft line break within the current paragraph
+	function handleKeydown(e: KeyboardEvent) {
+		if (e.key === 'Enter' && e.shiftKey) {
+			e.preventDefault();
+			document.execCommand('insertLineBreak');
+			updateValue();
+		}
+	}
+
+
 	function normalizeUrl(url: string): string {
 		const trimmed = url.trim();
 		// Allow raw {variable} placeholders to pass through untouched
@@ -58,13 +70,17 @@
 	}
 
 
-	// Set initial content only once when editor is mounted
+	// Set initial content only once when editor is mounted. Also normalize
+	// the browser's default Enter-key behavior to always create <p> elements
+	// (Chrome/Edge otherwise default to <div>, Firefox to <p> — inconsistent).
 	$effect(() => {
 		if (editor && !initialized) {
+			document.execCommand('defaultParagraphSeparator', false, 'p');
 			editor.innerHTML = value || '';
 			initialized = true;
 		}
 	});
+
 </script>
 
 <div class="border border-border-medium rounded-md overflow-hidden focus-within:ring-2 focus-within:ring-primary focus-within:border-transparent">
@@ -168,9 +184,11 @@
 		contenteditable="true"
 		oninput={updateValue}
 		onpaste={handlePaste}
+		onkeydown={handleKeydown}
 		class="min-h-[120px] p-3 outline-none prose prose-sm max-w-none input text-foreground"
 		data-placeholder={placeholder}
 	></div>
+
 </div>
 
 <style>
