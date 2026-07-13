@@ -27,7 +27,7 @@ export const load: PageServerLoad = async (event) => {
 	// Get event types
 	const eventTypes = await db
 		.prepare(
-			`SELECT id, name, slug, duration_minutes as duration, description, is_active
+			`SELECT id, name, slug, duration_minutes as duration, description, is_active, is_listed
 			FROM event_types
 			WHERE user_id = ?
 			ORDER BY name ASC`
@@ -40,6 +40,7 @@ export const load: PageServerLoad = async (event) => {
 			duration: number;
 			description: string;
 			is_active: number;
+			is_listed: number;
 		}>();
 
 	// Get upcoming bookings (only future meetings)
@@ -76,7 +77,11 @@ export const load: PageServerLoad = async (event) => {
 
 	return {
 		user,
-		eventTypes: eventTypes.results,
+		eventTypes: eventTypes.results.map((et) => ({
+			...et,
+			is_active: Boolean(et.is_active),
+			is_listed: Boolean(et.is_listed)
+		})),
 		recentBookings: recentBookings.results,
 		appUrl
 	};
