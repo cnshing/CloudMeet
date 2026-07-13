@@ -164,7 +164,7 @@
 						{#if data.proposal?.message}
 							<div class="mt-6 pt-6 border-t border-border">
 								<p class="text-xs font-semibold text-subtle-foreground uppercase mb-2">Message from host</p>
-								<div class="bg-amber-50 border border-amber-200 rounded-lg p-3 text-sm text-amber-900">
+								<div class="bg-surface-2 rounded-lg p-3 text-sm text-foreground">
 									{data.proposal.message}
 								</div>
 							</div>
@@ -176,7 +176,6 @@
 
 				<div class="flex-1 p-6 md:p-8">
 					<div class="mb-6 text-center md:text-left">
-						<p class="text-sm font-semibold text-primary mb-2">Reschedule request</p>
 						<h2 class="text-2xl font-semibold text-foreground mb-2">Review the new time</h2>
 						<p class="text-sm text-muted-foreground">
 							{data.proposal?.host_name} would like to move your meeting to a different time.
@@ -219,7 +218,7 @@
 
 					<div class="space-y-3">
 						<form method="POST" action="?/accept" use:enhance>
-							<Button type="submit" variant="success" fullWidth pill class="px-6 py-3 font-semibold">
+							<Button type="submit" variant="primary" fullWidth pill class="px-6 py-3 font-semibold">
 								Accept New Time
 							</Button>
 						</form>
