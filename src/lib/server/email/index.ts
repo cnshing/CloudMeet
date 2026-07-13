@@ -29,16 +29,31 @@ export { getEmailConfig, getEmailProviderFromEnv, isEmailConfigured } from './co
 // Re-export formatters
 export { createEmailFormatters, replaceSubjectVariables } from './formatters';
 
+// Re-export variable substitution helpers
+export {
+	applyEmailVariables,
+	buildBookingVariables,
+	buildRescheduleVariables,
+	buildReminderVariables
+} from './template-variables';
+export type { EmailVariableMap } from './template-variables';
+
+// Re-export sanitization helpers
+export { sanitizeEmailHtml, htmlToPlainText } from './sanitize';
+
 // Re-export template generators
 export {
 	generateBookingEmail,
 	generateBookingEmailText,
 	generateCancellationEmail,
+	generateCancellationEmailText,
 	generateAdminCancellationEmail,
 	generateRescheduleEmail,
+	generateRescheduleEmailText,
 	generateAdminRescheduleEmail,
 	generateRescheduleProposalEmail,
 	generateReminderEmail,
+	generateReminderEmailText,
 	getDefaultReminderSubject,
 	generateAdminNotificationEmail
 } from './templates';
@@ -52,7 +67,12 @@ import type {
 	EmailTemplateType
 } from './types';
 import type { EmailAddress, EmailMessage } from './providers';
-import { replaceSubjectVariables } from './formatters';
+import {
+	applyEmailVariables,
+	buildBookingVariables,
+	buildRescheduleVariables,
+	buildReminderVariables
+} from './template-variables';
 import {
 	generateBookingEmail,
 	generateBookingEmailText,
@@ -94,7 +114,7 @@ export async function sendBookingEmail(
 	const htmlBody = generateBookingEmail(data);
 	const textBody = generateBookingEmailText(data);
 	const subject = customSubject
-		? replaceSubjectVariables(customSubject, data)
+		? applyEmailVariables(customSubject, buildBookingVariables(data))
 		: `Meeting Confirmed: ${data.eventName} with ${data.hostName}`;
 
 	await sendWithProvider(
@@ -121,7 +141,7 @@ export async function sendCancellationEmail(
 ): Promise<void> {
 	const htmlBody = generateCancellationEmail(data);
 	const subject = customSubject
-		? replaceSubjectVariables(customSubject, data)
+		? applyEmailVariables(customSubject, buildBookingVariables(data))
 		: `Meeting Cancelled: ${data.eventName}`;
 
 	await sendWithProvider(
@@ -147,7 +167,7 @@ export async function sendRescheduleEmail(
 ): Promise<void> {
 	const htmlBody = generateRescheduleEmail(data);
 	const subject = customSubject
-		? replaceSubjectVariables(customSubject, data)
+		? applyEmailVariables(customSubject, buildRescheduleVariables(data))
 		: `Meeting Rescheduled: ${data.eventName} with ${data.hostName}`;
 
 	await sendWithProvider(
@@ -174,7 +194,14 @@ export async function sendReminderEmail(
 ): Promise<void> {
 	const htmlBody = generateReminderEmail(data, reminderType);
 	const subject = customSubject
-		? replaceSubjectVariables(customSubject, data)
+		? applyEmailVariables(
+			customSubject,
+			buildReminderVariables(data, reminderType === 'reminder_24h'
+				? 'tomorrow'
+				: reminderType === 'reminder_1h'
+					? 'in 1 hour'
+					: 'in 30 minutes')
+		)
 		: getDefaultReminderSubject(data, reminderType);
 
 	await sendWithProvider(

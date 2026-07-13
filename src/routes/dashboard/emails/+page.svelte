@@ -1,11 +1,13 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
+	import SimpleWysiwyg from '$lib/components/SimpleWysiwyg.svelte';
 
 	interface EmailTemplate {
 		template_type: string;
 		name: string;
 		description: string;
 		default_subject: string;
+		default_message: string;
 		id: string | null;
 		is_enabled: boolean;
 		subject: string;
@@ -39,7 +41,7 @@
 			// Initialize edit states
 			templates.forEach(t => {
 				editSubjects[t.template_type] = t.subject || t.default_subject;
-				editMessages[t.template_type] = t.custom_message || '';
+				editMessages[t.template_type] = t.custom_message || t.default_message;
 			});
 		} catch (err: any) {
 			error = err.message || 'Failed to load email templates';
@@ -140,6 +142,25 @@
 		if (type.startsWith('reminder_')) return 'Reminder';
 		return 'Notification';
 	}
+
+	// Which extra variables are available for each template type, beyond the
+	// common set shared by every email.
+	const COMMON_VARIABLES = [
+		'{event_name}', '{event_description}', '{host_name}', '{host_email}',
+		'{attendee_name}', '{attendee_email}', '{date}', '{time}',
+		'{start_time}', '{end_time}', '{meeting_url}', '{attendee_notes}',
+		'{cancel_url}', '{reschedule_url}'
+	];
+
+	function getExtraVariables(type: string): string[] {
+		if (type === 'reschedule') {
+			return ['{previous_date}', '{previous_time}', '{previous_start_time}', '{previous_end_time}'];
+		}
+		if (type.startsWith('reminder_')) {
+			return ['{reminder_time}'];
+		}
+		return [];
+	}
 </script>
 
 <div class="min-h-screen bg-background">
@@ -199,12 +220,14 @@
 					</svg>
 					<div class="text-sm text-muted-foreground">
 						<p class="font-medium mb-1">Email Variables</p>
-						<p>You can use these variables in your subject lines:</p>
-						<code class="text-xs bg-surface-2 px-1 py-0.5 rounded">{'{event_name}'}</code>,
-						<code class="text-xs bg-surface-2 px-1 py-0.5 rounded">{'{host_name}'}</code>,
-						<code class="text-xs bg-surface-2 px-1 py-0.5 rounded">{'{attendee_name}'}</code>,
-						<code class="text-xs bg-surface-2 px-1 py-0.5 rounded">{'{date}'}</code>,
-						<code class="text-xs bg-surface-2 px-1 py-0.5 rounded">{'{time}'}</code>
+						<p class="mb-2">You can use these variables in both the subject line and the email body. The email body is entirely yours to write — there's no fixed template, so include any variables and links you need directly in the text.</p>
+						<div class="flex flex-wrap gap-1.5">
+							{#each COMMON_VARIABLES as v}
+								<code class="text-xs bg-surface-2 px-1.5 py-0.5 rounded">{v}</code>
+							{/each}
+						</div>
+						<p class="mt-2 text-xs text-subtle-foreground">Reschedule emails also support: <code class="bg-surface-2 px-1 py-0.5 rounded">{'{previous_date}'}</code>, <code class="bg-surface-2 px-1 py-0.5 rounded">{'{previous_time}'}</code>, <code class="bg-surface-2 px-1 py-0.5 rounded">{'{previous_start_time}'}</code>, <code class="bg-surface-2 px-1 py-0.5 rounded">{'{previous_end_time}'}</code></p>
+						<p class="mt-1 text-xs text-subtle-foreground">Reminder emails also support: <code class="bg-surface-2 px-1 py-0.5 rounded">{'{reminder_time}'}</code> (e.g. "tomorrow", "in 1 hour")</p>
 					</div>
 				</div>
 			</div>
@@ -266,15 +289,20 @@
 
 										<div>
 											<label class="block text-sm font-medium text-muted-foreground mb-1">
-												Custom Message (Optional)
+												Email Body
 											</label>
-											<textarea
+											<SimpleWysiwyg
 												bind:value={editMessages[template.template_type]}
-												placeholder="Add a personal message that will appear in the email..."
-												rows="3"
-												class="w-full px-3 py-2 border border-border-medium rounded-md focus:ring-2 focus:ring-primary focus:border-transparent text-sm"
-											></textarea>
-											<p class="text-xs text-subtle-foreground mt-1">This message will be added to the email template</p>
+												placeholder="Write the full email body..."
+											/>
+											<p class="text-xs text-subtle-foreground mt-1">This is the entire email sent to the attendee — insert variables and links directly using the toolbar above.</p>
+											{#if getExtraVariables(template.template_type).length > 0}
+												<div class="flex flex-wrap gap-1.5 mt-2">
+													{#each getExtraVariables(template.template_type) as v}
+														<code class="text-xs bg-surface-2 px-1.5 py-0.5 rounded">{v}</code>
+													{/each}
+												</div>
+											{/if}
 										</div>
 
 										<div class="flex justify-end gap-2">
@@ -358,14 +386,20 @@
 
 										<div>
 											<label class="block text-sm font-medium text-muted-foreground mb-1">
-												Custom Message (Optional)
+												Email Body
 											</label>
-											<textarea
+											<SimpleWysiwyg
 												bind:value={editMessages[template.template_type]}
-												placeholder="Add a personal message that will appear in the reminder..."
-												rows="3"
-												class="w-full px-3 py-2 border border-border-medium rounded-md focus:ring-2 focus:ring-primary focus:border-transparent text-sm"
-											></textarea>
+												placeholder="Write the full reminder body..."
+											/>
+											<p class="text-xs text-subtle-foreground mt-1">This is the entire email sent to the attendee — insert variables and links directly using the toolbar above.</p>
+											{#if getExtraVariables(template.template_type).length > 0}
+												<div class="flex flex-wrap gap-1.5 mt-2">
+													{#each getExtraVariables(template.template_type) as v}
+														<code class="text-xs bg-surface-2 px-1.5 py-0.5 rounded">{v}</code>
+													{/each}
+												</div>
+											{/if}
 										</div>
 
 										<div class="flex justify-end gap-2">

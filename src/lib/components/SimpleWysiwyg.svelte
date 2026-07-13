@@ -29,6 +29,35 @@
 		updateValue();
 	}
 
+	function normalizeUrl(url: string): string {
+		const trimmed = url.trim();
+		// Allow raw {variable} placeholders to pass through untouched
+		if (/^\{[a-zA-Z_]+\}$/.test(trimmed)) {
+			return trimmed;
+		}
+		if (/^(https?:|mailto:){1}/i.test(trimmed)) {
+			return trimmed;
+		}
+		return `https://${trimmed}`;
+	}
+
+	function insertLink() {
+		editor?.focus();
+		const url = window.prompt(
+			'Enter a URL (e.g. https://example.com) or a variable like {cancel_url}:'
+		);
+		if (!url) return;
+		document.execCommand('createLink', false, normalizeUrl(url));
+		updateValue();
+	}
+
+	function removeLink() {
+		editor?.focus();
+		document.execCommand('unlink');
+		updateValue();
+	}
+
+
 	// Set initial content only once when editor is mounted
 	$effect(() => {
 		if (editor && !initialized) {
@@ -106,7 +135,32 @@
 				<text x="3" y="19" font-size="6" fill="currentColor" stroke="none">3</text>
 			</svg>
 		</button>
+		<div class="w-px h-5 bg-border-medium mx-1"></div>
+	<button
+		type="button"
+		onclick={insertLink}
+		class="p-1.5 rounded hover:bg-surface-2 transition text-muted-foreground focus:outline-none"
+		title="Insert Link"
+	>
+			<svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+				<path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"></path>
+				<path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"></path>
+			</svg>
+		</button>
+	<button
+		type="button"
+		onclick={removeLink}
+		class="p-1.5 rounded hover:bg-surface-2 transition text-muted-foreground focus:outline-none"
+		title="Remove Link"
+	>
+			<svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+				<path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"></path>
+				<path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"></path>
+				<line x1="3" y1="3" x2="21" y2="21"></line>
+			</svg>
+		</button>
 	</div>
+
 
 	<!-- Content editable area -->
 	<div
@@ -143,4 +197,10 @@
 	[contenteditable] :global(li) {
 		margin: 0.25rem 0;
 	}
+
+	[contenteditable] :global(a) {
+		color: var(--color-primary);
+		text-decoration: underline;
+	}
 </style>
+

@@ -13,8 +13,11 @@ export const MAX_LENGTHS = {
 	email: 254, // RFC 5321 maximum
 	description: 5000,
 	notes: 1000,
-	slug: 50
+	slug: 50,
+	emailSubject: 200,
+	emailBody: 10000
 } as const;
+
 
 /**
  * Validate email address using validator.js library

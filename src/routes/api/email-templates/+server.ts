@@ -1,10 +1,12 @@
 /**
  * Email Templates API endpoint
- * Manages email template settings (enable/disable, custom subjects, messages)
+ * Manages email template settings (enable/disable, custom subjects, rich-text bodies)
  */
 
 import { json, error, type RequestEvent } from '@sveltejs/kit';
 import { getCurrentUser } from '$lib/server/auth';
+import { sanitizeEmailHtml } from '$lib/server/email/sanitize';
+import { validateLength, validateFields, MAX_LENGTHS } from '$lib/server/validation';
 
 export interface EmailTemplate {
 	id: string;
@@ -14,37 +16,79 @@ export interface EmailTemplate {
 	custom_message: string | null;
 }
 
-// Default templates with descriptions
+// Default templates with descriptions.
+// `default_message` mirrors each template file's DEFAULT_*_BODY constant so
+// the dashboard can show/preview what will be sent if the host hasn't
+// customized the body yet.
 const DEFAULT_TEMPLATES = [
 	{
 		template_type: 'confirmation',
 		name: 'Booking Confirmation',
 		description: 'Sent when someone books a meeting with you',
-		default_subject: 'Meeting Confirmed: {event_name} with {host_name}'
+		default_subject: 'Meeting Confirmed: {event_name} with {host_name}',
+		default_message: `<p>Hi {attendee_name},</p>
+<p>Your meeting with {host_name} has been confirmed. A calendar invitation has been sent to your email address.</p>
+<p><strong>{event_name}</strong><br>
+{date}<br>
+{time}</p>
+<p>Join meeting: <a href="{meeting_url}">{meeting_url}</a></p>
+<p>Need to make changes? <a href="{reschedule_url}">Reschedule</a> or <a href="{cancel_url}">Cancel</a>.</p>`
 	},
 	{
 		template_type: 'cancellation',
 		name: 'Cancellation Notice',
 		description: 'Sent when a meeting is cancelled',
-		default_subject: 'Meeting Cancelled: {event_name}'
+		default_subject: 'Meeting Cancelled: {event_name}',
+		default_message: `<p>Hi {attendee_name},</p>
+<p>Your meeting with {host_name} has been cancelled.</p>
+<p>{cancellation_reason}</p>
+<p><strong>{event_name}</strong><br>
+Was scheduled for {date}<br>
+{time}</p>
+<p>Want to schedule again? Use the link below to book another time.</p>`
 	},
+
 	{
 		template_type: 'reschedule',
 		name: 'Reschedule Confirmation',
 		description: 'Sent when a meeting is rescheduled',
-		default_subject: 'Meeting Rescheduled: {event_name} with {host_name}'
+		default_subject: 'Meeting Rescheduled: {event_name} with {host_name}',
+		default_message: `<p>Hi {attendee_name},</p>
+<p>Your meeting with {host_name} has been moved to a new time. Your calendar invitation has been updated.</p>
+<p><strong>Previous time:</strong><br>
+{previous_date}<br>
+{previous_time}</p>
+<p><strong>New time:</strong><br>
+{date}<br>
+{time}</p>
+<p>Join meeting: <a href="{meeting_url}">{meeting_url}</a></p>
+<p>Need to make changes? <a href="{reschedule_url}">Reschedule again</a> or <a href="{cancel_url}">Cancel</a>.</p>`
 	},
 	{
 		template_type: 'reminder_24h',
 		name: '24 Hour Reminder',
 		description: 'Sent 24 hours before the meeting',
-		default_subject: 'Reminder: {event_name} tomorrow with {host_name}'
+		default_subject: 'Reminder: {event_name} tomorrow with {host_name}',
+		default_message: `<p>Hi {attendee_name},</p>
+<p>This is a friendly reminder that your meeting with {host_name} is coming up {reminder_time}.</p>
+<p><strong>{event_name}</strong><br>
+{date}<br>
+{time}</p>
+<p>Join meeting: <a href="{meeting_url}">{meeting_url}</a></p>
+<p>Need to make changes? <a href="{reschedule_url}">Reschedule</a> or <a href="{cancel_url}">Cancel</a>.</p>`
 	},
 	{
 		template_type: 'reminder_1h',
 		name: '1 Hour Reminder',
 		description: 'Sent 1 hour before the meeting',
-		default_subject: 'Reminder: {event_name} starts in 1 hour'
+		default_subject: 'Reminder: {event_name} starts in 1 hour',
+		default_message: `<p>Hi {attendee_name},</p>
+<p>This is a friendly reminder that your meeting with {host_name} is coming up {reminder_time}.</p>
+<p><strong>{event_name}</strong><br>
+{date}<br>
+{time}</p>
+<p>Join meeting: <a href="{meeting_url}">{meeting_url}</a></p>
+<p>Need to make changes? <a href="{reschedule_url}">Reschedule</a> or <a href="{cancel_url}">Cancel</a>.</p>`
 	}
 ];
 
@@ -78,7 +122,7 @@ export const GET = async (event: RequestEvent) => {
 				id: saved?.id || null,
 				is_enabled: saved ? saved.is_enabled === 1 : true,
 				subject: saved?.subject || def.default_subject,
-				custom_message: saved?.custom_message || null
+				custom_message: saved?.custom_message || def.default_message
 			};
 		});
 
@@ -117,6 +161,21 @@ export const PUT = async (event: RequestEvent) => {
 			throw error(400, 'Invalid template type');
 		}
 
+		// Validate input lengths
+		const lengthError = validateFields([
+			validateLength(subject, 'Subject', MAX_LENGTHS.emailSubject, false),
+			validateLength(custom_message, 'Email body', MAX_LENGTHS.emailBody, false)
+		]);
+		if (lengthError) {
+			throw error(400, lengthError);
+		}
+
+		// Sanitize the rich-text body before storing (strip to the allowlisted
+		// tag set understood by the email templates / WYSIWYG editor).
+		const sanitizedMessage = custom_message
+			? sanitizeEmailHtml(custom_message)
+			: null;
+
 		// Upsert template
 		await db
 			.prepare(`
@@ -125,7 +184,7 @@ export const PUT = async (event: RequestEvent) => {
 				ON CONFLICT(user_id, template_type)
 				DO UPDATE SET is_enabled = excluded.is_enabled, subject = excluded.subject, custom_message = excluded.custom_message, updated_at = CURRENT_TIMESTAMP
 			`)
-			.bind(userId, template_type, is_enabled ? 1 : 0, subject || null, custom_message || null)
+			.bind(userId, template_type, is_enabled ? 1 : 0, subject || null, sanitizedMessage)
 			.run();
 
 		return json({ success: true });

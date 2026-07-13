@@ -18,6 +18,7 @@ export {
 	type EmailProvider,
 	type EmailProviderName,
 	type EmailSendResult,
+	type EmailVariableMap,
 	// Provider config
 	getEmailConfig,
 	getEmailProviderFromEnv,
@@ -25,15 +26,26 @@ export {
 	// Formatters
 	createEmailFormatters,
 	replaceSubjectVariables,
+	// Variable substitution
+	applyEmailVariables,
+	buildBookingVariables,
+	buildRescheduleVariables,
+	buildReminderVariables,
+	// Sanitization
+	sanitizeEmailHtml,
+	htmlToPlainText,
 	// Template generators
 	generateBookingEmail,
 	generateBookingEmailText,
 	generateCancellationEmail,
+	generateCancellationEmailText,
 	generateAdminCancellationEmail,
 	generateRescheduleEmail,
+	generateRescheduleEmailText,
 	generateAdminRescheduleEmail,
 	generateRescheduleProposalEmail,
 	generateReminderEmail,
+	generateReminderEmailText,
 	getDefaultReminderSubject,
 	generateAdminNotificationEmail,
 	// Send functions

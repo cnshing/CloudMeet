@@ -245,6 +245,7 @@ export const POST: RequestHandler = async ({ request, platform }) => {
 							hostEmail: originalBooking.host_email,
 							hostContactEmail: originalBooking.contact_email || undefined,
 							appUrl: env.APP_URL || '',
+							customMessage: template?.custom_message || null,
 							timeFormat,
 							timezone: timezone || 'UTC',
 							brandColor: originalBooking.brand_color || undefined,
@@ -254,6 +255,7 @@ export const POST: RequestHandler = async ({ request, platform }) => {
 						template?.subject || undefined
 					);
 				}
+
 
 				// Send admin notification
 				try {

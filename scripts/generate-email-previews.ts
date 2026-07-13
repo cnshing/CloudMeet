@@ -64,6 +64,14 @@ const booking: BookingEmailData = {
 	timeFormat:      '12h',
 	timezone:        'America/Los_Angeles',
 	attendeeNotes:   'Looking forward to this! I have a few questions about the onboarding process.',
+	customMessage:  `<p>Hi {attendee_name},</p>
+<p>Thanks for booking time with <strong>{host_name}</strong> — really looking forward to it!</p>
+<p><strong>{event_name}</strong><br>
+{date}<br>
+{time}</p>
+<p>Join here: <a href="{meeting_url}">{meeting_url}</a></p>
+<p>Need to make changes? <a href="{reschedule_url}">Reschedule</a> or <a href="{cancel_url}">Cancel</a>.</p>
+<p>See you then!<br>{host_name}</p>`,
 };
 
 const reschedule: RescheduleEmailData = {
@@ -72,7 +80,12 @@ const reschedule: RescheduleEmailData = {
 	endTime:      NEW_END,
 	oldStartTime: OLD_START,
 	oldEndTime:   OLD_END,
-	customMessage:"I had a conflict come up on Friday. The new time on Thursday should work better for both of us!",
+	customMessage:`<p>Hi {attendee_name},</p>
+<p>I had a conflict come up on Friday — the new time below should work better for both of us!</p>
+<p><strong>Previous time:</strong><br>{previous_date}<br>{previous_time}</p>
+<p><strong>New time:</strong><br>{date}<br>{time}</p>
+<p>Join here: <a href="{meeting_url}">{meeting_url}</a></p>
+<p><a href="{reschedule_url}">Reschedule again</a> or <a href="{cancel_url}">Cancel</a>.</p>`,
 };
 
 const proposal: RescheduleProposalEmailData = {
@@ -125,7 +138,9 @@ write('02-admin-notification.html',
 write('03-cancellation.html',
 	generateCancellationEmail({
 		...booking,
-		customMessage: 'Unfortunately I need to cancel due to a scheduling conflict. Please feel free to rebook at a time that works for you.',
+		customMessage: `<p>Hi {attendee_name},</p>
+<p>Unfortunately I need to cancel our meeting due to a scheduling conflict. Please feel free to rebook at a time that works for you.</p>
+<p><strong>{event_name}</strong><br>Was scheduled for {date}<br>{time}</p>`,
 	})
 );
 
@@ -149,12 +164,24 @@ write('06-admin-reschedule.html',
 
 // 07 — 24h reminder
 write('07-reminder-24h.html',
-	generateReminderEmail(booking, 'reminder_24h')
+	generateReminderEmail({
+		...booking,
+		customMessage: `<p>Hi {attendee_name},</p>
+<p>Just a reminder — your meeting with {host_name} is coming up {reminder_time}.</p>
+<p><strong>{event_name}</strong><br>{date}<br>{time}</p>
+<p>Join here: <a href="{meeting_url}">{meeting_url}</a></p>`,
+	}, 'reminder_24h')
 );
 
 // 08 — 1h reminder
 write('08-reminder-1h.html',
-	generateReminderEmail(booking, 'reminder_1h')
+	generateReminderEmail({
+		...booking,
+		customMessage: `<p>Hi {attendee_name},</p>
+<p>Just a reminder — your meeting with {host_name} is coming up {reminder_time}.</p>
+<p><strong>{event_name}</strong><br>{date}<br>{time}</p>
+<p>Join here: <a href="{meeting_url}">{meeting_url}</a></p>`,
+	}, 'reminder_1h')
 );
 
 // 09 — 30min reminder

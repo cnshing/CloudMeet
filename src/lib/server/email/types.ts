@@ -24,7 +24,14 @@ export interface BookingEmailData {
 	timezone?: string;
 	brandColor?: string;
 	attendeeNotes?: string | null;
+	/**
+	 * One-off cancellation reason typed by the host at cancel time (distinct
+	 * from `customMessage`, which is the host's saved dashboard template body).
+	 * Exposed to templates via the {cancellation_reason} variable.
+	 */
+	cancellationReason?: string | null;
 }
+
 
 export interface RescheduleEmailData extends BookingEmailData {
 	oldStartTime: Date;
