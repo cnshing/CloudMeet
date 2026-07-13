@@ -150,7 +150,7 @@
 						</div>
 
 						<div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-							<p class="text-sm text-yellow-800"><strong>Heads up:</strong> This action cannot be undone.</p>
+							<p class="text-sm text-yellow-800"><strong>Heads up:</strong> This action cannot be undone. The host will be notified of the cancellation.</p>
 						</div>
 
 						<Button type="submit" disabled={cancelling} variant="danger" fullWidth pill class="py-3 px-6 font-semibold">
@@ -199,7 +199,6 @@
 
 				<div class="flex-1 p-8">
 					<div class="mb-6">
-						<p class="text-sm font-semibold text-red-600 mb-2">Cancellation</p>
 						<h2 class="text-2xl font-semibold text-foreground mb-2">Cancel this booking?</h2>
 						<p class="text-sm text-muted-foreground">
 							This will cancel your scheduled meeting and notify {data.booking.host_name}.
