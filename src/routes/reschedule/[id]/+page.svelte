@@ -267,10 +267,10 @@
 				<!-- Current booking -->
 				<div class="px-6 pb-5">
 					<p class="text-xs font-semibold text-subtle-foreground uppercase mb-2">Current booking</p>
-					<div class="bg-red-50 rounded-lg p-3 text-sm">
-						<p class="font-medium text-red-900">{formatOriginalDateTime(data.booking.startTime)}</p>
-						<p class="text-red-700">{data.booking.attendeeName}</p>
-						<p class="text-red-600 text-xs">{data.booking.attendeeEmail}</p>
+					<div class="bg-surface-2 rounded-lg p-3 text-sm">
+						<p class="font-medium text-foreground">{formatOriginalDateTime(data.booking.startTime)}</p>
+						<p class="text-muted-foreground">{data.booking.attendeeName}</p>
+						<p class="text-subtle-foreground text-xs">{data.booking.attendeeEmail}</p>
 					</div>
 				</div>
 			{/snippet}
@@ -350,10 +350,10 @@
 					<!-- Current booking info -->
 					<div class="mt-6 pt-6 border-t border-border">
 						<p class="text-xs font-semibold text-subtle-foreground uppercase mb-2">Current booking</p>
-						<div class="bg-red-50 rounded-lg p-3 text-sm">
-							<p class="font-medium text-red-900">{formatOriginalDateTime(data.booking.startTime)}</p>
-							<p class="text-red-700">{data.booking.attendeeName}</p>
-							<p class="text-red-600 text-xs">{data.booking.attendeeEmail}</p>
+						<div class="bg-surface-2 rounded-lg p-3 text-sm">
+							<p class="font-medium text-foreground">{formatOriginalDateTime(data.booking.startTime)}</p>
+							<p class="text-muted-foreground">{data.booking.attendeeName}</p>
+							<p class="text-subtle-foreground text-xs">{data.booking.attendeeEmail}</p>
 						</div>
 					</div>
 

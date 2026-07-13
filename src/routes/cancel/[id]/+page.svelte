@@ -191,7 +191,7 @@
 
 						<div class="mt-6 pt-6 border-t border-border">
 							<p class="text-xs font-semibold text-subtle-foreground uppercase mb-2">Attendee</p>
-							<div class="bg-background rounded-lg p-3 text-sm">
+							<div class="bg-surface-2 rounded-lg p-3 text-sm">
 								<p class="font-medium text-foreground">{data.booking.attendee_name}</p>
 								<p class="text-muted-foreground break-all">{data.booking.attendee_email}</p>
 							</div>
