@@ -56,7 +56,7 @@ export interface RescheduleProposalEmailData {
 	brandColor: string;
 }
 
-export type EmailTemplateType = 'confirmation' | 'cancellation' | 'reschedule' | 'reminder_24h' | 'reminder_1h' | 'reminder_30m';
+export type EmailTemplateType = 'confirmation' | 'cancellation' | 'reschedule' | 'reschedule_proposal' | 'reminder_24h' | 'reminder_1h' | 'reminder_30m';
 
 export interface EmailTemplate {
 	template_type: EmailTemplateType;

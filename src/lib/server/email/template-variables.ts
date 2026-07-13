@@ -11,7 +11,7 @@
  * survive sanitization untouched and are only substituted at the very end.
  */
 
-import type { BookingEmailData, RescheduleEmailData } from './types';
+import type { BookingEmailData, RescheduleEmailData, RescheduleProposalEmailData } from './types';
 import { createEmailFormatters } from './formatters';
 
 export interface EmailVariableMap {
@@ -93,5 +93,45 @@ export function buildReminderVariables(
 	return {
 		...buildBookingVariables(data),
 		reminder_time: reminderLabel
+	};
+}
+
+/**
+ * Variables available on host-initiated reschedule proposal emails.
+ *
+ * Includes the original booking time, the proposed new time, response-action
+ * URLs (accept / decline / counter), and the optional one-off message the
+ * host typed when sending the proposal ({proposal_message}).
+ */
+export function buildRescheduleProposalVariables(data: RescheduleProposalEmailData): EmailVariableMap {
+	const { formatDate, formatTime } = createEmailFormatters(data.timeFormat);
+
+	const acceptUrl = `${data.responseUrl}?action=accept`;
+	const declineUrl = `${data.responseUrl}?action=decline`;
+	const counterUrl = `${data.responseUrl}?action=counter`;
+
+	return {
+		attendee_name: data.attendeeName,
+		attendee_email: data.attendeeEmail,
+		host_name: data.hostName,
+		host_email: data.hostEmail,
+		event_name: data.eventName,
+		// Original (old) booking time
+		old_date: formatDate(data.oldStartTime),
+		old_time: `${formatTime(data.oldStartTime)} \u2013 ${formatTime(data.oldEndTime)}`,
+		old_start_time: formatTime(data.oldStartTime),
+		old_end_time: formatTime(data.oldEndTime),
+		// Proposed (new) booking time
+		proposed_date: formatDate(data.newStartTime),
+		proposed_time: `${formatTime(data.newStartTime)} \u2013 ${formatTime(data.newEndTime)}`,
+		proposed_start_time: formatTime(data.newStartTime),
+		proposed_end_time: formatTime(data.newEndTime),
+		// Response action links
+		response_url: data.responseUrl,
+		accept_url: acceptUrl,
+		decline_url: declineUrl,
+		counter_url: counterUrl,
+		// One-off message the host typed when sending the proposal (empty string if absent)
+		proposal_message: data.message || ''
 	};
 }

@@ -5,7 +5,7 @@
 
 import { json, error, type RequestEvent } from '@sveltejs/kit';
 import { getCurrentUser } from '$lib/server/auth';
-import { getEmailConfig, sendRescheduleProposalEmail } from '$lib/server/email';
+import { getEmailConfig, sendRescheduleProposalEmail, getEmailTemplates, isEmailEnabled } from '$lib/server/email';
 
 export const POST = async (event: RequestEvent) => {
 	const env = event.platform?.env;
@@ -116,27 +116,35 @@ export const POST = async (event: RequestEvent) => {
 				const appUrl = env.APP_URL || '';
 				const responseUrl = `${appUrl}/reschedule-response/${responseToken}`;
 
-				// Send proposal email
-				await sendRescheduleProposalEmail(
-					{
-						attendeeName: booking.attendee_name,
-						attendeeEmail: booking.attendee_email,
-						eventName: booking.event_name,
-						eventSlug: booking.event_slug,
-						hostName: booking.host_name,
-						hostEmail: booking.host_email,
-						oldStartTime: new Date(booking.start_time),
-						oldEndTime: new Date(booking.end_time),
-						newStartTime: new Date(proposedStartTime),
-						newEndTime: new Date(proposedEndTime),
-						message: message || null,
-						responseUrl,
-						appUrl,
-						timeFormat,
-						brandColor: booking.brand_color || '#3b82f6'
-					},
-					emailConfig
-				);
+				// Load user's email template settings for the proposal type
+				const emailTemplates = await getEmailTemplates(db, userId);
+				const proposalTemplate = emailTemplates.get('reschedule_proposal');
+
+				// Only send if the template is enabled (defaults to enabled if not configured)
+				if (isEmailEnabled(emailTemplates, 'reschedule_proposal')) {
+					await sendRescheduleProposalEmail(
+						{
+							attendeeName: booking.attendee_name,
+							attendeeEmail: booking.attendee_email,
+							eventName: booking.event_name,
+							eventSlug: booking.event_slug,
+							hostName: booking.host_name,
+							hostEmail: booking.host_email,
+							oldStartTime: new Date(booking.start_time),
+							oldEndTime: new Date(booking.end_time),
+							newStartTime: new Date(proposedStartTime),
+							newEndTime: new Date(proposedEndTime),
+							message: message || null,
+							responseUrl,
+							appUrl,
+							timeFormat,
+							brandColor: booking.brand_color || '#3b82f6'
+						},
+						emailConfig,
+						proposalTemplate?.subject ?? null,
+						proposalTemplate?.custom_message ?? null
+					);
+				}
 			} catch (emailErr) {
 				console.error('Failed to send reschedule proposal email:', emailErr);
 				// Don't fail the request if email fails

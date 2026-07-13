@@ -65,6 +65,26 @@ Was scheduled for {date}<br>
 <p>Need to make changes? <a href="{reschedule_url}">Reschedule again</a> or <a href="{cancel_url}">Cancel</a>.</p>`
 	},
 	{
+		template_type: 'reschedule_proposal',
+		name: 'Reschedule Proposal',
+		description: 'Sent when you propose a new meeting time to an attendee',
+		default_subject: 'Reschedule request: {event_name} with {host_name}',
+		default_message: `<p>Hi {attendee_name},</p>
+<p>I would like to reschedule our meeting to a new time.</p>
+{proposal_message}
+<p><strong>Original time:</strong><br>
+{old_date}<br>
+{old_time}</p>
+<p><strong>Proposed time:</strong><br>
+{proposed_date}<br>
+{proposed_time}</p>
+<p>
+  <a href="{accept_url}">Accept New Time</a> |
+  <a href="{decline_url}">Decline</a> |
+  <a href="{counter_url}">Propose a different time</a>
+</p>`
+	},
+	{
 		template_type: 'reminder_24h',
 		name: '24 Hour Reminder',
 		description: 'Sent 24 hours before the meeting',

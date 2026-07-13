@@ -127,8 +127,9 @@
 				return 'M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z';
 			case 'cancellation':
 				return 'M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z';
-			case 'reschedule':
-				return 'M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15';
+		case 'reschedule':
+		case 'reschedule_proposal':
+			return 'M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15';
 			case 'reminder_24h':
 			case 'reminder_1h':
 			case 'reminder_30m':
@@ -155,6 +156,14 @@
 	function getExtraVariables(type: string): string[] {
 		if (type === 'reschedule') {
 			return ['{previous_date}', '{previous_time}', '{previous_start_time}', '{previous_end_time}'];
+		}
+		if (type === 'reschedule_proposal') {
+			return [
+				'{old_date}', '{old_time}', '{old_start_time}', '{old_end_time}',
+				'{proposed_date}', '{proposed_time}', '{proposed_start_time}', '{proposed_end_time}',
+				'{accept_url}', '{decline_url}', '{counter_url}', '{response_url}',
+				'{proposal_message}'
+			];
 		}
 		if (type.startsWith('reminder_')) {
 			return ['{reminder_time}'];
@@ -226,7 +235,8 @@
 								<code class="text-xs bg-surface-2 px-1.5 py-0.5 rounded">{v}</code>
 							{/each}
 						</div>
-						<p class="mt-2 text-xs text-subtle-foreground">Reschedule emails also support: <code class="bg-surface-2 px-1 py-0.5 rounded">{'{previous_date}'}</code>, <code class="bg-surface-2 px-1 py-0.5 rounded">{'{previous_time}'}</code>, <code class="bg-surface-2 px-1 py-0.5 rounded">{'{previous_start_time}'}</code>, <code class="bg-surface-2 px-1 py-0.5 rounded">{'{previous_end_time}'}</code></p>
+						<p class="mt-2 text-xs text-subtle-foreground">Reschedule confirmation emails also support: <code class="bg-surface-2 px-1 py-0.5 rounded">{'{previous_date}'}</code>, <code class="bg-surface-2 px-1 py-0.5 rounded">{'{previous_time}'}</code>, <code class="bg-surface-2 px-1 py-0.5 rounded">{'{previous_start_time}'}</code>, <code class="bg-surface-2 px-1 py-0.5 rounded">{'{previous_end_time}'}</code></p>
+						<p class="mt-1 text-xs text-subtle-foreground">Reschedule proposal emails support: <code class="bg-surface-2 px-1 py-0.5 rounded">{'{old_date}'}</code>, <code class="bg-surface-2 px-1 py-0.5 rounded">{'{old_time}'}</code>, <code class="bg-surface-2 px-1 py-0.5 rounded">{'{proposed_date}'}</code>, <code class="bg-surface-2 px-1 py-0.5 rounded">{'{proposed_time}'}</code>, <code class="bg-surface-2 px-1 py-0.5 rounded">{'{accept_url}'}</code>, <code class="bg-surface-2 px-1 py-0.5 rounded">{'{decline_url}'}</code>, <code class="bg-surface-2 px-1 py-0.5 rounded">{'{counter_url}'}</code>, <code class="bg-surface-2 px-1 py-0.5 rounded">{'{proposal_message}'}</code></p>
 						<p class="mt-1 text-xs text-subtle-foreground">Reminder emails also support: <code class="bg-surface-2 px-1 py-0.5 rounded">{'{reminder_time}'}</code> (e.g. "tomorrow", "in 1 hour")</p>
 					</div>
 				</div>

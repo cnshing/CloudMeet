@@ -34,7 +34,8 @@ export {
 	applyEmailVariables,
 	buildBookingVariables,
 	buildRescheduleVariables,
-	buildReminderVariables
+	buildReminderVariables,
+	buildRescheduleProposalVariables
 } from './template-variables';
 export type { EmailVariableMap } from './template-variables';
 
@@ -71,7 +72,8 @@ import {
 	applyEmailVariables,
 	buildBookingVariables,
 	buildRescheduleVariables,
-	buildReminderVariables
+	buildReminderVariables,
+	buildRescheduleProposalVariables
 } from './template-variables';
 import {
 	generateBookingEmail,
@@ -288,9 +290,15 @@ export async function sendAdminRescheduleNotification(
  */
 export async function sendRescheduleProposalEmail(
 	data: RescheduleProposalEmailData,
-	config: EmailConfig
+	config: EmailConfig,
+	customSubject?: string | null,
+	customMessage?: string | null
 ): Promise<void> {
-	const htmlBody = generateRescheduleProposalEmail(data);
+	const vars = buildRescheduleProposalVariables(data);
+	const htmlBody = generateRescheduleProposalEmail(data, customMessage);
+	const subject = customSubject
+		? applyEmailVariables(customSubject, vars)
+		: `Reschedule request: ${data.eventName} with ${data.hostName}`;
 
 	await sendWithProvider(
 		config,
@@ -298,7 +306,7 @@ export async function sendRescheduleProposalEmail(
 			from: emailAddress(config.from, data.hostName),
 			to: emailAddress(data.attendeeEmail, data.attendeeName),
 			replyTo: config.replyTo ? emailAddress(config.replyTo) : undefined,
-			subject: `Reschedule Request: ${data.eventName} with ${data.hostName}`,
+			subject,
 			html: htmlBody
 		},
 		'Reschedule proposal email error'

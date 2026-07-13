@@ -1,44 +1,48 @@
 /**
  * Reschedule proposal email template (host proposes a new time to attendee).
  *
- * Static, unstyled internal HTML — not exposed to the dashboard.
- * Keeps the same function signature as before.
+ * Fully rich-text / host-editable: the entire email body is either the
+ * host's custom rich-text message (sanitized, with {variables} substituted)
+ * or a plain default body if the host hasn't customized it yet.
+ *
  */
 
 import type { RescheduleProposalEmailData } from '../types';
+import { sanitizeEmailHtml } from '../sanitize';
+import { applyEmailVariables, buildRescheduleProposalVariables } from '../template-variables';
 
-export function generateRescheduleProposalEmail(data: RescheduleProposalEmailData): string {
-	const formatDate = (date: Date) => date.toLocaleDateString('en-US', {
-		weekday: 'long',
-		year: 'numeric',
-		month: 'long',
-		day: 'numeric'
-	});
-	const formatTime = (date: Date) => date.toLocaleTimeString('en-US', {
-		hour: 'numeric',
-		minute: '2-digit',
-		hour12: data.timeFormat === '12h'
-	});
-
-	const messageSection = data.message
-		? `<p><strong>Message from ${data.hostName}:</strong><br>${data.message}</p>`
-		: '';
-
-	return `
-<p>Hi ${data.attendeeName},</p>
-<p>${data.hostName} would like to reschedule your meeting to a new time.</p>
-${messageSection}
+const DEFAULT_PROPOSAL_BODY = `<p>Hi {attendee_name},</p>
+<p>I would like to reschedule our meeting to a new time.</p>
+{proposal_message}
 <p><strong>Original time:</strong><br>
-${formatDate(data.oldStartTime)}<br>
-${formatTime(data.oldStartTime)} \u2013 ${formatTime(data.oldEndTime)}</p>
+{old_date}<br>
+{old_time}</p>
 <p><strong>Proposed time:</strong><br>
-${formatDate(data.newStartTime)}<br>
-${formatTime(data.newStartTime)} \u2013 ${formatTime(data.newEndTime)}</p>
+{proposed_date}<br>
+{proposed_time}</p>
 <p>
-  <a href="${data.responseUrl}?action=accept">Accept New Time</a> |
-  <a href="${data.responseUrl}?action=decline">Decline</a> |
-  <a href="${data.responseUrl}?action=counter">Propose a different time</a>
-</p>
-<p>This reschedule request was sent by ${data.hostName}.</p>
-	`.trim();
+  <a href="{accept_url}">Accept New Time</a> |
+  <a href="{decline_url}">Decline</a> |
+  <a href="{counter_url}">Propose a different time</a>
+</p>`.trim();
+
+/**
+ * Generate HTML email for a host-initiated reschedule proposal.
+ *
+ * @param data        Proposal data (times, URLs, optional host message)
+ * @param customBody  Optional host-saved rich-text body from the dashboard.
+ *                    When present it is sanitized and has {variables} replaced.
+ *                    When absent the static default body is used instead.
+ */
+export function generateRescheduleProposalEmail(
+	data: RescheduleProposalEmailData,
+	customBody?: string | null
+): string {
+	const vars = buildRescheduleProposalVariables(data);
+
+	const body = customBody && customBody.trim().length > 0
+		? sanitizeEmailHtml(customBody)
+		: DEFAULT_PROPOSAL_BODY;
+
+	return applyEmailVariables(body, vars);
 }
