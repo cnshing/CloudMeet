@@ -60,8 +60,13 @@
 		);
 		if (!url) return;
 		document.execCommand('createLink', false, normalizeUrl(url));
+		// Inline the brand accent color on the newly created <a> so it keeps its intended color
+		editor.querySelectorAll('a:not([style])').forEach((a) => {
+			(a as HTMLElement).style.color = 'var(--color-accent)';
+		});
 		updateValue();
 	}
+
 
 	function removeLink() {
 		editor?.focus();
@@ -217,8 +222,9 @@
 	}
 
 	[contenteditable] :global(a) {
-		color: var(--color-primary);
+		color: var(--color-accent);
 		text-decoration: underline;
 	}
+
 </style>
 
