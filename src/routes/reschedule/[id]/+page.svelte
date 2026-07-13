@@ -151,7 +151,7 @@
 					</svg>
 				</div>
 				<h1 class="text-2xl font-semibold text-foreground mb-2">Thanks for rescheduling with me!</h1>
-				<p class="text-muted-foreground mb-8">A calendar update has been sent to your email. Looking forward to it!</p>
+				<p class="text-muted-foreground mb-8">A calendar update has been sent to your email. Looking forward to hearing from you soon.</p>
 				<div class="bg-surface-2 rounded-lg p-6 text-left mb-6">
 					<h3 class="font-semibold text-foreground mb-4">{data.booking.eventName}</h3>
 					<div class="space-y-3 text-sm">
