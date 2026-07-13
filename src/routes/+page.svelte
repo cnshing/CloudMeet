@@ -1,5 +1,6 @@
 <script lang="ts">
 	import type { PageData } from './$types';
+	import { Avatar, Badge, Button, Card } from '$lib/components/ui';
 
 	let { data }: { data: PageData } = $props();
 
@@ -20,17 +21,7 @@
 		<div class="max-w-2xl mx-auto px-4">
 			<!-- User Header -->
 			<div class="text-center mb-10">
-				{#if data.user.profileImage}
-					<img
-						src={data.user.profileImage}
-						alt={data.user.name}
-						class="w-24 h-24 rounded-full mx-auto mb-4 object-cover shadow-md"
-					/>
-				{:else}
-				<div class="w-24 h-24 rounded-full mx-auto mb-4 flex items-center justify-center text-primary-foreground font-bold text-3xl shadow-md bg-primary">
-					{data.user.name?.charAt(0) || 'U'}
-				</div>
-				{/if}
+				<Avatar src={data.user.profileImage} name={data.user.name} size="lg" class="mx-auto mb-4 shadow-md" />
 				<h1 class="text-3xl font-bold text-foreground mb-2">{data.user.name}</h1>
 				<p class="text-muted-foreground">Select a meeting type to book a time</p>
 			</div>
@@ -50,7 +41,7 @@
 										<p class="text-muted-foreground text-sm line-clamp-2">{stripHtml(eventType.description)}</p>
 									{/if}
 								</div>
-								<div class="flex items-center text-sm font-medium ml-4 px-3 py-1 rounded-full bg-accent-subtle text-accent">
+								<Badge variant="accent" class="ml-4 px-3 py-1 text-sm">
 									<svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 										<path
 											stroke-linecap="round"
@@ -60,13 +51,13 @@
 										></path>
 									</svg>
 									<span>{eventType.duration} min</span>
-								</div>
+								</Badge>
 							</div>
 						</a>
 					{/each}
 				</div>
 			{:else}
-				<div class="bg-surface rounded-lg border border-border shadow-md p-12 text-center">
+				<Card padding="xl" shadow="md" class="text-center">
 					<svg
 						class="w-16 h-16 mx-auto mb-4 text-subtle-foreground"
 						fill="none"
@@ -82,7 +73,7 @@
 					</svg>
 					<h2 class="text-xl font-semibold text-foreground mb-2">No Available Meeting Types</h2>
 					<p class="text-muted-foreground">Check back later.</p>
-				</div>
+				</Card>
 			{/if}
 		</div>
 	</div>
@@ -99,24 +90,27 @@
 				Free, open-source meeting scheduling on Cloudflare
 			</p>
 			<div class="flex justify-center gap-4">
-				<a
+				<Button
 					href="/auth/login"
-					class="inline-flex items-center px-8 py-3 border border-transparent text-base font-medium rounded-lg shadow-sm text-primary-foreground bg-primary hover:opacity-90 transition"
+					size="lg"
+					class="px-8 py-3 text-base"
 				>
 					Login with Google
-				</a>
-				<a
+				</Button>
+				<Button
 					href="/dashboard"
-					class="inline-flex items-center px-8 py-3 border border-border-medium text-base font-medium rounded-lg text-muted-foreground bg-surface hover:bg-surface-2 transition"
+					variant="outline"
+					size="lg"
+					class="px-8 py-3 border-border-medium text-base"
 				>
 					Go to Dashboard
-				</a>
+				</Button>
 			</div>
 		</div>
 
 		<!-- Features -->
 		<div class="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
-			<div class="bg-surface border border-border p-8 rounded-xl shadow-sm">
+			<Card padding="lg" radius="xl">
 				<div class="w-12 h-12 bg-accent-subtle rounded-lg flex items-center justify-center mb-4">
 					<svg
 						class="w-6 h-6 text-accent"
@@ -136,9 +130,9 @@
 				<p class="text-muted-foreground text-sm">
 					Automatically sync with your Google Calendar to prevent double bookings
 				</p>
-			</div>
+			</Card>
 
-			<div class="bg-surface border border-border p-8 rounded-xl shadow-sm">
+			<Card padding="lg" radius="xl">
 				<div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mb-4">
 					<svg
 						class="w-6 h-6 text-green-600"
@@ -158,9 +152,9 @@
 				<p class="text-muted-foreground text-sm">
 					Define your availability and let people book meetings during those times
 				</p>
-			</div>
+			</Card>
 
-			<div class="bg-surface border border-border p-8 rounded-xl shadow-sm">
+			<Card padding="lg" radius="xl">
 				<div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mb-4">
 					<svg
 						class="w-6 h-6 text-purple-600"
@@ -180,7 +174,7 @@
 				<p class="text-muted-foreground text-sm">
 					Built on Cloudflare's edge network for instant page loads worldwide
 				</p>
-			</div>
+			</Card>
 		</div>
 
 		<!-- How It Works -->
@@ -247,12 +241,13 @@
 
 		<!-- CTA -->
 		<div class="mt-20 text-center">
-			<a
+			<Button
 				href="/auth/login"
-				class="inline-flex items-center px-12 py-4 border border-transparent text-lg font-medium rounded-lg shadow-sm text-primary-foreground bg-primary hover:opacity-90 transition"
+				size="lg"
+				class="px-12 py-4 text-lg"
 			>
 				Get Started - It's Free
-			</a>
+			</Button>
 		</div>
 	</div>
 </div>

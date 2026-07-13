@@ -2,6 +2,8 @@
 	import { enhance } from '$app/forms';
 	import type { PageData, ActionData } from './$types';
 	import SimpleWysiwyg from '$lib/components/SimpleWysiwyg.svelte';
+	import { Alert, Button, Card, FormField, Spinner } from '$lib/components/ui';
+	import { PageHeader, PageShell } from '$lib/components/layout';
 
 	let { data, form }: { data: PageData; form: ActionData } = $props();
 
@@ -107,43 +109,31 @@
 	}
 </script>
 
-<div class="min-h-screen bg-background">
-	<!-- Header -->
-	<header class="bg-surface shadow-sm">
-		<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-			<div class="flex items-center gap-4">
-				<a href="/dashboard" class="text-muted-foreground hover:text-foreground">← Back to Dashboard</a>
-				<h1 class="text-2xl font-bold text-foreground">Create Event Type</h1>
-			</div>
-		</div>
-	</header>
+<PageShell>
+	<PageHeader title="Create Event Type" backHref="/dashboard" backLabel="Dashboard" />
 
 	<main class="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
 		{#if form?.error}
-			<div class="bg-red-50 border border-red-200 text-red-800 rounded-lg p-4 mb-6">Error: {form.error}</div>
+			<Alert variant="error" class="mb-6">Error: {form.error}</Alert>
 		{/if}
 
-		<div class="bg-surface border border-border rounded-lg shadow-sm p-6">
+		<Card>
 			<form method="POST" use:enhance={handleSubmit}>
 				<div class="space-y-6">
 					<!-- Event Name -->
-					<div>
-						<label for="name" class="block text-sm font-medium text-muted-foreground mb-2">Event Name *</label>
+					<FormField forId="name" label="Event Name" required>
 						<input type="text" id="name" name="name" bind:value={name} required placeholder="e.g., 30 Minute Meeting"
 							class="w-full px-3 py-2 border border-border-medium rounded-md focus:ring-2 focus:ring-primary focus:border-transparent" />
-					</div>
+					</FormField>
 
 					<!-- Slug -->
-					<div>
-						<label for="slug" class="block text-sm font-medium text-muted-foreground mb-2">URL Slug *</label>
+					<FormField forId="slug" label="URL Slug" required help="Only lowercase letters, numbers, and hyphens.">
 						<input type="text" id="slug" name="slug" bind:value={slug} required pattern="[a-z0-9\-]+" placeholder="e.g., 30min"
 							class="w-full px-3 py-2 border border-border-medium rounded-md focus:ring-2 focus:ring-primary focus:border-transparent" />
-						<p class="text-xs text-subtle-foreground mt-1">Only lowercase letters, numbers, and hyphens.</p>
-					</div>
+					</FormField>
 
 					<!-- Duration -->
-					<div>
-						<label for="duration" class="block text-sm font-medium text-muted-foreground mb-2">Duration (minutes) *</label>
+					<FormField forId="duration" label="Duration (minutes)" required>
 						<select id="duration" name="duration" bind:value={duration} required
 							class="w-full px-3 py-2 border border-border-medium rounded-md focus:ring-2 focus:ring-primary focus:border-transparent">
 							<option value={15}>15 minutes</option>
@@ -153,7 +143,7 @@
 							<option value={90}>90 minutes</option>
 							<option value={120}>2 hours</option>
 						</select>
-					</div>
+					</FormField>
 
 					<!-- Description -->
 					<div>
@@ -178,7 +168,7 @@
 							<input type="file" accept="image/*" onchange={handleCoverUpload} class="hidden" disabled={uploadingCover} />
 							{#if uploadingCover}
 								<div class="flex items-center gap-2 text-muted-foreground">
-									<div class="w-5 h-5 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
+									<Spinner size="sm" />
 									<span>Uploading...</span>
 								</div>
 							{:else}
@@ -263,13 +253,13 @@
 
 					<!-- Submit -->
 					<div class="flex gap-4 pt-4">
-						<button type="submit" disabled={saving} class="px-6 py-2 bg-primary text-primary-foreground rounded-lg hover:opacity-90 transition disabled:opacity-50">
+						<Button type="submit" disabled={saving}>
 							{saving ? 'Creating...' : 'Create Event Type'}
-						</button>
-						<a href="/dashboard" class="px-6 py-2 bg-surface border border-border text-muted-foreground rounded-lg hover:bg-surface-2 transition">Cancel</a>
+						</Button>
+						<Button href="/dashboard" variant="outline">Cancel</Button>
 					</div>
 				</div>
 			</form>
-		</div>
+		</Card>
 	</main>
-</div>
+</PageShell>

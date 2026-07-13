@@ -1,6 +1,8 @@
 <script lang="ts">
 	import type { PageData } from './$types';
 	import { ProfileSection, CancelBookingModal, HostRescheduleModal, BookingsList, EventTypesList } from '$lib/components/dashboard';
+	import { Alert, Button, Card } from '$lib/components/ui';
+	import { PageHeader, PageShell } from '$lib/components/layout';
 
 	let { data }: { data: PageData } = $props();
 
@@ -99,53 +101,24 @@
 	}
 </script>
 
-<div class="min-h-screen bg-background">
-	<!-- Header -->
-	<header class="bg-surface shadow-sm">
-		<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-			<div class="flex justify-between items-center">
-				<div>
-					<h1 class="text-2xl font-bold text-foreground">Dashboard</h1>
-					<p class="text-sm text-muted-foreground">Welcome back, {data.user?.name || 'User'}!</p>
-				</div>
-				<div class="flex gap-4">
-					<a
-						href="/dashboard/calendars"
-					class="px-4 py-2 bg-surface-2 text-muted-foreground rounded-lg hover:bg-border-medium transition"
-				>
-					Calendars
-				</a>
-				<a
-					href="/dashboard/emails"
-					class="px-4 py-2 bg-surface-2 text-muted-foreground rounded-lg hover:bg-border-medium transition"
-					>
-						Emails
-					</a>
-					<a
-						href="/dashboard/availability"
-						class="px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:opacity-90 transition"
-					>
-						Set Availability
-					</a>
-					<form method="POST" action="/auth/logout">
-						<button
-							type="submit"
-							class="px-4 py-2 bg-surface-2 text-muted-foreground rounded-lg hover:bg-border-medium transition"
-						>
-							Logout
-						</button>
-					</form>
-				</div>
-			</div>
-		</div>
-	</header>
+<PageShell>
+	<PageHeader title="Dashboard" subtitle="Welcome back, {data.user?.name || 'User'}!">
+		{#snippet actions()}
+			<Button href="/dashboard/calendars" variant="secondary">Calendars</Button>
+			<Button href="/dashboard/emails" variant="secondary">Emails</Button>
+			<Button href="/dashboard/availability">Set Availability</Button>
+			<form method="POST" action="/auth/logout">
+				<Button type="submit" variant="secondary">Logout</Button>
+			</form>
+		{/snippet}
+	</PageHeader>
 
 	<main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
 		<!-- Profile Section -->
 		<ProfileSection user={data.user} />
 
 		<!-- Booking Link -->
-		<div class="bg-accent-subtle border border-border-primary rounded-lg p-4 mb-8">
+		<Card class="bg-accent-subtle border-border-primary mb-8" padding="sm" shadow="none">
 			<h2 class="text-lg font-semibold text-foreground mb-2">Your Booking Page</h2>
 			<div class="flex items-center gap-2">
 				<input
@@ -154,21 +127,20 @@
 					value="{data.appUrl}/"
 					class="flex-1 px-3 py-2 bg-surface-2 border border-border-medium rounded-md text-sm text-foreground"
 				/>
-				<button
+				<Button
 					onclick={() => {
 						navigator.clipboard.writeText(data.appUrl + '/');
 					}}
-					class="px-4 py-2 bg-primary text-primary-foreground rounded-md hover:opacity-90 transition text-sm"
 				>
 					Copy Link
-				</button>
+				</Button>
 			</div>
-		</div>
+		</Card>
 
 		{#if cancelSuccess || rescheduleSuccess}
-			<div class="bg-accent-subtle border border-border-strong text-foreground rounded-lg p-3 text-sm mb-4">
+			<Alert variant="success" class="mb-4 p-3">
 				{cancelSuccess || rescheduleSuccess}
-			</div>
+			</Alert>
 		{/if}
 
 		<div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
@@ -179,7 +151,7 @@
 			<BookingsList {bookings} onCancelClick={openCancelModal} onRescheduleClick={openRescheduleModal} />
 		</div>
 	</main>
-</div>
+</PageShell>
 
 <!-- Cancel Booking Modal -->
 <CancelBookingModal

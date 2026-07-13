@@ -1,5 +1,7 @@
 <script lang="ts">
 	import { createFormatters } from '$lib/utils/dateFormatters';
+	import { Badge, Button, Card } from '$lib/components/ui';
+	import { SectionHeader } from '$lib/components/layout';
 
 	interface Booking {
 		id: string;
@@ -40,23 +42,23 @@
 		return sorted;
 	});
 
-	function getStatusColor(status: string) {
+	function getStatusVariant(status: string): 'success' | 'error' | 'warning' | 'neutral' {
 		switch (status) {
 			case 'confirmed':
-				return 'bg-green-100 text-green-800';
+				return 'success';
 			case 'canceled':
-				return 'bg-red-100 text-red-800';
+				return 'error';
 			case 'pending':
-				return 'bg-yellow-100 text-yellow-800';
+				return 'warning';
 			default:
-				return 'bg-surface-2 text-muted-foreground';
+				return 'neutral';
 		}
 	}
 </script>
 
 <div>
-	<div class="flex justify-between items-center mb-4">
-		<h2 class="text-xl font-bold text-foreground">Upcoming Bookings</h2>
+	<SectionHeader title="Upcoming Bookings" class="mb-4">
+		{#snippet actions()}
 		<select
 			bind:value={sortOrder}
 			class="text-sm border border-border-medium rounded-md px-2 py-1 bg-surface-2 text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
@@ -64,12 +66,13 @@
 			<option value="last_booked">Last booked</option>
 			<option value="upcoming">Upcoming first</option>
 		</select>
-	</div>
+		{/snippet}
+	</SectionHeader>
 
 	<div class="space-y-4">
 		{#if sortedBookings().length > 0}
 			{#each sortedBookings() as booking}
-				<div class="bg-surface rounded-lg shadow-sm p-4 border border-border">
+				<Card padding="sm">
 					<div class="flex justify-between items-start mb-2">
 						<div>
 							<h3 class="font-semibold text-foreground">{booking.event_type_name}</h3>
@@ -77,22 +80,26 @@
 							<p class="text-xs text-subtle-foreground">{booking.attendee_email}</p>
 						</div>
 						<div class="flex items-center gap-2">
-							<span class="px-2 py-1 text-xs rounded-full {getStatusColor(booking.status)}">
+							<Badge variant={getStatusVariant(booking.status)}>
 								{booking.status}
-							</span>
+							</Badge>
 							{#if booking.status === 'confirmed'}
-								<button
+								<Button
 									onclick={() => onRescheduleClick(booking.id)}
-									class="text-xs text-accent hover:text-accent font-medium"
+									variant="ghost"
+									size="sm"
+									class="px-1 py-0 text-xs text-accent hover:text-accent hover:bg-transparent focus:ring-0 focus:ring-offset-0"
 								>
 									Reschedule
-								</button>
-								<button
+								</Button>
+								<Button
 									onclick={() => onCancelClick(booking.id)}
-									class="text-xs text-red-600 hover:text-red-700 font-medium"
+									variant="ghost"
+									size="sm"
+									class="px-1 py-0 text-xs text-red-600 hover:text-red-700 hover:bg-transparent focus:ring-0 focus:ring-offset-0"
 								>
 									Cancel
-								</button>
+								</Button>
 							{/if}
 						</div>
 					</div>
@@ -112,12 +119,12 @@
 							{/if}
 						</div>
 					{/if}
-				</div>
+				</Card>
 			{/each}
 		{:else}
-			<div class="bg-surface rounded-lg shadow-sm p-8 text-center border border-border">
+			<Card padding="lg" class="text-center">
 				<p class="text-muted-foreground">No bookings yet</p>
-			</div>
+			</Card>
 		{/if}
 	</div>
 </div>

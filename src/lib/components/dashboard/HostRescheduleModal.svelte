@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { createFormatters } from '$lib/utils/dateFormatters';
+	import { Alert, Button, Card, FormField, Spinner } from '$lib/components/ui';
 
 	interface Booking {
 		id: string;
@@ -96,7 +97,7 @@
 			// Fetch available slots for this date
 			const response = await fetch(`/api/availability?date=${dateKey}&event=${booking?.event_type_slug}`);
 			if (response.ok) {
-				const data = await response.json();
+				const data = await response.json() as { slots?: Array<{ start: string; end: string }> };
 				availableSlots = data.slots || [];
 			} else {
 				error = 'Failed to load available times';
@@ -152,7 +153,7 @@
 		class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
 		onclick={handleBackdropClick}
 	>
-		<div class="bg-surface border border-border rounded-xl shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+		<Card radius="xl" shadow="lg" padding="none" class="max-w-2xl w-full max-h-[90vh] overflow-y-auto">
 			<!-- Header -->
 			<div class="p-6 border-b border-border">
 				<div class="flex justify-between items-start">
@@ -177,9 +178,9 @@
 			<!-- Body -->
 			<div class="p-6">
 				{#if error}
-					<div class="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">
+					<Alert variant="error" class="mb-4 p-3">
 						{error}
-					</div>
+					</Alert>
 				{/if}
 
 				<div class="flex gap-6">
@@ -228,7 +229,9 @@
 						</h3>
 
 						{#if loadingSlots}
-							<div class="text-center py-8 text-subtle-foreground">Loading...</div>
+							<div class="flex items-center justify-center py-8">
+								<Spinner />
+							</div>
 						{:else if selectedDate && availableSlots.length === 0}
 							<div class="text-center py-8 text-subtle-foreground">No available times</div>
 						{:else if selectedDate}
@@ -258,10 +261,7 @@
 				</div>
 
 				<!-- Message -->
-				<div class="mt-6">
-					<label for="message" class="block text-sm font-medium text-muted-foreground mb-2">
-						Message to attendee (optional)
-					</label>
+				<FormField forId="message" label="Message to attendee (optional)" class="mt-6">
 					<textarea
 						id="message"
 						bind:value={message}
@@ -269,27 +269,26 @@
 						class="w-full px-3 py-2 border border-border-medium rounded-lg focus:ring-2 focus:ring-primary focus:border-primary text-sm"
 						placeholder="Let them know why you need to reschedule..."
 					></textarea>
-				</div>
+				</FormField>
 			</div>
 
 			<!-- Footer -->
 			<div class="p-6 border-t border-border flex gap-3 justify-end">
-				<button
+				<Button
 					type="button"
 					onclick={onClose}
-					class="px-4 py-2 text-sm font-medium text-muted-foreground bg-surface border border-border rounded-lg hover:bg-surface-2 transition"
+					variant="outline"
 				>
 					Cancel
-				</button>
-				<button
+				</Button>
+				<Button
 					type="button"
 					onclick={handleSubmit}
 					disabled={!selectedDate || !selectedTime || submitting}
-					class="px-4 py-2 text-sm font-medium text-primary-foreground bg-primary rounded-lg hover:opacity-90 transition disabled:opacity-50 disabled:cursor-not-allowed"
 				>
 					{submitting ? 'Sending...' : 'Send Proposal'}
-				</button>
+				</Button>
 			</div>
-		</div>
+		</Card>
 	</div>
 {/if}

@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { Alert, Avatar, Button, Card, FormField, Spinner } from '$lib/components/ui';
+
 	interface Props {
 		user: {
 			name?: string;
@@ -98,46 +100,37 @@
 	}
 </script>
 
-<div class="bg-surface rounded-lg shadow-sm border border-border p-6 mb-8">
+<Card class="mb-8">
 	<div class="flex items-center justify-between mb-4">
 		<h2 class="text-lg font-semibold text-foreground">Your Profile</h2>
-		<button
+		<Button
 			onclick={() => showProfileEdit = !showProfileEdit}
-			class="text-sm text-accent hover:text-accent"
+			variant="ghost"
+			class="px-0 py-0 text-sm text-accent hover:text-accent hover:bg-transparent focus:ring-0 focus:ring-offset-0"
 		>
 			{showProfileEdit ? 'Cancel' : 'Edit Profile'}
-		</button>
+		</Button>
 	</div>
 
 	{#if showProfileEdit}
 		<!-- Edit Mode -->
 		<div class="space-y-4">
 			{#if profileError}
-				<div class="bg-red-50 border border-red-200 text-red-800 rounded-lg p-3 text-sm">
+				<Alert variant="error" class="p-3">
 					{profileError}
-				</div>
+				</Alert>
 			{/if}
 			{#if profileSuccess}
-				<div class="bg-green-50 border border-green-200 text-green-800 rounded-lg p-3 text-sm">
+				<Alert variant="success" class="p-3">
 					{profileSuccess}
-				</div>
+				</Alert>
 			{/if}
 
 			<div class="flex items-start gap-6">
 				<!-- Profile Image Upload -->
 				<div class="flex-shrink-0">
 					<div class="relative">
-						{#if profileImage}
-							<img
-								src={profileImage}
-								alt="Profile"
-								class="w-24 h-24 rounded-full object-cover"
-							/>
-						{:else}
-							<div class="w-24 h-24 bg-primary rounded-full flex items-center justify-center text-primary-foreground font-semibold text-3xl">
-								{profileName?.charAt(0) || 'U'}
-							</div>
-						{/if}
+						<Avatar src={profileImage} name={profileName} size="lg" alt="Profile" />
 						<label class="absolute bottom-0 right-0 bg-surface rounded-full p-2 shadow-lg border border-border cursor-pointer hover:bg-background transition">
 							<input
 								type="file"
@@ -147,7 +140,7 @@
 								disabled={uploadingImage}
 							/>
 							{#if uploadingImage}
-								<div class="w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
+								<Spinner size="sm" />
 							{:else}
 								<svg class="w-4 h-4 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path>
@@ -161,10 +154,7 @@
 
 				<!-- Name Input -->
 				<div class="flex-1 space-y-4">
-					<div>
-						<label for="profile-name" class="block text-sm font-medium text-muted-foreground mb-2">
-							Display Name
-						</label>
+					<FormField forId="profile-name" label="Display Name" help="This name will be shown on your booking page">
 						<input
 							type="text"
 							id="profile-name"
@@ -172,13 +162,13 @@
 							class="w-full px-3 py-2 border border-border-medium rounded-md focus:ring-2 focus:ring-primary focus:border-transparent"
 							placeholder="Your name"
 						/>
-						<p class="text-xs text-subtle-foreground mt-1">This name will be shown on your booking page</p>
-					</div>
+					</FormField>
 
-					<div>
-						<label for="contact-email" class="block text-sm font-medium text-muted-foreground mb-2">
-							Contact Email
-						</label>
+					<FormField
+						forId="contact-email"
+						label="Contact Email"
+						help="Business email shown in booking emails. Leave empty to use {user?.email}"
+					>
 						<input
 							type="email"
 							id="contact-email"
@@ -186,10 +176,7 @@
 							class="w-full px-3 py-2 border border-border-medium rounded-md focus:ring-2 focus:ring-primary focus:border-transparent"
 							placeholder="your@business-email.com"
 						/>
-						<p class="text-xs text-subtle-foreground mt-1">
-							Business email shown in booking emails. Leave empty to use {user?.email}
-						</p>
-					</div>
+					</FormField>
 				</div>
 			</div>
 
@@ -218,33 +205,22 @@
 			</div>
 
 			<div class="flex justify-end mt-6">
-				<button
+				<Button
 					onclick={saveProfile}
 					disabled={savingProfile}
-					class="px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:opacity-90 transition disabled:opacity-50"
 				>
 					{savingProfile ? 'Saving...' : 'Save Profile'}
-				</button>
+				</Button>
 			</div>
 		</div>
 	{:else}
 		<!-- View Mode -->
 		<div class="flex items-center gap-4">
-			{#if user?.profile_image}
-				<img
-					src={user.profile_image}
-					alt="Profile"
-					class="w-16 h-16 rounded-full object-cover"
-				/>
-			{:else}
-				<div class="w-16 h-16 bg-primary rounded-full flex items-center justify-center text-primary-foreground font-semibold text-2xl">
-					{user?.name?.charAt(0) || 'U'}
-				</div>
-			{/if}
+			<Avatar src={user?.profile_image} name={user?.name} alt="Profile" />
 			<div>
 				<p class="font-semibold text-foreground">{user?.name}</p>
 				<p class="text-sm text-muted-foreground">{user?.email}</p>
 			</div>
 		</div>
 	{/if}
-</div>
+</Card>

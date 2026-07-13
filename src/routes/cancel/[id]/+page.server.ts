@@ -19,7 +19,7 @@ export const load: PageServerLoad = async ({ params, platform }) => {
 	const booking = await db
 		.prepare(
 			`SELECT b.id, b.start_time, b.end_time, b.attendee_name, b.attendee_email,
-			b.status, b.google_event_id, e.name as event_name, e.slug as event_slug, u.name as host_name
+			b.status, b.google_event_id, e.name as event_name, e.slug as event_slug, u.name as host_name, u.profile_image as host_profile_image
 			FROM bookings b
 			JOIN event_types e ON b.event_type_id = e.id
 			JOIN users u ON b.user_id = u.id
@@ -37,7 +37,9 @@ export const load: PageServerLoad = async ({ params, platform }) => {
 			event_name: string;
 			event_slug: string;
 			host_name: string;
+			host_profile_image: string | null;
 		}>();
+
 
 	if (!booking) {
 		throw error(404, 'Booking not found');

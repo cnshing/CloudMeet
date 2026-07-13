@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { createFormatters } from '$lib/utils/dateFormatters';
+	import { Alert, Button, Card, FormField } from '$lib/components/ui';
 
 	interface Booking {
 		id: string;
@@ -51,7 +52,7 @@
 
 {#if show && booking}
 	<div class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-		<div class="bg-surface border border-border rounded-lg shadow-xl max-w-md w-full">
+		<Card padding="none" shadow="lg" class="max-w-md w-full">
 			<div class="p-6">
 				<h3 class="text-lg font-semibold text-foreground mb-2">Cancel Booking</h3>
 				<p class="text-sm text-muted-foreground mb-4">
@@ -59,15 +60,17 @@
 				</p>
 
 				{#if cancelError}
-					<div class="bg-red-50 border border-red-200 text-red-800 rounded-lg p-3 text-sm mb-4">
+					<Alert variant="error" class="p-3 mb-4">
 						{cancelError}
-					</div>
+					</Alert>
 				{/if}
 
-				<div class="mb-4">
-					<label for="cancel-message" class="block text-sm font-medium text-muted-foreground mb-1">
-						Message to attendee (optional)
-					</label>
+				<FormField
+					forId="cancel-message"
+					label="Message to attendee (optional)"
+					help="This message will be included in the cancellation email"
+					class="mb-4"
+				>
 					<textarea
 						id="cancel-message"
 						bind:value={cancelMessage}
@@ -75,25 +78,24 @@
 						rows="3"
 						class="w-full px-3 py-2 border border-border-medium rounded-md focus:ring-2 focus:ring-red-500 focus:border-transparent text-sm"
 					></textarea>
-					<p class="text-xs text-subtle-foreground mt-1">This message will be included in the cancellation email</p>
-				</div>
+				</FormField>
 
 				<div class="flex justify-end gap-3">
-					<button
+					<Button
 						onclick={handleClose}
-						class="px-4 py-2 text-sm text-muted-foreground hover:text-foreground"
+						variant="ghost"
 					>
 						Keep Booking
-					</button>
-					<button
+					</Button>
+					<Button
 						onclick={handleCancel}
 						disabled={cancelling}
-						class="px-4 py-2 bg-red-600 text-white text-sm rounded-lg hover:bg-red-700 transition disabled:opacity-50"
+						variant="danger"
 					>
 						{cancelling ? 'Cancelling...' : 'Cancel Booking'}
-					</button>
+					</Button>
 				</div>
 			</div>
-		</div>
+		</Card>
 	</div>
 {/if}
