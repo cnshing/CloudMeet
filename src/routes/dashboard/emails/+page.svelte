@@ -232,12 +232,12 @@
 						<p class="mb-2">You can use these variables in both the subject line and the email body. The email body is entirely yours to write — there's no fixed template, so include any variables and links you need directly in the text.</p>
 						<div class="flex flex-wrap gap-1.5">
 							{#each COMMON_VARIABLES as v}
-								<code class="text-xs bg-surface-2 px-1.5 py-0.5 rounded">{v}</code>
+								<code class="text-xs text-subtle-foreground bg-surface-2 px-1.5 py-0.5 rounded">{v}</code>
 							{/each}
 						</div>
-						<p class="mt-2 text-xs text-subtle-foreground">Reschedule confirmation emails also support: <code class="bg-surface-2 px-1 py-0.5 rounded">{'{previous_date}'}</code>, <code class="bg-surface-2 px-1 py-0.5 rounded">{'{previous_time}'}</code>, <code class="bg-surface-2 px-1 py-0.5 rounded">{'{previous_start_time}'}</code>, <code class="bg-surface-2 px-1 py-0.5 rounded">{'{previous_end_time}'}</code></p>
-						<p class="mt-1 text-xs text-subtle-foreground">Reschedule proposal emails support: <code class="bg-surface-2 px-1 py-0.5 rounded">{'{old_date}'}</code>, <code class="bg-surface-2 px-1 py-0.5 rounded">{'{old_time}'}</code>, <code class="bg-surface-2 px-1 py-0.5 rounded">{'{proposed_date}'}</code>, <code class="bg-surface-2 px-1 py-0.5 rounded">{'{proposed_time}'}</code>, <code class="bg-surface-2 px-1 py-0.5 rounded">{'{accept_url}'}</code>, <code class="bg-surface-2 px-1 py-0.5 rounded">{'{decline_url}'}</code>, <code class="bg-surface-2 px-1 py-0.5 rounded">{'{counter_url}'}</code>, <code class="bg-surface-2 px-1 py-0.5 rounded">{'{proposal_message}'}</code></p>
-						<p class="mt-1 text-xs text-subtle-foreground">Reminder emails also support: <code class="bg-surface-2 px-1 py-0.5 rounded">{'{reminder_time}'}</code> (e.g. "tomorrow", "in 1 hour")</p>
+						<p class="mt-2 text-xs text-subtle-foreground">Reschedule confirmation emails also support: <code class="text-subtle-foreground bg-surface-2 px-1 py-0.5 rounded">{'{previous_date}'}</code>, <code class="text-subtle-foreground bg-surface-2 px-1 py-0.5 rounded">{'{previous_time}'}</code>, <code class="text-subtle-foreground bg-surface-2 px-1 py-0.5 rounded">{'{previous_start_time}'}</code>, <code class="text-subtle-foreground bg-surface-2 px-1 py-0.5 rounded">{'{previous_end_time}'}</code></p>
+						<p class="mt-1 text-xs text-subtle-foreground">Reschedule proposal emails support: <code class="text-subtle-foreground bg-surface-2 px-1 py-0.5 rounded">{'{old_date}'}</code>, <code class="text-subtle-foreground bg-surface-2 px-1 py-0.5 rounded">{'{old_time}'}</code>, <code class="text-subtle-foreground bg-surface-2 px-1 py-0.5 rounded">{'{proposed_date}'}</code>, <code class="text-subtle-foreground bg-surface-2 px-1 py-0.5 rounded">{'{proposed_time}'}</code>, <code class="text-subtle-foreground bg-surface-2 px-1 py-0.5 rounded">{'{accept_url}'}</code>, <code class="text-subtle-foreground bg-surface-2 px-1 py-0.5 rounded">{'{decline_url}'}</code>, <code class="text-subtle-foreground bg-surface-2 px-1 py-0.5 rounded">{'{counter_url}'}</code>, <code class="text-subtle-foreground bg-surface-2 px-1 py-0.5 rounded">{'{proposal_message}'}</code></p>
+						<p class="mt-1 text-xs text-subtle-foreground">Reminder emails also support: <code class="text-subtle-foreground bg-surface-2 px-1 py-0.5 rounded">{'{reminder_time}'}</code> (e.g. "tomorrow", "in 1 hour")</p>
 					</div>
 				</div>
 			</div>
@@ -306,39 +306,39 @@
 												placeholder="Write the full email body..."
 											/>
 											<p class="text-xs text-subtle-foreground mt-1">This is the entire email sent to the attendee — insert variables and links directly using the toolbar above.</p>
-											{#if getExtraVariables(template.template_type).length > 0}
-												<div class="flex flex-wrap gap-1.5 mt-2">
-													{#each getExtraVariables(template.template_type) as v}
-														<code class="text-xs bg-surface-2 px-1.5 py-0.5 rounded">{v}</code>
-													{/each}
-												</div>
-											{/if}
-										</div>
+									{#if getExtraVariables(template.template_type).length > 0}
+											<div class="flex flex-wrap gap-1.5 mt-2">
+												{#each getExtraVariables(template.template_type) as v}
+													<code class="text-xs text-subtle-foreground bg-surface-2 px-1.5 py-0.5 rounded">{v}</code>
+												{/each}
+											</div>
+										{/if}
+									</div>
 
-										<div class="flex justify-end gap-2">
-											<button
-												onclick={() => expandedTemplate = null}
-												class="px-4 py-2 text-sm text-muted-foreground hover:text-foreground"
-											>
-												Cancel
-											</button>
-											<button
-												onclick={() => saveTemplate(template)}
-												disabled={saving === template.template_type}
-												class="px-4 py-2 bg-primary text-primary-foreground text-sm rounded-lg hover:opacity-90 transition disabled:opacity-50"
-											>
-												{saving === template.template_type ? 'Saving...' : 'Save Changes'}
-											</button>
-										</div>
+									<div class="flex justify-end gap-2">
+										<button
+											onclick={() => expandedTemplate = null}
+											class="px-4 py-2 text-sm text-muted-foreground hover:text-foreground"
+										>
+											Cancel
+										</button>
+										<button
+											onclick={() => saveTemplate(template)}
+											disabled={saving === template.template_type}
+											class="px-4 py-2 bg-primary text-primary-foreground text-sm rounded-lg hover:opacity-90 transition disabled:opacity-50"
+										>
+											{saving === template.template_type ? 'Saving...' : 'Save Changes'}
+										</button>
 									</div>
 								</div>
-							{/if}
-						</div>
-					{/each}
-				</div>
+							</div>
+						{/if}
+					</div>
+				{/each}
 			</div>
+		</div>
 
-			<!-- Reminder Emails -->
+		<!-- Reminder Emails -->
 			<div>
 				<h2 class="text-lg font-semibold text-foreground mb-4">Meeting Reminders</h2>
 				<p class="text-sm text-muted-foreground mb-4">Automatically remind attendees before their scheduled meetings.</p>
@@ -403,13 +403,13 @@
 												placeholder="Write the full reminder body..."
 											/>
 											<p class="text-xs text-subtle-foreground mt-1">This is the entire email sent to the attendee — insert variables and links directly using the toolbar above.</p>
-											{#if getExtraVariables(template.template_type).length > 0}
-												<div class="flex flex-wrap gap-1.5 mt-2">
-													{#each getExtraVariables(template.template_type) as v}
-														<code class="text-xs bg-surface-2 px-1.5 py-0.5 rounded">{v}</code>
-													{/each}
-												</div>
-											{/if}
+										{#if getExtraVariables(template.template_type).length > 0}
+											<div class="flex flex-wrap gap-1.5 mt-2">
+												{#each getExtraVariables(template.template_type) as v}
+													<code class="text-xs text-subtle-foreground bg-surface-2 px-1.5 py-0.5 rounded">{v}</code>
+												{/each}
+											</div>
+										{/if}
 										</div>
 
 										<div class="flex justify-end gap-2">
