@@ -63,7 +63,7 @@
 	}: Props = $props();
 </script>
 
-<div class="flex items-stretch">
+<div class="flex h-full min-h-0 items-stretch">
 	<div class="w-80">
 		<h2 class="text-xl font-semibold text-foreground mb-6">{heading}</h2>
 

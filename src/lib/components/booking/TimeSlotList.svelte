@@ -39,7 +39,7 @@
 	}: Props = $props();
 </script>
 
-<div class="w-52 ml-6 border-l border-border pl-6 flex flex-col" style="max-height: 400px;">
+<div class="w-52 ml-6 border-l border-border pl-6 flex flex-col self-stretch min-h-0">
 	<h3 class="text-sm font-medium text-subtle-foreground mb-4 flex-shrink-0">
 		{formatSelectedDate(selectedDate).split(',')[0]}
 	</h3>
@@ -51,7 +51,7 @@
 	{:else if availableSlots.length === 0}
 		<p class="text-sm text-subtle-foreground py-4">{emptyLabel}</p>
 	{:else}
-		<div class="space-y-2 overflow-y-auto flex-1 pr-2 pb-2 scrollbar-thin">
+		<div class="space-y-2 overflow-y-auto flex-1 max-h-[360px] pr-2 pb-2 scrollbar-thin">
 			{#each availableSlots as slot}
 				{#if selectedSlot === slot}
 					<div class="flex gap-2">
