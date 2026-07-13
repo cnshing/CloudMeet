@@ -7,13 +7,16 @@ import { json, error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { getBusyTimes, getValidAccessToken } from '$lib/server/google-calendar';
 import { getOutlookBusyTimes, getValidOutlookAccessToken } from '$lib/server/outlook-calendar';
+import { getCurrentUser } from '$lib/server/auth';
+import { getSchedulingLimits, isWithinSchedulingLimits, getBookingWindowCutoff } from '$lib/server/scheduling-limits';
 
 interface TimeSlot {
 	start: string;
 	end: string;
 }
 
-export const GET: RequestHandler = async ({ url, platform }) => {
+export const GET: RequestHandler = async (event) => {
+	const { url, platform } = event;
 	const env = platform?.env;
 	if (!env) {
 		throw error(500, 'Platform env not available');
@@ -29,11 +32,18 @@ export const GET: RequestHandler = async ({ url, platform }) => {
 	try {
 		const db = env.DB;
 
-		// Check cache first to avoid expensive DB/API calls
+		// Determine if the requester is the logged-in host (bypasses scheduling limits)
+		const sessionUserId = await getCurrentUser(event);
+
+		// Check cache first to avoid expensive DB/API calls.
+		// Host-bypass responses are never cached/read from cache since they may
+		// contain dates that shouldn't be shown to attendees.
 		const cacheKey = `availability:month:${eventSlug}:${month}`;
-		const cached = await env.KV.get(cacheKey);
-		if (cached) {
-			return json(JSON.parse(cached));
+		if (!sessionUserId) {
+			const cached = await env.KV.get(cacheKey);
+			if (cached) {
+				return json(JSON.parse(cached));
+			}
 		}
 
 		// Get the first (and only) user for single-user setup
@@ -44,6 +54,8 @@ export const GET: RequestHandler = async ({ url, platform }) => {
 		if (!user) {
 			throw error(404, 'User not found');
 		}
+
+		const isHostBypass = !!sessionUserId && sessionUserId === user.id;
 
 		const userTimezone = user.timezone || 'UTC';
 
@@ -87,13 +99,27 @@ export const GET: RequestHandler = async ({ url, platform }) => {
 		}
 
 		const eventType = await db
-			.prepare('SELECT id, duration_minutes as duration, availability_calendars FROM event_types WHERE user_id = ? AND slug = ? AND is_active = 1')
+			.prepare(
+				`SELECT id, duration_minutes as duration, availability_calendars,
+					min_notice_enabled, min_notice_minutes, booking_window_enabled, booking_window_days
+				FROM event_types WHERE user_id = ? AND slug = ? AND is_active = 1`
+			)
 			.bind(user.id, eventSlug)
-			.first<{ id: string; duration: number; availability_calendars: string | null }>();
+			.first<{
+				id: string;
+				duration: number;
+				availability_calendars: string | null;
+				min_notice_enabled: number | null;
+				min_notice_minutes: number | null;
+				booking_window_enabled: number | null;
+				booking_window_days: number | null;
+			}>();
 
 		if (!eventType) {
 			throw error(404, 'Event type not found or inactive');
 		}
+
+		const schedulingLimits = getSchedulingLimits(eventType);
 
 		// Get calendar settings: use event type override if set, otherwise use global settings
 		const availabilityCalendars = eventType.availability_calendars || userSettings.defaultAvailabilityCalendars || 'both';
@@ -126,9 +152,21 @@ export const GET: RequestHandler = async ({ url, platform }) => {
 		const lastDay = new Date(year, monthNum, 0);
 		const today = new Date();
 		today.setHours(0, 0, 0, 0);
+		const now = new Date();
 
-		// Max date is 60 days from today
-		const maxDate = new Date(today.getTime() + 60 * 24 * 60 * 60 * 1000);
+		// Determine the max date to consider for this month's day-level cutoff:
+		// - Host bypass: no cap (use a far-future date so navigation isn't blocked)
+		// - Booking window enabled: use the configured cutoff
+		// - Otherwise: fall back to the historical 60-day default so existing
+		//   event types (which have the feature disabled) behave unchanged.
+		let maxDate: Date;
+		if (isHostBypass) {
+			maxDate = new Date(today.getTime() + 5 * 365 * 24 * 60 * 60 * 1000);
+		} else if (schedulingLimits.bookingWindowEnabled) {
+			maxDate = getBookingWindowCutoff(schedulingLimits, today) || new Date(today.getTime() + 30 * 24 * 60 * 60 * 1000);
+		} else {
+			maxDate = new Date(today.getTime() + 60 * 24 * 60 * 60 * 1000);
+		}
 
 		// Get busy times from connected calendars for the entire month
 		let busySlots: TimeSlot[] = [];
@@ -217,7 +255,14 @@ export const GET: RequestHandler = async ({ url, platform }) => {
 					slotEnd.setMinutes(slotEnd.getMinutes() + eventType.duration);
 
 					if (slotEnd > endTime) break;
-					if (currentTime < new Date()) {
+					if (currentTime < now) {
+						currentTime.setMinutes(currentTime.getMinutes() + slotIncrement);
+						continue;
+					}
+
+					// Enforce per-event-type scheduling limits (min notice / booking window),
+					// unless the requester is the host (e.g. using "Propose New Time").
+					if (!isHostBypass && !isWithinSchedulingLimits(currentTime, schedulingLimits, now)) {
 						currentTime.setMinutes(currentTime.getMinutes() + slotIncrement);
 						continue;
 					}
@@ -246,8 +291,10 @@ export const GET: RequestHandler = async ({ url, platform }) => {
 			}
 		}
 
-		// Cache response in KV for 5 minutes
-		await env.KV.put(cacheKey, JSON.stringify({ availableDates }), { expirationTtl: 300 });
+		// Cache response in KV for 5 minutes (skip caching host-bypass responses)
+		if (!isHostBypass) {
+			await env.KV.put(cacheKey, JSON.stringify({ availableDates }), { expirationTtl: 300 });
+		}
 
 		return json({ availableDates });
 	} catch (err: any) {

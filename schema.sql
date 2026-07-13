@@ -36,10 +36,15 @@ CREATE TABLE IF NOT EXISTS event_types (
     cover_image TEXT,
     availability_calendars TEXT DEFAULT 'both', -- 'google', 'outlook', 'both'
     invite_calendar TEXT DEFAULT 'google', -- 'google' or 'outlook'
+    min_notice_enabled BOOLEAN DEFAULT 0, -- require minimum scheduling notice
+    min_notice_minutes INTEGER DEFAULT 4320, -- 3 days
+    booking_window_enabled BOOLEAN DEFAULT 0, -- limit how far in advance bookings can be made
+    booking_window_days INTEGER DEFAULT 30, -- 1 month
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
     UNIQUE(user_id, slug)
 );
+
 
 CREATE INDEX idx_event_types_user ON event_types(user_id);
 CREATE INDEX idx_event_types_active ON event_types(user_id, is_active);
