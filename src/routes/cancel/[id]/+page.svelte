@@ -53,7 +53,7 @@
 			<ResultState
 				variant="success"
 				title="I'm sorry it didn't work out!"
-				description={success ? 'Your meeting has been cancelled successfully and the host notified.' : 'This meeting has already been cancelled.'}
+				description={success ? 'Your meeting has been cancelled successfully and the host has been notified.' : 'This meeting has already been cancelled.'}
 				class="w-full rounded-2xl"
 			>
 				<div class="bg-surface-2 rounded-lg p-4 sm:p-6 text-left mb-2">
