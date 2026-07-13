@@ -10,6 +10,7 @@
 	let duration = $state(data.eventType.duration);
 	let description = $state(data.eventType.description || '');
 	let isActive = $state(data.eventType.is_active === 1);
+	let isListed = $state(data.eventType.is_listed === 1);
 	let coverImage = $state(data.eventType.cover_image || '');
 	let saving = $state(false);
 	let uploadingCover = $state(false);
@@ -257,9 +258,22 @@
 					{/if}
 
 					<!-- Is Active -->
-					<div class="flex items-center">
-						<input type="checkbox" id="is_active" name="is_active" bind:checked={isActive} class="h-4 w-4 text-primary rounded border-border-medium" />
-						<label for="is_active" class="ml-2 text-sm text-muted-foreground">Active (allow people to book this event type)</label>
+					<div class="space-y-4 border-t border-border pt-6">
+						<div class="flex items-start">
+							<input type="checkbox" id="is_listed" name="is_listed" bind:checked={isListed} class="h-4 w-4 text-primary rounded border-border-medium mt-0.5" />
+							<div class="ml-2">
+								<label for="is_listed" class="text-sm text-muted-foreground">Show on public booking page</label>
+								<p class="text-xs text-subtle-foreground mt-1">Turn this off to make the event unlisted. Anyone with the direct link can still book it.</p>
+							</div>
+						</div>
+
+						<div class="flex items-start">
+							<input type="checkbox" id="is_active" name="is_active" bind:checked={isActive} class="h-4 w-4 text-primary rounded border-border-medium mt-0.5" />
+							<div class="ml-2">
+								<label for="is_active" class="text-sm text-muted-foreground">Active (allow people to book this event type)</label>
+								<p class="text-xs text-subtle-foreground mt-1">Inactive event types cannot be booked, even with a direct link.</p>
+							</div>
+						</div>
 					</div>
 
 					<!-- Submit -->

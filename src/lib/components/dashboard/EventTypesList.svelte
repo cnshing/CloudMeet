@@ -6,6 +6,7 @@
 		duration: number;
 		description?: string | null;
 		is_active: boolean;
+		is_listed: boolean;
 	}
 
 	interface Props {
@@ -35,13 +36,20 @@
 							<h3 class="font-semibold text-foreground">{eventType.name}</h3>
 							<p class="text-sm text-muted-foreground">{eventType.duration} minutes</p>
 						</div>
-						<span
-							class="px-2 py-1 text-xs rounded-full {eventType.is_active
-								? 'bg-green-100 text-green-800'
-								: 'bg-surface-2 text-muted-foreground'}"
-						>
-							{eventType.is_active ? 'Active' : 'Inactive'}
-						</span>
+						<div class="flex flex-wrap justify-end gap-2">
+							{#if !eventType.is_listed}
+								<span class="px-2 py-1 text-xs rounded-full bg-amber-100 text-amber-800">
+									Unlisted
+								</span>
+							{/if}
+							<span
+								class="px-2 py-1 text-xs rounded-full {eventType.is_active
+									? 'bg-green-100 text-green-800'
+									: 'bg-surface-2 text-muted-foreground'}"
+							>
+								{eventType.is_active ? 'Active' : 'Inactive'}
+							</span>
+						</div>
 					</div>
 					{#if eventType.description}
 						<p class="text-sm text-muted-foreground mb-3">{eventType.description}</p>

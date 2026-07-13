@@ -73,6 +73,7 @@ export const actions: Actions = {
 		const duration = formData.get('duration');
 		const description = formData.get('description') || '';
 		const isActive = formData.get('is_active') === 'on';
+		const isListed = formData.get('is_listed') === 'on';
 		const coverImage = formData.get('cover_image') || '';
 		const overrideCalendarSettings = formData.get('override_calendar_settings') === 'on';
 		// Only use custom values if override is enabled, otherwise null (use global)
@@ -113,10 +114,10 @@ export const actions: Actions = {
 			// Insert new event type
 			await db
 				.prepare(
-					`INSERT INTO event_types (user_id, name, slug, duration_minutes, description, is_active, cover_image, availability_calendars, invite_calendar, created_at)
-					VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)`
+					`INSERT INTO event_types (user_id, name, slug, duration_minutes, description, is_active, is_listed, cover_image, availability_calendars, invite_calendar, created_at)
+					VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)`
 				)
-				.bind(userId, name, slugStr, parseInt(duration.toString()), description, isActive ? 1 : 0, coverImage, availabilityCalendars, inviteCalendar)
+				.bind(userId, name, slugStr, parseInt(duration.toString()), description, isActive ? 1 : 0, isListed ? 1 : 0, coverImage, availabilityCalendars, inviteCalendar)
 				.run();
 
 			throw redirect(302, '/dashboard');

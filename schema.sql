@@ -32,6 +32,7 @@ CREATE TABLE IF NOT EXISTS event_types (
     location_type TEXT DEFAULT 'google_meet', -- google_meet, zoom, phone, in_person
     location_details TEXT,
     is_active BOOLEAN DEFAULT 1,
+    is_listed BOOLEAN DEFAULT 1,
     cover_image TEXT,
     availability_calendars TEXT DEFAULT 'both', -- 'google', 'outlook', 'both'
     invite_calendar TEXT DEFAULT 'google', -- 'google' or 'outlook'
@@ -42,6 +43,7 @@ CREATE TABLE IF NOT EXISTS event_types (
 
 CREATE INDEX idx_event_types_user ON event_types(user_id);
 CREATE INDEX idx_event_types_active ON event_types(user_id, is_active);
+CREATE INDEX idx_event_types_listed ON event_types(user_id, is_active, is_listed);
 
 -- Availability rules (recurring weekly schedule)
 CREATE TABLE IF NOT EXISTS availability_rules (

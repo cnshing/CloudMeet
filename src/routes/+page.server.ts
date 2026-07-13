@@ -26,7 +26,7 @@ export const load: PageServerLoad = async ({ platform }) => {
 		.prepare(
 			`SELECT id, name, slug, duration_minutes as duration, description, is_active
 			FROM event_types
-			WHERE user_id = ? AND is_active = 1
+			WHERE user_id = ? AND is_active = 1 AND is_listed = 1
 			ORDER BY name ASC`
 		)
 		.bind(user.id)

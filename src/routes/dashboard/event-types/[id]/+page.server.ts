@@ -44,7 +44,7 @@ export const load: PageServerLoad = async (event) => {
 	// Get event type
 	const eventType = await db
 		.prepare(
-			`SELECT id, name, slug, duration_minutes as duration, description, is_active, cover_image,
+			`SELECT id, name, slug, duration_minutes as duration, description, is_active, is_listed, cover_image,
 				availability_calendars, invite_calendar
 			FROM event_types
 			WHERE id = ? AND user_id = ?`
@@ -57,6 +57,7 @@ export const load: PageServerLoad = async (event) => {
 			duration: number;
 			description: string;
 			is_active: number;
+			is_listed: number;
 			cover_image: string | null;
 			availability_calendars: string | null;
 			invite_calendar: string | null;
@@ -107,6 +108,7 @@ export const actions: Actions = {
 		const duration = formData.get('duration');
 		const description = formData.get('description') || '';
 		const isActive = formData.get('is_active') === 'on';
+		const isListed = formData.get('is_listed') === 'on';
 		const coverImage = formData.get('cover_image') || null;
 		const overrideCalendarSettings = formData.get('override_calendar_settings') === 'on';
 		// Only use custom values if override is enabled, otherwise null (use global)
@@ -150,7 +152,7 @@ export const actions: Actions = {
 			await db
 				.prepare(
 					`UPDATE event_types
-					SET name = ?, slug = ?, duration_minutes = ?, description = ?, is_active = ?, cover_image = ?,
+					SET name = ?, slug = ?, duration_minutes = ?, description = ?, is_active = ?, is_listed = ?, cover_image = ?,
 						availability_calendars = ?, invite_calendar = ?
 					WHERE id = ? AND user_id = ?`
 				)
@@ -160,6 +162,7 @@ export const actions: Actions = {
 					parseInt(duration.toString()),
 					description.toString(),
 					isActive ? 1 : 0,
+					isListed ? 1 : 0,
 					coverImage ? coverImage.toString() : null,
 					availabilityCalendars ? availabilityCalendars.toString() : null,
 					inviteCalendar ? inviteCalendar.toString() : null,
