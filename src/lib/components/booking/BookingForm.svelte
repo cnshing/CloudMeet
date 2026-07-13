@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { Alert, Button, FormField } from '$lib/components/ui';
+
 	interface Props {
 		bookingForm: {
 			name: string;
@@ -22,14 +24,13 @@
 	<h2 class="text-xl font-semibold text-foreground mb-6">Enter Details</h2>
 
 	{#if bookingError}
-		<div class="bg-red-50 border border-red-200 text-red-800 rounded-lg p-4 mb-6">
+		<Alert variant="error" class="mb-6">
 			{bookingError}
-		</div>
+		</Alert>
 	{/if}
 
 	<form onsubmit={onSubmit} class="space-y-5">
-		<div>
-			<label for="name" class="block text-sm font-medium text-muted-foreground mb-2">Name *</label>
+		<FormField forId="name" label="Name" required>
 			<input
 				type="text"
 				id="name"
@@ -38,9 +39,8 @@
 				class="w-full px-4 py-3 border border-border-medium rounded-lg focus:ring-2 focus:border-transparent outline-none"
 				style="--tw-ring-color: var(--color-primary)"
 			/>
-		</div>
-		<div>
-			<label for="email" class="block text-sm font-medium text-muted-foreground mb-2">Email *</label>
+		</FormField>
+		<FormField forId="email" label="Email" required>
 			<input
 				type="email"
 				id="email"
@@ -49,11 +49,8 @@
 				class="w-full px-4 py-3 border border-border-medium rounded-lg focus:ring-2 focus:border-transparent outline-none"
 				style="--tw-ring-color: var(--color-primary)"
 			/>
-		</div>
-		<div>
-			<label for="notes" class="block text-sm font-medium text-muted-foreground mb-2">
-				Please share anything that will help prepare for our meeting.
-			</label>
+		</FormField>
+		<FormField forId="notes" label="Please share anything that will help prepare for our meeting.">
 			<textarea
 				id="notes"
 				bind:value={bookingForm.notes}
@@ -61,13 +58,15 @@
 				class="w-full px-4 py-3 border border-border-medium rounded-lg focus:ring-2 focus:border-transparent outline-none resize-none"
 				style="--tw-ring-color: var(--color-primary)"
 			></textarea>
-		</div>
-		<button
+		</FormField>
+		<Button
 			type="submit"
 			disabled={bookingStatus === 'submitting'}
-			class="w-full bg-primary text-primary-foreground py-3 px-6 rounded-full font-semibold transition disabled:opacity-50 hover:bg-border-strong"
+			fullWidth
+			pill
+			class="py-3 px-6 font-semibold hover:bg-border-strong"
 		>
 			{bookingStatus === 'submitting' ? 'Scheduling...' : 'Schedule Event'}
-		</button>
+		</Button>
 	</form>
 </div>

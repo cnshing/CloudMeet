@@ -2,6 +2,8 @@
 	import { enhance } from '$app/forms';
 	import type { PageData, ActionData } from './$types';
 	import TimezoneSelector from '$lib/components/TimezoneSelector.svelte';
+	import { Alert, Button, Card } from '$lib/components/ui';
+	import { PageHeader, PageShell } from '$lib/components/layout';
 
 	let { data, form }: { data: PageData; form: ActionData } = $props();
 
@@ -87,32 +89,24 @@
 	}
 </script>
 
-<div class="min-h-screen bg-background">
-	<!-- Header -->
-	<header class="bg-surface shadow-sm">
-		<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-			<div class="flex items-center gap-4">
-				<a href="/dashboard" class="text-muted-foreground hover:text-foreground">← Back to Dashboard</a>
-				<h1 class="text-2xl font-bold text-foreground">Set Availability</h1>
-			</div>
-		</div>
-	</header>
+<PageShell>
+	<PageHeader title="Set Availability" backHref="/dashboard" backLabel="Dashboard" />
 
 	<main class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
 		{#if showSuccess}
-			<div class="bg-green-50 border border-green-200 text-green-800 rounded-lg p-4 mb-6">
+			<Alert variant="success" class="mb-6">
 				✓ Availability saved successfully!
-			</div>
+			</Alert>
 		{/if}
 
 		{#if form?.error}
-			<div class="bg-red-50 border border-red-200 text-red-800 rounded-lg p-4 mb-6">
+			<Alert variant="error" class="mb-6">
 				Error: {form.error}
-			</div>
+			</Alert>
 		{/if}
 
 		<!-- Timezone Selection -->
-		<div class="bg-surface border border-border rounded-lg shadow-sm p-6 mb-6">
+		<Card class="mb-6">
 			<h2 class="text-lg font-semibold text-foreground mb-4">Your Timezone</h2>
 			<p class="text-sm text-muted-foreground mb-4">
 				Set your timezone so that your availability is shown correctly to people booking meetings.
@@ -142,9 +136,9 @@
 					/>
 				{/if}
 			</div>
-		</div>
+		</Card>
 
-		<div class="bg-surface border border-border rounded-lg shadow-sm p-6 mb-6">
+		<Card class="mb-6">
 			<h2 class="text-lg font-semibold text-foreground mb-4">Weekly Schedule</h2>
 			<p class="text-sm text-muted-foreground mb-6">
 				Set your available hours for each day of the week. People can only book meetings during these times.
@@ -182,34 +176,33 @@
 				</div>
 
 				<div class="mt-6 flex gap-4">
-					<button
+					<Button
 						type="submit"
 						disabled={saving}
-						class="px-6 py-2 bg-primary text-primary-foreground rounded-lg hover:opacity-90 transition disabled:opacity-50"
 					>
 						{saving ? 'Saving...' : 'Save Availability'}
-					</button>
-					<button
+					</Button>
+					<Button
 						type="button"
 						onclick={() => {
 							availability = availability.map((day) => ({
 								...day, enabled: day.day >= 1 && day.day <= 5, startTime: '09:00', endTime: '17:00'
 							}));
 						}}
-						class="px-6 py-2 bg-surface border border-border text-muted-foreground rounded-lg hover:bg-surface-2 transition"
+						variant="outline"
 					>
 						Set Default Hours (Mon-Fri, 9-5)
-					</button>
+					</Button>
 				</div>
 			</form>
-		</div>
+		</Card>
 
-		<div class="bg-accent-subtle border border-border-primary rounded-lg p-4">
+		<Card padding="sm" shadow="none" class="bg-accent-subtle border-border-primary">
 			<h3 class="font-semibold text-foreground mb-2">Note</h3>
 			<p class="text-sm text-muted-foreground">
 				Your connected calendars will also be checked for conflicts. Even if you're available according to these hours,
 				if you have an event on your calendar during a time slot, it won't be shown as available to book.
 			</p>
-		</div>
+		</Card>
 	</main>
-</div>
+</PageShell>

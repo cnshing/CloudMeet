@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
+	import { Alert, Badge, Button, Card, Spinner } from '$lib/components/ui';
 
 	interface GoogleCalendar {
 		id: string;
@@ -59,8 +60,8 @@
 		try {
 			const response = await fetch('/api/calendars/google');
 			if (response.ok) {
-				const data = await response.json();
-				googleCalendars = data.calendars;
+				const data = await response.json() as { calendars?: GoogleCalendar[] };
+				googleCalendars = data.calendars || [];
 				// If no calendars selected yet, select all by default
 				if (selectedCalendarIds.size === 0 && googleCalendars.length > 0) {
 					selectedCalendarIds = new Set(googleCalendars.map(c => c.id));
@@ -119,21 +120,21 @@
 	}
 </script>
 
-<div class="bg-surface rounded-lg shadow-sm border border-border p-6">
+<Card>
 	<h3 class="text-lg font-semibold text-foreground mb-2">Calendar Integrations</h3>
 	<p class="text-sm text-muted-foreground mb-4">
 		Connect your calendars to check availability and send invites.
 	</p>
 
 	{#if error}
-		<div class="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">
+		<Alert variant="error" class="mb-4 p-3">
 			{error}
-		</div>
+		</Alert>
 	{/if}
 
 	<div class="space-y-4">
 		<!-- Google Calendar -->
-		<div class="flex items-center justify-between p-4 bg-background rounded-lg">
+		<Card padding="sm" shadow="none" class="bg-background flex items-center justify-between">
 			<div class="flex items-center gap-3">
 				<div class="w-10 h-10 flex items-center justify-center bg-surface border border-border rounded-lg shadow-sm">
 					<!-- Google Calendar icon -->
@@ -152,17 +153,17 @@
 					<h4 class="font-medium text-foreground">Google Calendar</h4>
 					<p class="text-sm text-muted-foreground">
 						{#if user?.googleConnected}
-							<span class="text-green-600">Connected</span> <span class="text-subtle-foreground">(via login)</span>
+							<Badge variant="success">Connected</Badge> <span class="text-subtle-foreground">(via login)</span>
 						{:else}
 							<span class="text-subtle-foreground">Not connected</span>
 						{/if}
 					</p>
 				</div>
 			</div>
-		</div>
+		</Card>
 
 		<!-- Outlook Calendar -->
-		<div class="flex items-center justify-between p-4 bg-background rounded-lg">
+		<Card padding="sm" shadow="none" class="bg-background flex items-center justify-between">
 			<div class="flex items-center gap-3">
 				<div class="w-10 h-10 flex items-center justify-center bg-surface border border-border rounded-lg shadow-sm">
 					<!-- Microsoft Outlook icon -->
@@ -182,7 +183,7 @@
 						{#if !outlookConfigured}
 							<span class="text-subtle-foreground">Not configured</span>
 						{:else if user?.outlookConnected}
-							<span class="text-green-600">Connected</span>
+							<Badge variant="success">Connected</Badge>
 						{:else}
 							<span class="text-subtle-foreground">Not connected</span>
 						{/if}
@@ -191,22 +192,21 @@
 			</div>
 			{#if outlookConfigured}
 				{#if user?.outlookConnected}
-					<button
+					<Button
 						onclick={disconnectOutlook}
-						class="px-3 py-1.5 text-sm font-medium text-red-600 hover:text-red-700 hover:bg-red-50 rounded-lg transition"
+						variant="ghost"
+						size="sm"
+						class="text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-950/40"
 					>
 						Disconnect
-					</button>
+					</Button>
 				{:else}
-					<a
-						href="/auth/outlook"
-						class="px-3 py-1.5 text-sm font-medium text-primary-foreground bg-primary rounded-lg hover:opacity-90 transition"
-					>
+					<Button href="/auth/outlook" size="sm">
 						Connect
-					</a>
+					</Button>
 				{/if}
 			{/if}
-		</div>
+		</Card>
 	</div>
 
 	<!-- Global Calendar Settings -->
@@ -241,7 +241,10 @@
 							Google calendars to check
 						</label>
 						{#if loadingCalendars}
-							<p class="text-sm text-subtle-foreground">Loading calendars...</p>
+							<div class="flex items-center gap-2 text-sm text-subtle-foreground">
+								<Spinner size="sm" />
+								<span>Loading calendars...</span>
+							</div>
 						{:else if googleCalendars.length === 0}
 							<p class="text-sm text-subtle-foreground">No calendars found</p>
 						{:else}
@@ -285,14 +288,13 @@
 					</select>
 				</div>
 
-				<button
+				<Button
 					onclick={saveCalendarSettings}
 					disabled={saving}
-					class="px-4 py-2 text-sm font-medium text-primary-foreground bg-primary rounded-lg hover:opacity-90 disabled:opacity-50 transition"
 				>
 					{saving ? 'Saving...' : 'Save Settings'}
-				</button>
+				</Button>
 			</div>
 		</div>
 	{/if}
-</div>
+</Card>

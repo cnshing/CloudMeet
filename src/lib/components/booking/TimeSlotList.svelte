@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { formatSelectedDate } from '$lib/utils/dateFormatters';
+	import { Button, Spinner } from '$lib/components/ui';
 
 	interface TimeSlot {
 		start: string;
@@ -34,7 +35,7 @@
 
 	{#if loading}
 		<div class="flex items-center justify-center py-8">
-			<div class="animate-spin rounded-full h-8 w-8 border-2 border-t-transparent" style="border-color: var(--color-primary); border-top-color: transparent"></div>
+			<Spinner />
 		</div>
 	{:else if availableSlots.length === 0}
 		<p class="text-sm text-subtle-foreground py-4">No available times</p>
@@ -43,25 +44,27 @@
 			{#each availableSlots as slot}
 				{#if selectedSlot === slot}
 					<div class="flex gap-2">
-						<button type="button" class="flex-1 py-2.5 px-3 border-2 border-foreground bg-foreground text-background rounded-lg text-sm font-semibold">
+						<Button type="button" variant="outline" class="flex-1 py-2.5 px-3 border-2 border-foreground bg-foreground text-background text-sm font-semibold hover:bg-foreground">
 							{formatTime(slot.start)}
-						</button>
-						<button
+						</Button>
+						<Button
 							type="button"
 							onclick={onConfirm}
-							class="flex-1 py-2.5 px-3 bg-primary text-primary-foreground rounded-lg text-sm font-semibold transition hover:bg-border-strong"
+							class="flex-1 py-2.5 px-3 text-sm font-semibold hover:bg-border-strong"
 						>
 							Next
-						</button>
+						</Button>
 					</div>
 				{:else}
-					<button
+					<Button
 						type="button"
 						onclick={() => onSelectSlot(slot)}
-						class="w-full py-2.5 px-3 border-2 border-primary text-primary rounded-lg text-sm font-semibold transition hover:bg-accent-subtle"
+						variant="outline"
+						fullWidth
+						class="py-2.5 px-3 border-2 border-primary text-primary text-sm font-semibold hover:bg-accent-subtle"
 					>
 						{formatTime(slot.start)}
-					</button>
+					</Button>
 				{/if}
 			{/each}
 		</div>

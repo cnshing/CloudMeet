@@ -6,6 +6,7 @@
 	import { detectTimezone, getTimezoneWithTime } from '$lib/constants/timezones';
 	import { formatDateLocal, formatSelectedDate, createFormatters } from '$lib/utils/dateFormatters';
 	import { BookingCalendar, TimeSlotList, BookingForm, BookingSuccess, EventSidebar } from '$lib/components/booking';
+	import { Alert, Avatar, Button, Spinner } from '$lib/components/ui';
 
 	let { data }: { data: PageData } = $props();
 
@@ -282,13 +283,7 @@
 			<!-- Profile Image centered with name below -->
 			{#if mobileStep === 'calendar'}
 				<div class="flex flex-col items-center pt-8 pb-6 px-6">
-					{#if data.user?.profileImage}
-						<img src={data.user.profileImage} alt={data.user.name} class="w-24 h-24 rounded-full object-cover border-4 border-surface shadow-lg" />
-					{:else}
-						<div class="w-24 h-24 rounded-full flex items-center justify-center text-primary-foreground font-semibold text-3xl border-4 border-surface shadow-lg bg-primary">
-							{data.user?.name?.charAt(0) || 'M'}
-						</div>
-					{/if}
+					<Avatar src={data.user?.profileImage} name={data.user?.name} size="lg" fallback="M" class="border-4 border-surface shadow-lg" />
 					<p class="mt-4 text-base font-semibold text-muted-foreground">{data.user?.name || 'Host'}</p>
 				</div>
 
@@ -402,7 +397,7 @@
 					<p class="text-sm text-subtle-foreground text-center mb-6">{selectedDate ? formatSelectedDate(selectedDate) : ''}</p>
 					{#if loading}
 						<div class="flex items-center justify-center py-8">
-							<div class="animate-spin rounded-full h-8 w-8 border-2 border-t-transparent" style="border-color: var(--color-primary); border-top-color: transparent;"></div>
+							<Spinner />
 						</div>
 					{:else if availableSlots.length === 0}
 						<p class="text-sm text-subtle-foreground py-4 text-center">No available times for this date</p>
@@ -418,13 +413,15 @@
 							{/each}
 						</div>
 						{#if selectedSlot}
-							<button
+							<Button
 								type="button"
 								onclick={confirmSlot}
-								class="w-full mt-6 py-3 px-6 bg-primary text-primary-foreground rounded-full font-semibold transition hover:bg-border-strong"
+								fullWidth
+								pill
+								class="mt-6 py-3 px-6 font-semibold hover:bg-border-strong"
 							>
 								Next
-							</button>
+							</Button>
 						{/if}
 					{/if}
 				</div>
@@ -434,7 +431,7 @@
 			{#if mobileStep === 'form'}
 				<div class="px-6 pb-8">
 					{#if bookingError}
-						<div class="bg-red-50 border border-red-200 text-red-800 rounded-lg p-3 mb-4 text-sm">{bookingError}</div>
+						<Alert variant="error" class="p-3 mb-4">{bookingError}</Alert>
 					{/if}
 					<h2 class="text-lg font-semibold text-foreground mb-2 text-center">Enter Details</h2>
 					<p class="text-sm text-subtle-foreground text-center mb-6">
@@ -459,10 +456,9 @@
 								class="w-full px-4 py-3 border border-border-medium rounded-lg focus:ring-2 focus:border-transparent outline-none resize-none text-sm"
 								style="--tw-ring-color: var(--color-primary)"></textarea>
 						</div>
-						<button type="submit" disabled={bookingStatus === 'submitting'}
-							class="w-full bg-primary text-primary-foreground py-3 px-6 rounded-full font-semibold transition disabled:opacity-50 hover:bg-border-strong">
+						<Button type="submit" disabled={bookingStatus === 'submitting'} fullWidth pill class="py-3 px-6 font-semibold hover:bg-border-strong">
 							{bookingStatus === 'submitting' ? 'Scheduling...' : 'Schedule Event'}
-						</button>
+						</Button>
 					</form>
 				</div>
 			{/if}
@@ -478,9 +474,9 @@
 			<!-- Main Content -->
 			<div class="flex-1 p-6">
 				{#if bookingError}
-					<div class="bg-red-50 border border-red-200 text-red-800 rounded-lg p-4 mb-6 max-w-2xl">
+					<Alert variant="error" class="mb-6 max-w-2xl">
 						{bookingError}
-					</div>
+					</Alert>
 				{/if}
 
 				{#if showForm}

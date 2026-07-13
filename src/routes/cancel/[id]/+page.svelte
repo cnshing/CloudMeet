@@ -3,6 +3,7 @@
 	import { page } from '$app/stores';
 	import type { PageData, ActionData } from './$types';
 	import Footer from '$lib/components/Footer.svelte';
+	import { Alert, Button, Card, ResultState } from '$lib/components/ui';
 
 	let { data, form }: { data: PageData; form: ActionData } = $props();
 
@@ -40,30 +41,22 @@
 	<div class="max-w-2xl mx-auto px-4">
 		{#if success || data.alreadyCanceled}
 			<!-- Success Message -->
-			<div class="bg-surface border border-border rounded-lg shadow-lg p-8 text-center">
-			<div class="w-16 h-16 bg-accent-subtle rounded-full flex items-center justify-center mx-auto mb-4">
-				<svg class="w-8 h-8 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-						<path
-							stroke-linecap="round"
-							stroke-linejoin="round"
-							stroke-width="2"
-							d="M5 13l4 4L19 7"
-						></path>
-					</svg>
-				</div>
-				<h1 class="text-2xl font-bold text-foreground mb-2">Booking Cancelled</h1>
-				<p class="text-muted-foreground mb-6">Your meeting has been cancelled successfully. The host has been notified.</p>
-				<a href="/{data.booking.event_slug}" class="inline-block px-6 py-3 bg-primary text-primary-foreground rounded-lg hover:opacity-90 transition">
-					Book Another Meeting
-				</a>
-			</div>
+			<ResultState
+				variant="success"
+				title="Booking Cancelled"
+				description="Your meeting has been cancelled successfully. The host has been notified."
+			>
+				{#snippet actions()}
+					<Button href="/{data.booking.event_slug}" size="lg">Book Another Meeting</Button>
+				{/snippet}
+			</ResultState>
 		{:else}
 			<!-- Cancellation Form -->
-			<div class="bg-surface border border-border rounded-lg shadow-lg p-8">
+			<Card padding="lg" shadow="lg">
 				<h1 class="text-2xl font-bold text-foreground mb-6">Cancel Booking</h1>
 
 				{#if form?.error}
-					<div class="bg-red-50 border border-red-200 text-red-800 rounded-lg p-4 mb-6">Error: {form.error}</div>
+					<Alert variant="error" class="mb-6">Error: {form.error}</Alert>
 				{/if}
 
 				<div class="bg-surface-2 border border-border rounded-lg p-6 mb-6">
@@ -90,19 +83,20 @@
 				<form method="POST" use:enhance={handleSubmit}>
 					<input type="hidden" name="reason" value={reason} />
 					<div class="flex gap-4">
-						<button
+						<Button
 							type="submit"
 							disabled={cancelling}
-							class="flex-1 px-6 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition disabled:opacity-50 font-medium"
+							variant="danger"
+							class="flex-1 px-6 py-3 font-medium"
 						>
 							{cancelling ? 'Cancelling...' : 'Yes, Cancel Booking'}
-						</button>
-						<a href="/{data.booking.event_slug}" class="flex-1 px-6 py-3 bg-surface-2 text-muted-foreground rounded-lg hover:bg-border-medium transition text-center font-medium">
+						</Button>
+						<Button href="/{data.booking.event_slug}" variant="secondary" class="flex-1 px-6 py-3 font-medium">
 							Keep Booking
-						</a>
+						</Button>
 					</div>
 				</form>
-			</div>
+			</Card>
 		{/if}
 
 		<Footer class="mt-6" />

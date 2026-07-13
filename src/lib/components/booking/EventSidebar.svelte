@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { browser } from '$app/environment';
 	import { formatSelectedDate } from '$lib/utils/dateFormatters';
+	import { Avatar } from '$lib/components/ui';
 
 	interface Props {
 		user: {
@@ -60,13 +61,7 @@
 
 	<div class="flex-1 p-6">
 		<div class="mb-6">
-			{#if user?.profileImage}
-				<img src={user.profileImage} alt={user.name} class="w-12 h-12 rounded-full object-cover mb-3" />
-			{:else}
-				<div class="w-12 h-12 rounded-full flex items-center justify-center text-primary-foreground font-semibold text-lg mb-3 bg-primary">
-					{user?.name?.charAt(0) || 'M'}
-				</div>
-			{/if}
+			<Avatar src={user?.profileImage} name={user?.name} size="sm" fallback="M" class="mb-3" />
 			<p class="text-sm font-medium text-muted-foreground mb-1">{user?.name || 'Host'}</p>
 			<h1 class="text-2xl font-bold text-foreground">{eventType?.name || 'Meeting'}</h1>
 		</div>

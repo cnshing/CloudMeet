@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { Card } from '$lib/components/ui';
+
 	interface Props {
 		eventName: string;
 		selectedDate: string;
@@ -22,7 +24,8 @@
 	const meetingLabel = meetingType === 'teams' ? 'Join Microsoft Teams Meeting' : 'Join Google Meet';
 </script>
 
-<div class="bg-surface border border-border rounded-2xl shadow-lg p-6 sm:p-8 max-w-md w-full mx-2">
+<Card radius="2xl" shadow="lg" class="max-w-md w-full mx-2" padding="none">
+	<div class="p-6 sm:p-8">
 	<div class="text-center">
 		<div class="w-16 h-16 sm:w-20 sm:h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4 sm:mb-6">
 			<svg class="w-8 h-8 sm:w-10 sm:h-10 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -55,4 +58,5 @@
 			</div>
 		</div>
 	</div>
-</div>
+	</div>
+</Card>

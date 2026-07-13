@@ -1,12 +1,15 @@
 <script lang="ts">
+	import { Badge, Button, Card } from '$lib/components/ui';
+	import { SectionHeader } from '$lib/components/layout';
+
 	interface EventType {
 		id: string;
 		name: string;
 		slug: string;
 		duration: number;
 		description?: string | null;
-		is_active: boolean;
-		is_listed: boolean;
+		is_active: boolean | number;
+		is_listed: boolean | number;
 	}
 
 	interface Props {
@@ -17,20 +20,18 @@
 </script>
 
 <div>
-	<div class="flex justify-between items-center mb-4">
-		<h2 class="text-xl font-bold text-foreground">Event Types</h2>
-		<a
-			href="/dashboard/event-types/new"
-			class="px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:opacity-90 transition text-sm"
-		>
+	<SectionHeader title="Event Types" class="mb-4">
+		{#snippet actions()}
+		<Button href="/dashboard/event-types/new">
 			+ New Event Type
-		</a>
-	</div>
+		</Button>
+		{/snippet}
+	</SectionHeader>
 
 	<div class="space-y-4">
 		{#if eventTypes && eventTypes.length > 0}
 			{#each eventTypes as eventType}
-				<div class="bg-surface rounded-lg shadow-sm p-4 border border-border">
+				<Card padding="sm">
 					<div class="flex justify-between items-start mb-2">
 						<div>
 							<h3 class="font-semibold text-foreground">{eventType.name}</h3>
@@ -38,17 +39,13 @@
 						</div>
 						<div class="flex flex-wrap justify-end gap-2">
 							{#if !eventType.is_listed}
-								<span class="px-2 py-1 text-xs rounded-full bg-amber-100 text-amber-800">
+								<Badge variant="warning">
 									Unlisted
-								</span>
+								</Badge>
 							{/if}
-							<span
-								class="px-2 py-1 text-xs rounded-full {eventType.is_active
-									? 'bg-green-100 text-green-800'
-									: 'bg-surface-2 text-muted-foreground'}"
-							>
+							<Badge variant={eventType.is_active ? 'success' : 'neutral'}>
 								{eventType.is_active ? 'Active' : 'Inactive'}
-							</span>
+							</Badge>
 						</div>
 					</div>
 					{#if eventType.description}
@@ -70,18 +67,15 @@
 							Edit
 						</a>
 					</div>
-				</div>
+				</Card>
 			{/each}
 		{:else}
-			<div class="bg-surface rounded-lg shadow-sm p-8 text-center border border-border">
+			<Card padding="lg" class="text-center">
 				<p class="text-muted-foreground mb-4">No event types yet</p>
-				<a
-					href="/dashboard/event-types/new"
-					class="inline-block px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:opacity-90 transition"
-				>
+				<Button href="/dashboard/event-types/new">
 					Create Your First Event Type
-				</a>
-			</div>
+				</Button>
+			</Card>
 		{/if}
 	</div>
 </div>
