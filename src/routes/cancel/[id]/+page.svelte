@@ -52,8 +52,8 @@
 		<div class="w-full max-w-md px-4 md:px-0">
 			<ResultState
 				variant="success"
-				title="Booking Cancelled"
-				description={data.alreadyCanceled ? 'This meeting has already been cancelled.' : 'Your meeting has been cancelled successfully. The host has been notified.'}
+				title="I'm sorry it didn't work out!"
+				description={data.alreadyCanceled ? 'This meeting has already been cancelled.' : 'Your meeting has been cancelled successfully and the host notified.'}
 				class="w-full rounded-2xl"
 			>
 				<div class="bg-surface-2 rounded-lg p-4 sm:p-6 text-left mb-2">

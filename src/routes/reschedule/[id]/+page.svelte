@@ -150,8 +150,8 @@
 						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
 					</svg>
 				</div>
-				<h1 class="text-2xl font-semibold text-foreground mb-2">Meeting Rescheduled!</h1>
-				<p class="text-muted-foreground mb-8">Your meeting has been rescheduled. A calendar update has been sent to your email.</p>
+				<h1 class="text-2xl font-semibold text-foreground mb-2">Thanks for rescheduling with me!</h1>
+				<p class="text-muted-foreground mb-8">A calendar update has been sent to your email. Looking forward to it!</p>
 				<div class="bg-surface-2 rounded-lg p-6 text-left mb-6">
 					<h3 class="font-semibold text-foreground mb-4">{data.booking.eventName}</h3>
 					<div class="space-y-3 text-sm">

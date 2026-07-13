@@ -32,7 +32,7 @@
 				<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
 			</svg>
 		</div>
-		<h1 class="text-xl sm:text-2xl font-semibold text-foreground mb-2">You are scheduled</h1>
+		<h1 class="text-xl sm:text-2xl font-semibold text-foreground mb-2">Thank you for booking a time with me!</h1>
 		<p class="text-muted-foreground mb-6 sm:mb-8 text-sm sm:text-base">A calendar invitation has been sent to your email address.</p>
 
 		<div class="bg-surface-2 rounded-lg p-4 sm:p-6 text-left mb-6">

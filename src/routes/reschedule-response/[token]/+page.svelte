@@ -50,7 +50,7 @@
 	{#if success === 'accepted'}
 		<!-- Accepted Success -->
 		<div class="w-full max-w-md px-4 md:px-0">
-			<ResultState variant="success" title="Meeting Rescheduled!" description="Your meeting has been confirmed for the new time. A calendar update has been sent to your email." class="w-full rounded-2xl">
+			<ResultState variant="success" title="Great, see you at the new time!" description="Your meeting has been confirmed for the new time, and a calendar update has been sent to your email." class="w-full rounded-2xl">
 				<div class="bg-surface-2 rounded-lg p-4 sm:p-6 text-left mb-2">
 					<h2 class="font-semibold text-foreground mb-3">{data.proposal?.event_name}</h2>
 					<div class="space-y-3 text-sm">
@@ -80,7 +80,7 @@
 	{:else if success === 'declined'}
 		<!-- Declined Success -->
 		<div class="w-full max-w-md px-4 md:px-0">
-			<ResultState variant="error" title="Meeting Cancelled" description="The meeting has been cancelled. The host has been notified." class="w-full rounded-2xl">
+			<ResultState variant="error" title="I'm sorry it didn't work out!" description="No worries — the meeting has been cancelled. Feel free to book a new time whenever works for you." class="w-full rounded-2xl">
 				<div class="bg-surface-2 rounded-lg p-4 sm:p-6 text-left mb-2">
 					<h2 class="font-semibold text-foreground mb-3">{data.proposal?.event_name}</h2>
 					<div class="flex items-start gap-3 text-sm">
@@ -120,8 +120,8 @@
 						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
 					</svg>
 				</div>
-				<h1 class="text-xl sm:text-2xl font-semibold text-foreground mb-2">Propose Different Time</h1>
-				<p class="text-sm sm:text-base text-muted-foreground mb-6">Choose another available time for this meeting.</p>
+				<h1 class="text-xl sm:text-2xl font-semibold text-foreground mb-2">Let's find a better time!</h1>
+				<p class="text-sm sm:text-base text-muted-foreground mb-6">I understand the new time doesn't work, so let's pick whatever works best for you.</p>
 				<div class="bg-surface-2 rounded-lg p-4 sm:p-6 text-left mb-6">
 					<h2 class="font-semibold text-foreground mb-1">{data.proposal?.event_name}</h2>
 					<p class="text-sm text-muted-foreground">With {data.proposal?.host_name}</p>
